@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>메이크샵 관리자 — Google 쇼핑</title>
+<link rel="stylesheet" href="../css/common.css">
+</head>
+<body>
+  <div class="gc-page" style="padding-top:28px;">
+    <div class="gc-flex-between" style="align-items:flex-start; margin-bottom:16px;">
+      <h1 class="gc-title">Google 쇼핑</h1>
+      <div class="gc-breadcrumb"><a href="../../index.html">부가서비스</a> &gt; 부가서비스 &gt; 채널 &gt; Google 쇼핑</div>
+    </div>
+
+    <div class="gc-tabbar" data-tab-group>
+      <button class="gc-tab active" data-tab-target="dash">연결 관리</button>
+      <button class="gc-tab" data-tab-target="feed">상품 피드</button>
+      <button class="gc-tab" data-tab-target="ads">Google Ads</button>
+    </div>
+
+    <div data-tab-panel="dash"><div id="panel-dash"></div></div>
+    <div data-tab-panel="feed" class="gc-hidden"><div id="panel-feed"></div></div>
+    <div data-tab-panel="ads" class="gc-hidden"><div id="panel-ads"></div></div>
+  </div>
+
+  <div id="gc-dev-toolbar">
+    <b>[프로토타입 전용] 상태 미리보기</b>
+    <span>연결관리:</span> <select id="dev-dash-state"></select>
+    <span>상품피드:</span> <select id="dev-feed-state"></select>
+    <span>Google Ads:</span> <select id="dev-ads-state"></select>
+    <span class="gc-faint">※ 실제 서비스에는 노출되지 않는 QA용 도구입니다.</span>
+  </div>
+
+  <script src="../js/components.js"></script>
+  <script src="../data/dash-data.js"></script>
+  <script src="../data/feed-data.js"></script>
+  <script src="../data/ads-data.js"></script>
+  <script src="../js/dash.js"></script>
+  <script src="../js/feed.js"></script>
+  <script src="../js/ads.js"></script>
+  <script>
+    const tabRoot = document.body;
+    GC.initTabs(tabRoot, { onChange: (t) => { history.replaceState(null, "", "#" + t); } });
+
+    function setupDevSelect(selectId, moduleName) {
+      const mod = window[moduleName];
+      const sel = document.getElementById(selectId);
+      if (!mod || !mod.states) { sel.innerHTML = "<option>(작성 예정)</option>"; sel.disabled = true; return; }
+      mod.states.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.value; opt.textContent = s.label;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener("change", () => mod.render(document.getElementById(mod.mountId), sel.value));
+      mod.render(document.getElementById(mod.mountId), mod.states[0].value);
+    }
+    setupDevSelect("dev-dash-state", "GC_DASH");
+    setupDevSelect("dev-feed-state", "GC_FEED");
+    setupDevSelect("dev-ads-state", "GC_ADS");
+
+    // deep-link via hash
+    const initial = location.hash.replace("#", "");
+    if (initial) {
+      const btn = document.querySelector(`.gc-tab[data-tab-target="${initial}"]`);
+      if (btn) btn.click();
+    }
+  </script>
+</body>
+</html>

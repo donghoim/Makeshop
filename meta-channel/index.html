@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meta 비즈니스 — 메이크샵 어드민 (Prototype)</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<link rel="stylesheet" href="src/css/style.css" />
+</head>
+<body>
+
+  <!-- ============ Top bar (make#free) ============ -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="topbar__left">
+        <span class="logo">make<strong>#free</strong></span>
+        <span class="chip chip--premium">Premium 전환</span>
+        <span class="topbar__divider"></span>
+        <span class="topbar__link">사용버전 ▾</span>
+        <span class="topbar__link">주문 1.0</span>
+        <span class="topbar__link">디자인 D4</span>
+        <span class="topbar__link">모바일 4.0</span>
+        <span class="topbar__link">통합옵션 사용</span>
+      </div>
+      <div class="topbar__right">
+        <span class="topbar__brand">PLAYAUTO</span>
+        <span class="topbar__link">maketest04</span>
+        <span class="topbar__link">번호 : 244082</span>
+        <span class="topbar__link">공지사항</span>
+        <span class="topbar__link">업그레이드</span>
+        <span class="topbar__link">이벤트 모니터링 요청</span>
+        <span class="topbar__link">로그아웃</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ GNB ============ -->
+  <nav class="gnb">
+    <ul class="gnb__list">
+      <li>설정</li><li>상품</li><li>주문</li><li>회원</li><li>게시판</li>
+      <li>프로모션</li><li>디자인</li>
+      <li class="is-active">부가서비스</li>
+      <li>통계</li><li>#CRM ↗</li><li>마켓관리 ↗</li><li>마케팅</li><li>샵스토어 ↗</li>
+    </ul>
+  </nav>
+  <div class="subbar">
+    <span>등록된 스마트 폴더가 없습니다. 메뉴 우측의 ☆를 클릭하여 자주 사용하는 메뉴를 등록해주세요.</span>
+    <span class="subbar__star">★ 설정</span>
+  </div>
+
+  <!-- ============ Body layout ============ -->
+  <div class="layout">
+
+    <!-- 부가서비스 LNB -->
+    <aside class="lnb" id="lnb">
+      <div class="lnb__group-title">부가서비스</div>
+      <ul class="lnb__list">
+        <li>메이크샵 Premium 소개</li>
+        <li>부가서비스 소개</li>
+        <li>부가서비스 이용 현황</li>
+        <li>메이크샵스토어</li>
+        <li>모바일앱</li>
+        <li>상품</li>
+        <li>이미지호스팅</li>
+        <li>배송</li>
+        <li>회원</li>
+        <li>후기</li>
+        <li class="is-active">
+          채널
+          <ul class="lnb__sublist">
+            <li class="is-current">Meta 비즈니스</li>
+          </ul>
+        </li>
+        <li>오픈 API</li>
+        <li>혜택</li>
+        <li>프로모션</li>
+        <li>디자인</li>
+      </ul>
+
+      <div class="lnb__quicksearch">
+        <div class="lnb__quicksearch-title">Quick Search</div>
+        <div class="lnb__radio-row">
+          <label><input type="radio" name="qs-type" checked /> 상품</label>
+          <label><input type="radio" name="qs-type" /> 회원</label>
+          <label><input type="radio" name="qs-type" /> 주문</label>
+        </div>
+        <select class="sel" style="width:100%; margin-bottom:8px;">
+          <option>전체상품</option>
+        </select>
+        <div style="display:flex; gap:6px;">
+          <input type="text" class="lnb__search-input" placeholder="검색어를 입력하세요" />
+          <button class="btn btn--primary btn--sm">검색</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="page-header">
+        <h1>Meta 비즈니스 <span class="chip chip--menu">매뉴얼</span></h1>
+        <nav class="breadcrumb">부가서비스 &gt; 채널 &gt; <strong>Meta 비즈니스</strong></nav>
+      </div>
+
+      <div class="meta-layout">
+        <!-- Meta 서비스 좌측 세로 탭 -->
+        <nav class="meta-nav" id="tabbar" role="tablist">
+          <div class="meta-nav__icon" aria-hidden="true">∞</div>
+          <button class="meta-nav__item" data-tab="home" role="tab">홈</button>
+          <button class="meta-nav__item is-active" data-tab="conn" role="tab">연결 관리</button>
+          <button class="meta-nav__item" data-tab="feed" role="tab">상품 피드</button>
+          <button class="meta-nav__item" data-tab="ads" role="tab">광고 관리</button>
+          <button class="meta-nav__item" data-tab="shops" role="tab">Shop 관리</button>
+        </nav>
+
+        <!-- Dynamic content mount point -->
+        <section id="content" class="content"></section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ============ Modal root ============ -->
+  <div id="modal-root" class="modal-root" aria-hidden="true"></div>
+
+  <!-- ============ Toast root ============ -->
+  <div id="toast-root" class="toast-root"></div>
+
+  <!-- ============ QA 상태 미리보기 (프로토타입 전용) ============ -->
+  <div id="qa-toolbar">
+    <b>[프로토타입 전용] 상태 미리보기</b>
+    <span>연동 상태:</span> <select id="qa-state-select"></select>
+    <span class="qa-faint">※ 실제 서비스에는 노출되지 않는 QA용 도구입니다. 연결 관리/상품 피드/광고 관리/Shops 관리 4개 탭에 모두 반영됩니다.</span>
+  </div>
+
+  <script src="src/js/data.js"></script>
+  <script src="src/js/ui.js"></script>
+  <script src="src/js/fbe-oauth.js"></script>
+  <script src="src/js/main.js"></script>
+</body>
+</html>

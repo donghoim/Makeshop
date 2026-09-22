@@ -1,0 +1,9 @@
+[
+  { "name": "Apple 정품 라이트닝 이어맷", "variantCount": 3, "shopCategoryPath": "의류 > 여성 > 아우터 > 코트", "price": 89000, "status": "active", "feedCategory": "의류 및 액세서리 > 의류 > 겉옷 > 코트" },
+  { "name": "울 블렌드 롱 코트", "variantCount": 4, "shopCategoryPath": "의류 > 여성 > 아우터 > 코트", "price": 158000, "status": "active", "feedCategory": "의류 및 액세서리 > 의류 > 겉옷 > 코트" },
+  { "name": "겨울 롱 패딩 코트", "variantCount": 4, "shopCategoryPath": "의류 > 여성 > 아우터 > 코트", "price": 219000, "status": "review", "feedCategory": null },
+  { "name": "무스탕 페이크 퍼 코트", "variantCount": 3, "shopCategoryPath": "의류 > 여성 > 아우터 > 코트", "price": 178000, "status": "rejected", "feedCategory": null, "reasonCode": "MISSING_BRAND" },
+  { "name": "한정판 자수 패딩 자켓", "variantCount": 3, "shopCategoryPath": "의류 > 여성 > 아우터 > 자켓", "price": 205000, "status": "limited", "feedCategory": null, "reasonCode": "NO_IMAGE" },
+  { "name": "개인결제 전용 맞춤 코트", "variantCount": 1, "shopCategoryPath": "의류 > 여성 > 아우터 > 코트", "price": 250000, "status": "disabled", "feedCategory": null },
+  { "name": "국내산 부사 사과 5호 (10과)", "variantCount": 1, "shopCategoryPath": "과실/견과류 > 국내산 과일", "price": 32900, "status": "active", "feedCategory": "식품, 음료 및 담배 > 식품 > 과일 및 채소 > 신선 과일" }
+]

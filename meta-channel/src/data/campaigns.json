@@ -1,0 +1,6 @@
+[
+  { "name": "캠페인명1", "objective": "카탈로그 판매", "impressions": 524810, "clicks": 15240, "purchases": 342, "roas": 9.2, "revenue": 1181280, "cost": 128400 },
+  { "name": "캠페인명2", "objective": "전환", "impressions": 312440, "clicks": 9820, "purchases": 298, "roas": 11.4, "revenue": 994280, "cost": 87200 },
+  { "name": "캠페인명3", "objective": "트래픽", "impressions": 284110, "clicks": 8420, "purchases": 124, "roas": 6.8, "revenue": 423480, "cost": 62100 },
+  { "name": "캠페인명4", "objective": "브랜드 인지도", "impressions": 108200, "clicks": 3840, "purchases": 54, "roas": 2.7, "revenue": 76860, "cost": 24800 }
+]
