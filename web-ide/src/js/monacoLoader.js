@@ -93,6 +93,22 @@ function setupMakeshopLanguage(monaco) {
       'editor.background': '#ffffff',
     },
   });
+
+  monaco.editor.defineTheme('makeshop-dark', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [
+      { token: 'ms-tag', foreground: 'c084fc', fontStyle: 'bold' },
+      { token: 'tag', foreground: '60a5fa' },
+      { token: 'attribute.name', foreground: 'fbbf24' },
+      { token: 'string', foreground: '4ade80' },
+      { token: 'comment', foreground: '9ca3af', fontStyle: 'italic' },
+    ],
+    colors: {
+      'editor.background': '#1e1e1e',
+    },
+  });
+
   monaco.editor.setTheme('makeshop-light');
 }
 

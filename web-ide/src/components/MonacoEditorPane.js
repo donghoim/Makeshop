@@ -1,7 +1,7 @@
 import { html, useEffect, useRef, useState } from '../js/lib.js';
 import { useStore } from '../js/store.js';
 import { loadMonaco, registerCompletionProviders } from '../js/monacoLoader.js';
-import { languageForExt } from '../js/pathUtils.js';
+import { languageForExt, extOf, isHistoryPath } from '../js/pathUtils.js';
 
 export function MonacoEditorPane(props) {
   var store = useStore();
@@ -33,7 +33,7 @@ export function MonacoEditorPane(props) {
         var editor = monaco.editor.create(containerRef.current, {
           value: '',
           language: 'plaintext',
-          theme: 'makeshop-light',
+          theme: stateRef.current.editorTheme === 'dark' ? 'makeshop-dark' : 'makeshop-light',
           automaticLayout: true,
           fontSize: 13,
           minimap: { enabled: true },
@@ -69,13 +69,14 @@ export function MonacoEditorPane(props) {
 
   function getOrCreateModel(monaco, path) {
     if (modelsRef.current[path]) return modelsRef.current[path];
-    var ext = path.split('.').pop();
+    var ext = extOf(path);
     var content = stateRef.current.contents[path] || '';
     var uri = monaco.Uri.parse('inmemory://makeshop-ide/' + encodeURIComponent(path));
     var model = monaco.editor.createModel(content, languageForExt(ext), uri);
     model.onDidChangeContent(function () {
       var latestActive = stateRef.current.activeTabPath;
       if (latestActive !== path) return;
+      if (isHistoryPath(path)) return; // 히스토리 스냅샷은 읽기 전용
       var value = model.getValue();
       if (value !== stateRef.current.contents[path]) {
         dispatchRef.current({ type: 'UPDATE_CONTENT', path: path, value: value });
@@ -98,6 +99,7 @@ export function MonacoEditorPane(props) {
     if (editor.getModel() !== model) {
       editor.setModel(model);
     }
+    editor.updateOptions({ readOnly: isHistoryPath(activePath) });
     var pos = editor.getPosition();
     if (onCursorChangeRef.current && pos) {
       onCursorChangeRef.current({ line: pos.lineNumber, column: pos.column });
@@ -109,6 +111,13 @@ export function MonacoEditorPane(props) {
   useEffect(function () {
     syncActiveModel();
   }, [state.activeTabPath]);
+
+  // 2-1) 에디터 테마(라이트/다크) 토글 반영
+  useEffect(function () {
+    var monaco = monacoRef.current;
+    if (!monaco) return;
+    monaco.editor.setTheme(state.editorTheme === 'dark' ? 'makeshop-dark' : 'makeshop-light');
+  }, [state.editorTheme]);
 
   // 3) 외부 요인(저장 취소/삭제/이름변경)으로 contents 가 모델과 달라졌으면 모델 값 동기화
   useEffect(function () {

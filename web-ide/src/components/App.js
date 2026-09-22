@@ -11,6 +11,9 @@ import { ConfirmModal } from './ConfirmModal.js';
 import { InputModal } from './InputModal.js';
 import { ContextMenu } from './ContextMenu.js';
 import { Toast } from './Toast.js';
+import { HistoryModal } from './HistoryModal.js';
+import { SaveConfirmModal } from './SaveConfirmModal.js';
+import { extOf, isHistoryPath } from '../js/pathUtils.js';
 
 export function App() {
   var store = useStore();
@@ -26,7 +29,12 @@ export function App() {
       if (key === 's') {
         e.preventDefault();
         var active = store.state.activeTabPath;
-        if (active) store.dispatch({ type: 'SAVE_FILE', path: active });
+        if (!active || isHistoryPath(active)) return;
+        if (extOf(active) === 'html') {
+          store.dispatch({ type: 'REQUEST_SAVE', path: active });
+        } else {
+          store.dispatch({ type: 'SAVE_FILE', path: active });
+        }
       } else if (key === 'p') {
         e.preventDefault();
         store.dispatch({ type: 'TOGGLE_QUICK_OPEN' });
@@ -56,6 +64,8 @@ export function App() {
       <${InputModal} />
       <${ContextMenu} />
       <${Toast} />
+      <${HistoryModal} />
+      <${SaveConfirmModal} />
     </div>
   `;
 }

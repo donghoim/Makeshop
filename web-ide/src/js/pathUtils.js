@@ -64,10 +64,58 @@ export function languageForExt(ext) {
 }
 
 export function fileNameOf(path) {
-  var parts = path.split('/');
+  var base = historyBasePath(path);
+  var parts = base.split('/');
   return parts[parts.length - 1];
 }
 
 export function breadcrumbOf(path) {
-  return path.split('/');
+  return historyBasePath(path).split('/');
+}
+
+// ===== 검색(파일 트리 필터) =====
+export function filterTreeByQuery(nodes, query) {
+  if (!query) return nodes;
+  var q = query.toLowerCase();
+  var result = [];
+  nodes.forEach(function (node) {
+    if (node.type === 'file') {
+      if (node.name.toLowerCase().indexOf(q) !== -1) result.push(node);
+    } else {
+      var filteredChildren = filterTreeByQuery(node.children, query);
+      var selfMatches = node.name.toLowerCase().indexOf(q) !== -1;
+      if (filteredChildren.length > 0 || selfMatches) {
+        result.push(Object.assign({}, node, { children: filteredChildren.length > 0 ? filteredChildren : node.children }));
+      }
+    }
+  });
+  return result;
+}
+
+// ===== 히스토리 스냅샷 경로 (실제 파일이 아닌 가상 탭) =====
+// 형태: "<원본경로>@history/<entryId>"
+export var HISTORY_SEP = '@history/';
+
+export function isHistoryPath(path) {
+  return path.indexOf(HISTORY_SEP) !== -1;
+}
+
+export function historyBasePath(path) {
+  var idx = path.indexOf(HISTORY_SEP);
+  return idx === -1 ? path : path.slice(0, idx);
+}
+
+export function historyEntryId(path) {
+  var idx = path.indexOf(HISTORY_SEP);
+  return idx === -1 ? null : path.slice(idx + HISTORY_SEP.length);
+}
+
+export function makeHistoryPath(basePath, entryId) {
+  return basePath + HISTORY_SEP + entryId;
+}
+
+export function extOf(path) {
+  var base = historyBasePath(path);
+  var name = base.split('/').pop();
+  return name.split('.').pop();
 }

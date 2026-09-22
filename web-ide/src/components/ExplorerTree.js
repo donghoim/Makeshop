@@ -1,19 +1,20 @@
 import { html } from '../js/lib.js';
 import { useStore } from '../js/store.js';
-import { FileIcon, FolderIcon, ChevronIcon } from './Icon.js';
+import { FileIcon, FolderIcon, ChevronIcon, StarIcon } from './Icon.js';
 
 export function ExplorerTree(props) {
   var nodes = props.nodes;
   var root = props.root;
   var basePath = props.basePath;
   var depth = props.depth || 0;
+  var forceOpen = !!props.forceOpen;
 
   return html`
     <div class="tree-level">
       ${nodes.map(function (node) {
         var path = basePath + '/' + node.name;
         return html`
-          <${TreeNode} key=${path} node=${node} root=${root} path=${path} depth=${depth} />
+          <${TreeNode} key=${path} node=${node} root=${root} path=${path} depth=${depth} forceOpen=${forceOpen} />
         `;
       })}
     </div>
@@ -26,6 +27,7 @@ function TreeNode(props) {
   var path = props.path;
   var root = props.root;
   var depth = props.depth;
+  var forceOpen = props.forceOpen;
   var indent = 10 + depth * 14;
 
   function onContextMenu(e) {
@@ -37,7 +39,7 @@ function TreeNode(props) {
   }
 
   if (node.type === 'folder') {
-    var open = !!store.state.expanded[path];
+    var open = forceOpen || !!store.state.expanded[path];
     return html`
       <div>
         <div
@@ -50,13 +52,19 @@ function TreeNode(props) {
           <${FolderIcon} open=${open} />
           <span class="tree-row__label">${node.name}</span>
         </div>
-        ${open && html`<${ExplorerTree} nodes=${node.children} root=${root} basePath=${path} depth=${depth + 1} />`}
+        ${open && html`<${ExplorerTree} nodes=${node.children} root=${root} basePath=${path} depth=${depth + 1} forceOpen=${forceOpen} />`}
       </div>
     `;
   }
 
   var active = store.state.activeTabPath === path;
   var dirty = store.state.contents[path] !== store.state.savedContents[path];
+  var favorited = !!store.state.favorites[path];
+
+  function onToggleFavorite(e) {
+    e.stopPropagation();
+    store.dispatch({ type: 'TOGGLE_FAVORITE', path: path });
+  }
 
   return html`
     <div
@@ -68,6 +76,9 @@ function TreeNode(props) {
       <${FileIcon} ext=${node.ext} />
       <span class="tree-row__label">${node.name}</span>
       ${dirty && html`<span class="tree-row__dirty-dot"></span>`}
+      <button class="tree-row__favorite" onClick=${onToggleFavorite} title=${favorited ? '즐겨찾기 해제' : '즐겨찾기 추가'}>
+        <${StarIcon} filled=${favorited} />
+      </button>
     </div>
   `;
 }

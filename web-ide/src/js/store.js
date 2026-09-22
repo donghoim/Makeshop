@@ -1,6 +1,6 @@
 import { React, useReducer, useContext, createContext } from './lib.js';
 import { fileSystemTree, fileContents } from '../data/mockFileSystem.js';
-import { parsePath, joinPath, languageForExt } from './pathUtils.js';
+import { parsePath, joinPath, languageForExt, makeHistoryPath } from './pathUtils.js';
 
 function cloneTree(tree) {
   return JSON.parse(JSON.stringify(tree));
@@ -83,9 +83,14 @@ function initialState() {
     previewVisible: false,
     pageLinksVisible: false,
     virtualTagsVisible: false,
+    editorTheme: 'light',
     contextMenu: null,
     inputModal: null,
     errorFlash: null,
+    favorites: {},
+    history: {},
+    historyModalVisible: false,
+    saveConfirm: null,
   };
 }
 
@@ -135,6 +140,74 @@ function reducer(state, action) {
         toast: { id: Date.now(), message: action.path.split('/').pop() + ' 파일이 저장되었습니다.' },
       });
     }
+
+    // html 파일 저장 시: 저장 버튼/Ctrl+S -> 확인 모달을 먼저 띄운다
+    case 'REQUEST_SAVE':
+      if (!action.path) return state;
+      return Object.assign({}, state, { saveConfirm: { path: action.path, step: 'choose' } });
+    case 'CANCEL_SAVE':
+      return Object.assign({}, state, { saveConfirm: null });
+    case 'SAVE_CONFIRM_GOTO_NAME':
+      if (!state.saveConfirm) return state;
+      return Object.assign({}, state, { saveConfirm: Object.assign({}, state.saveConfirm, { step: 'name' }) });
+    case 'SAVE_CONFIRM_GOTO_CHOOSE':
+      if (!state.saveConfirm) return state;
+      return Object.assign({}, state, { saveConfirm: Object.assign({}, state.saveConfirm, { step: 'choose' }) });
+    case 'SAVE_WITHOUT_HISTORY': {
+      if (!action.path) return state;
+      var savedNH = Object.assign({}, state.savedContents);
+      savedNH[action.path] = state.contents[action.path];
+      return Object.assign({}, state, {
+        savedContents: savedNH,
+        saveConfirm: null,
+        toast: { id: Date.now(), message: action.path.split('/').pop() + ' 파일이 저장되었습니다.' },
+      });
+    }
+    case 'SAVE_WITH_HISTORY': {
+      if (!action.path) return state;
+      var name = (action.name || '').trim() || '이름 없는 히스토리';
+      var savedWH = Object.assign({}, state.savedContents);
+      savedWH[action.path] = state.contents[action.path];
+      var historyNext = Object.assign({}, state.history);
+      var entries = (historyNext[action.path] || []).slice();
+      entries.push({ id: String(Date.now()), name: name, timestamp: Date.now(), content: state.contents[action.path] });
+      historyNext[action.path] = entries;
+      return Object.assign({}, state, {
+        savedContents: savedWH,
+        history: historyNext,
+        saveConfirm: null,
+        toast: { id: Date.now(), message: '히스토리로 저장되었습니다: ' + name },
+      });
+    }
+    case 'TOGGLE_HISTORY_MODAL':
+      return Object.assign({}, state, { historyModalVisible: !state.historyModalVisible });
+    case 'OPEN_HISTORY_ENTRY': {
+      var entryList = state.history[action.path] || [];
+      var entry = entryList.find(function (e) { return e.id === action.entryId; });
+      if (!entry) return state;
+      var historyPath = makeHistoryPath(action.path, action.entryId);
+      var contentsHE = Object.assign({}, state.contents);
+      var savedHE = Object.assign({}, state.savedContents);
+      contentsHE[historyPath] = entry.content;
+      savedHE[historyPath] = entry.content;
+      var tabsHE = state.openTabs.indexOf(historyPath) === -1 ? state.openTabs.concat([historyPath]) : state.openTabs;
+      return Object.assign({}, state, {
+        contents: contentsHE,
+        savedContents: savedHE,
+        openTabs: tabsHE,
+        activeTabPath: historyPath,
+        historyModalVisible: false,
+      });
+    }
+    case 'TOGGLE_FAVORITE': {
+      var favNext = Object.assign({}, state.favorites);
+      if (favNext[action.path]) {
+        delete favNext[action.path];
+      } else {
+        favNext[action.path] = true;
+      }
+      return Object.assign({}, state, { favorites: favNext });
+    }
     case 'SHOW_TOAST':
       return Object.assign({}, state, { toast: { id: Date.now(), message: action.message } });
     case 'HIDE_TOAST':
@@ -150,6 +223,8 @@ function reducer(state, action) {
       return Object.assign({}, state, { previewVisible: !state.previewVisible });
     case 'TOGGLE_PAGE_LINKS':
       return Object.assign({}, state, { pageLinksVisible: !state.pageLinksVisible });
+    case 'TOGGLE_EDITOR_THEME':
+      return Object.assign({}, state, { editorTheme: state.editorTheme === 'light' ? 'dark' : 'light' });
     case 'TOGGLE_VIRTUAL_TAGS':
       return Object.assign({}, state, { virtualTagsVisible: !state.virtualTagsVisible });
     case 'OPEN_CONTEXT_MENU':
@@ -209,6 +284,8 @@ function reducer(state, action) {
         tree: tree3,
         contents: remapPrefix(state.contents, action.path, newPath2),
         savedContents: remapPrefix(state.savedContents, action.path, newPath2),
+        favorites: remapPrefix(state.favorites, action.path, newPath2),
+        history: remapPrefix(state.history, action.path, newPath2),
         openTabs: remapArrayPrefix(state.openTabs, action.path, newPath2),
         activeTabPath: state.activeTabPath ? remapArrayPrefix([state.activeTabPath], action.path, newPath2)[0] : null,
         expanded: (function () {
@@ -237,6 +314,8 @@ function reducer(state, action) {
         tree: tree4,
         contents: removePrefix(state.contents, action.path),
         savedContents: removePrefix(state.savedContents, action.path),
+        favorites: removePrefix(state.favorites, action.path),
+        history: removePrefix(state.history, action.path),
         openTabs: newTabs,
         activeTabPath: newActive,
         toast: { id: Date.now(), message: action.path.split('/').pop() + ' 이(가) 삭제되었습니다.' },

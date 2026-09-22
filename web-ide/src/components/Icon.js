@@ -24,6 +24,25 @@ export function FolderIcon(props) {
   `;
 }
 
+export function StarIcon(props) {
+  var filled = !!props.filled;
+  return html`
+    <svg
+      class=${'star-icon' + (filled ? ' star-icon--filled' : '')}
+      width="13" height="13" viewBox="0 0 20 20"
+      fill=${filled ? '#f59e0b' : 'none'}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M10 1.8 12.5 7 18.2 7.8 14.1 11.7 15.1 17.4 10 14.7 4.9 17.4 5.9 11.7 1.8 7.8 7.5 7 10 1.8Z"
+        stroke=${filled ? '#f59e0b' : '#9ca3af'}
+        stroke-width="1.2"
+        stroke-linejoin="round"
+      />
+    </svg>
+  `;
+}
+
 export function ChevronIcon(props) {
   return html`
     <svg
