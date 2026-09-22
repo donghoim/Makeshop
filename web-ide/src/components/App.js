@@ -13,6 +13,7 @@ import { ContextMenu } from './ContextMenu.js';
 import { Toast } from './Toast.js';
 import { HistoryModal } from './HistoryModal.js';
 import { SaveConfirmModal } from './SaveConfirmModal.js';
+import { AIPanel } from './AIPanel.js';
 import { extOf, isHistoryPath } from '../js/pathUtils.js';
 
 export function App() {
@@ -55,6 +56,8 @@ export function App() {
         <${Explorer} mobileOpen=${explorerOpen} />
         ${explorerOpen && html`<div class="explorer-backdrop" onClick=${function () { setExplorerOpen(false); }}></div>`}
         <${EditorArea} />
+        ${store.state.aiPanelVisible && html`<div class="ai-panel-backdrop" onClick=${function () { store.dispatch({ type: 'TOGGLE_AI_PANEL' }); }}></div>`}
+        <${AIPanel} />
       </div>
       <${PreviewPanel} />
       <${QuickOpen} />

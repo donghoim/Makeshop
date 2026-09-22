@@ -19,8 +19,8 @@ ES Module(import/export)과 fetch 기반 리소스 로딩을 쓰기 때문에 `i
 
 | 항목 | 조정 내용 |
 |---|---|
-| React | esm.sh CDN에서 React 18 / ReactDOM 18을 네이티브 ES Module로 로드 (`src/js/lib.js`) |
-| JSX | 빌드 없이 JSX 유사 문법을 쓰기 위해 `htm` 라이브러리 사용(태그드 템플릿 리터럴, 별도 컴파일 불필요) |
+| React | cdnjs UMD 빌드(`react.production.min.js` / `react-dom.production.min.js`)를 `<script>` 태그로 로드 후 `src/js/lib.js`에서 전역(window.React 등)을 재수출 (esm.sh ESM import는 Claude Artifact 등 CSP 샌드박스에서 차단되어 UMD 방식으로 변경) |
+| JSX | 빌드 없이 JSX 유사 문법을 쓰기 위해 jsdelivr의 `htm` UMD 빌드 사용(태그드 템플릿 리터럴, 별도 컴파일 불필요) |
 | TypeScript | **미사용.** 브라우저에서 트랜스파일 없이 동작해야 해서 순수 JS로 작성했습니다. 대신 컴포넌트/상태 단위를 명확히 분리해 추후 `.tsx` 전환이 쉬운 구조로 작성했습니다. |
 | Monaco Editor | jsdelivr CDN의 AMD 로더(`vs/loader.js`)로 로드 |
 | Tailwind | 미사용. 260px Explorer / 40px Tab / 28px Status Bar 등 IDE 특유의 정밀한 레이아웃이 많아 커스텀 CSS(`src/css/styles.css`)로 직접 작성했습니다. |
@@ -64,6 +64,12 @@ ES Module(import/export)과 fetch 기반 리소스 로딩을 쓰기 때문에 `i
 - (상단 GNB) 페이지주소 버튼 — SYSTEM 운영 페이지 전체를 Mock URL 목록으로 보여주는 모달. 클릭 시 해당 페이지를 에디터에서 바로 열 수 있고, 개별 URL 복사 가능
 - (상단 GNB) 가상태그 버튼 — 현재 활성 탭 파일에서 실제로 적용 가능한 가상태그만 추려 보여주는 모달(파일 카테고리별 매핑은 `src/data/mockFileSystem.js`의 `getApplicableTags`). 파일이 열려있지 않으면 비활성화
 - (상단 GNB) 디자인 매뉴얼 버튼 — 전용 매뉴얼 링크가 아직 없어 메이크샵 홈페이지(`https://www.makeshop.co.kr/`)로 새 탭 연결
+- (에디터 툴바) 다크/라이트 테마 토글 — Monaco 에디터 배경/문법 하이라이팅만 전환(나머지 UI는 라이트 유지)
+- Explorer 탭 분리(즐겨찾는 화면 / 전체 화면) — 파일별 즐겨찾기(별표), 즐겨찾는 화면 탭에서 경로와 함께 목록 노출
+- Explorer 상단 페이지명 검색 — 입력 시 일치하는 파일만 남기고 해당 폴더 자동 확장
+- (에디터 툴바, html 전용) 히스토리 버튼 — 제목+시간 목록 모달, 클릭 시 해당 시점 내용을 읽기 전용 새 탭으로 오픈
+- html 파일 저장 시 확인 모달(취소 / 그냥 저장 / 히스토리 남기고 저장) — 히스토리 선택 시 이름 입력 단계 추가. CSS/JS는 기존처럼 즉시 저장
+- (상단 GNB) **AI 편집 어시스턴트** — 우측 슬라이드 패널. 채팅 형태로 수정 요청을 입력하면(예시 프롬프트 칩 제공) 코드 스니펫 제안 카드를 보여주고 "적용하기"로 현재 파일 버퍼에 반영. **Mock 엔진**(`src/js/mockAi.js`)으로 동작 — 실제 LLM API 호출이 아닌 키워드 매칭 기반 데모입니다(Public 저장소에 API 키를 넣지 않기 위한 의도적 설계). 파일별로 대화 기록이 분리되어 유지됩니다.
 
 ## 제외 범위 (요청 17번 항목과 동일)
 

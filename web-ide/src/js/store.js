@@ -91,6 +91,8 @@ function initialState() {
     history: {},
     historyModalVisible: false,
     saveConfirm: null,
+    aiPanelVisible: false,
+    aiChats: {},
   };
 }
 
@@ -208,6 +210,40 @@ function reducer(state, action) {
       }
       return Object.assign({}, state, { favorites: favNext });
     }
+    case 'TOGGLE_AI_PANEL':
+      return Object.assign({}, state, { aiPanelVisible: !state.aiPanelVisible });
+    case 'AI_ADD_MESSAGE': {
+      var chatsNext = Object.assign({}, state.aiChats);
+      var msgs = (chatsNext[action.path] || []).concat([action.message]);
+      chatsNext[action.path] = msgs;
+      return Object.assign({}, state, { aiChats: chatsNext });
+    }
+    case 'AI_APPLY_SUGGESTION': {
+      var chatsA = Object.assign({}, state.aiChats);
+      var msgsA = (chatsA[action.path] || []).map(function (m) {
+        if (m.id !== action.messageId) return m;
+        return Object.assign({}, m, { status: 'applied' });
+      });
+      chatsA[action.path] = msgsA;
+      var target = (chatsA[action.path] || []).find(function (m) { return m.id === action.messageId; });
+      var contentsAI = Object.assign({}, state.contents);
+      if (target && typeof target.nextContent === 'string') {
+        contentsAI[action.path] = target.nextContent;
+      }
+      return Object.assign({}, state, {
+        aiChats: chatsA,
+        contents: contentsAI,
+        toast: { id: Date.now(), message: 'AI 제안을 적용했습니다. 저장하면 반영됩니다.' },
+      });
+    }
+    case 'AI_DISMISS_SUGGESTION': {
+      var chatsD = Object.assign({}, state.aiChats);
+      chatsD[action.path] = (chatsD[action.path] || []).map(function (m) {
+        if (m.id !== action.messageId) return m;
+        return Object.assign({}, m, { status: 'dismissed' });
+      });
+      return Object.assign({}, state, { aiChats: chatsD });
+    }
     case 'SHOW_TOAST':
       return Object.assign({}, state, { toast: { id: Date.now(), message: action.message } });
     case 'HIDE_TOAST':
@@ -286,6 +322,7 @@ function reducer(state, action) {
         savedContents: remapPrefix(state.savedContents, action.path, newPath2),
         favorites: remapPrefix(state.favorites, action.path, newPath2),
         history: remapPrefix(state.history, action.path, newPath2),
+        aiChats: remapPrefix(state.aiChats, action.path, newPath2),
         openTabs: remapArrayPrefix(state.openTabs, action.path, newPath2),
         activeTabPath: state.activeTabPath ? remapArrayPrefix([state.activeTabPath], action.path, newPath2)[0] : null,
         expanded: (function () {
@@ -316,6 +353,7 @@ function reducer(state, action) {
         savedContents: removePrefix(state.savedContents, action.path),
         favorites: removePrefix(state.favorites, action.path),
         history: removePrefix(state.history, action.path),
+        aiChats: removePrefix(state.aiChats, action.path),
         openTabs: newTabs,
         activeTabPath: newActive,
         toast: { id: Date.now(), message: action.path.split('/').pop() + ' 이(가) 삭제되었습니다.' },

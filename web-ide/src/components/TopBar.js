@@ -18,6 +18,9 @@ export function TopBar(props) {
     if (!activePath) return;
     store.dispatch({ type: 'TOGGLE_VIRTUAL_TAGS' });
   }
+  function onAiPanel() {
+    store.dispatch({ type: 'TOGGLE_AI_PANEL' });
+  }
 
   return html`
     <header class="topbar">
@@ -43,6 +46,10 @@ export function TopBar(props) {
           title=${!activePath ? '파일을 먼저 열어주세요' : '현재 페이지에 적용 가능한 가상태그'}
         >가상태그</button>
         <a class="btn btn--ghost btn--link" href=${MAKESHOP_HOME_URL} target="_blank" rel="noopener noreferrer">디자인 매뉴얼</a>
+        <span class="topbar__divider"></span>
+        <button class=${'btn btn--ai' + (state.aiPanelVisible ? ' btn--ai-active' : '')} onClick=${onAiPanel}>
+          <span class="btn--ai-dot"></span>AI 편집
+        </button>
       </div>
     </header>
   `;
