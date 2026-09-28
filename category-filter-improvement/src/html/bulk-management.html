@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>검색 필터 일괄 관리 - make#</title>
+<link rel="stylesheet" href="../css/common.css" />
+<link rel="stylesheet" href="../css/components.css" />
+</head>
+<body>
+
+<header class="app-topbar">
+  <div class="logo">make<span>#</span></div>
+  <div class="util-links">
+    <span>네오테스트17</span><span>공지사항</span><span>업그레이드</span><span>고객센터</span>
+  </div>
+</header>
+<nav class="app-nav">
+  <span class="nav-item">설정</span><span class="nav-item">상품</span><span class="nav-item">주문</span>
+  <span class="nav-item">회원</span><span class="nav-item">게시판</span><span class="nav-item">디자인</span>
+  <span class="nav-item">프로모션</span><span class="nav-item active">부가서비스</span><span class="nav-item">통계</span>
+</nav>
+<div class="app-notice">
+  <span>등록된 스마트 폴더가 없습니다. 메뉴 우측의 ☆를 클릭하여 자주 사용하는 메뉴를 등록해주세요.</span>
+  <span>★ 설정</span>
+</div>
+
+<div class="app-body">
+  <aside class="app-sidebar">
+    <div class="side-title">부가서비스</div>
+    <span class="side-badge">메이크샵Premium</span>
+    <div class="side-group-label">부가서비스</div>
+    <ul>
+      <li><a href="#">부가서비스소개</a></li>
+      <li><a href="#">부가서비스이용현황</a></li>
+      <li><a href="#">메이크샵스토어</a></li>
+      <li><a href="../../index.html">상품 · 검색 필터</a></li>
+      <li><a href="bulk-management.html" class="active">검색 필터 일괄 관리</a></li>
+      <li><a href="#">이미지호스팅</a></li>
+      <li><a href="#">배송</a></li>
+      <li><a href="#">회원</a></li>
+      <li><a href="#">후기</a></li>
+      <li><a href="#">채널</a></li>
+      <li><a href="#">오픈API</a></li>
+    </ul>
+  </aside>
+
+  <main class="app-main">
+    <div class="breadcrumb">부가서비스 &gt; 부가서비스 &gt; 상품 &gt; 검색 필터 &gt; 검색 필터 일괄 관리</div>
+    <h1 class="page-title">검색 필터 일괄 관리</h1>
+
+    <section class="panel">
+      <div class="panel-title">상품 검색</div>
+      <div class="row"><div class="row-label">진열 상태</div>
+        <label class="radio-inline"><input type="radio" name="display" value="전체" checked>전체</label>
+        <label class="radio-inline"><input type="radio" name="display" value="진열">진열</label>
+        <label class="radio-inline"><input type="radio" name="display" value="미진열">미진열</label>
+      </div>
+      <div class="row"><div class="row-label">상품 검색</div>
+        <select class="styled-select" id="search-type">
+          <option>상품명</option><option>상품코드</option><option>상품번호</option><option>키워드</option>
+        </select>
+        <input type="text" id="search-keyword" placeholder="입력하세요" style="flex:1;max-width:320px;">
+      </div>
+      <div class="row"><div class="row-label">분류 검색 필터</div>
+        <select class="styled-select" id="search-filter-select"><option value="">필터를 선택해 주세요.</option></select>
+        <select class="styled-select" id="search-filter-value-select" disabled><option value="">필터값을 선택해 주세요.</option></select>
+      </div>
+      <div style="text-align:center;margin-top:14px;">
+        <button class="btn" id="btn-reset-search">↻ 초기화</button>
+        <button class="btn btn-primary" id="btn-search">검색</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div>
+          <span class="panel-title" style="margin:0;">상품 리스트</span>
+          <span class="helper-text" id="result-count" style="margin-left:8px;"></span>
+        </div>
+        <div>
+          <span class="selected-count" id="selected-count-label" style="margin-right:12px;"></span>
+          <button class="btn btn-primary" id="btn-bulk-change" disabled>필터값 일괄 변경 &gt;</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <div style="flex:1.4;min-width:0;">
+          <table class="data-table">
+            <thead><tr><th style="width:32px;"><input type="checkbox" id="select-all-checkbox"></th><th style="width:100px;">상품번호</th><th style="width:70px;">이미지</th><th>상품명</th></tr></thead>
+            <tbody id="product-table-body"></tbody>
+          </table>
+          <div class="pagination" id="pagination"></div>
+        </div>
+        <div style="flex:1;min-width:280px;">
+          <div class="panel" style="margin:0;padding:14px;">
+            <div class="panel-title">필터 적용 현황</div>
+            <div id="filter-status-panel" style="font-size:12px;color:#6b7280;">상품을 선택하면 필터 적용 현황이 표시됩니다.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- SCR-FILTER-005 : 상품 분류 검색 필터 일괄 변경 팝업 -->
+<div class="modal-overlay" id="bulk-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>상품 분류 검색 필터 일괄 변경</h2>
+      <button class="modal-close" id="bulk-modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box" id="bulk-top-info"></div>
+
+      <div class="row"><div class="row-label required">필터 선택</div>
+        <select class="styled-select" id="bulk-filter-select"><option value="">필터를 선택해 주세요.</option></select>
+      </div>
+
+      <div class="row" style="align-items:flex-start;"><div class="row-label required" style="padding-top:2px;">작업 유형</div>
+        <div class="op-type-group" id="op-type-group">
+          <label><input type="radio" name="op-type" value="REPLACE" checked>상품 적용값 변경</label>
+          <label><input type="radio" name="op-type" value="RENAME">필터값명 수정</label>
+          <label><input type="radio" name="op-type" value="ADD">필터값 추가</label>
+          <label><input type="radio" name="op-type" value="REMOVE">필터값 적용 해제</label>
+        </div>
+      </div>
+
+      <div class="op-fields" id="fields-REPLACE">
+        <div class="row"><div class="row-label required">기존 필터값</div>
+          <select class="styled-select" id="from-value-select" disabled><option value="">필터값을 선택해 주세요.</option></select>
+        </div>
+        <div class="row"><div class="row-label required">변경할 필터값</div>
+          <select class="styled-select" id="to-value-select" disabled><option value="">필터값을 선택해 주세요.</option></select>
+        </div>
+        <div class="helper-text" id="replace-preview"></div>
+        <div class="error-text" id="replace-error"></div>
+      </div>
+
+      <div class="op-fields" id="fields-RENAME" hidden>
+        <div class="row"><div class="row-label required">수정할 필터값</div>
+          <select class="styled-select" id="rename-target-select" disabled><option value="">필터값을 선택해 주세요.</option></select>
+        </div>
+        <div class="row"><div class="row-label required">변경할 명칭</div>
+          <input type="text" id="rename-input" style="flex:1;" maxlength="40" disabled>
+        </div>
+        <div class="error-text" id="rename-error"></div>
+        <div class="warning-box">필터값명 수정은 해당 값을 사용하는 모든 상품과 쇼핑몰 검색 필터에 반영됩니다.<br>선택한 상품과 관계없이 해당 필터값을 사용하는 전체 상품에 반영됩니다.</div>
+      </div>
+
+      <div class="op-fields" id="fields-ADD" hidden>
+        <div class="row"><div class="row-label required">추가할 필터값</div>
+          <select class="styled-select" id="add-value-select" disabled><option value="">필터값을 선택해 주세요.</option></select>
+        </div>
+        <div class="helper-text" id="add-preview"></div>
+      </div>
+
+      <div class="op-fields" id="fields-REMOVE" hidden>
+        <div class="row"><div class="row-label required">적용 해제할 필터값</div>
+          <select class="styled-select" id="remove-value-select" disabled><option value="">필터값을 선택해 주세요.</option></select>
+        </div>
+        <div class="info-box">선택한 상품에서 필터값 적용만 해제됩니다. 필터값 자체는 삭제되지 않습니다.</div>
+        <div class="helper-text" id="remove-preview"></div>
+      </div>
+
+      <div id="modified-date-block">
+        <div class="row" id="modified-date-row">
+          <label style="display:flex;align-items:center;gap:8px;font-size:12px;">
+            <input type="checkbox" id="modified-date-checkbox"> 선택한 상품의 수정일시를 변경합니다.
+          </label>
+        </div>
+        <div class="helper-text">선택하면 필터값 변경과 함께 상품의 최종 수정일시가 현재 시점으로 변경됩니다.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="btn-bulk-cancel">취소</button>
+      <button class="btn btn-primary" id="btn-bulk-save" disabled>저장</button>
+    </div>
+  </div>
+</div>
+
+<script src="../components/toast.js"></script>
+<script src="../components/modal.js"></script>
+<script src="../components/chip-editor.js"></script>
+<script src="../data/filters-data.js"></script>
+<script src="../data/products-data.js"></script>
+<script src="../js/bulk-management.js"></script>
+</body>
+</html>

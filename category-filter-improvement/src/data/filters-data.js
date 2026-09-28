@@ -1,0 +1,54 @@
+// 프로토타입 전용 Mock 데이터 (file:// 환경에서 fetch 제약 없이 동작하도록 JS로 내장)
+// 원본 데이터 구조 정의는 06_Data-API/Data-Definition.md 및 filters.json 참조
+window.MOCK_FILTERS = [
+  {
+    filterId: 1, name: "사이즈", exposed: true, sortOrder: 1, colorLinked: false,
+    exposedCategoryIds: [1, 2, 3, 4],
+    values: [
+      { filterValueId: 101, name: "S", colorCode: null },
+      { filterValueId: 102, name: "M", colorCode: null },
+      { filterValueId: 103, name: "L", colorCode: null },
+      { filterValueId: 104, name: "XL", colorCode: null },
+      { filterValueId: 105, name: "2XL", colorCode: null },
+      { filterValueId: 106, name: "XS", colorCode: null },
+      { filterValueId: 107, name: "Free", colorCode: null }
+    ]
+  },
+  {
+    filterId: 2, name: "색상", exposed: true, sortOrder: 2, colorLinked: true,
+    exposedCategoryIds: [1, 2, 3, 4, 5, 6, 7],
+    values: [
+      { filterValueId: 201, name: "화이트", colorCode: "#FFFFFF" },
+      { filterValueId: 202, name: "블랙", colorCode: "#000000" },
+      { filterValueId: 203, name: "레드", colorCode: "#E53935" },
+      { filterValueId: 204, name: "블루", colorCode: "#1E88E5" },
+      { filterValueId: 205, name: "네이비", colorCode: "#1A237E" },
+      { filterValueId: 206, name: "오렌지", colorCode: "#FB8C00" },
+      { filterValueId: 207, name: "베이지", colorCode: "#D8C3A5" },
+      { filterValueId: 208, name: "그레이", colorCode: "#9E9E9E" },
+      { filterValueId: 209, name: "브라운", colorCode: "#6D4C33" },
+      { filterValueId: 210, name: "버건디", colorCode: "#6D1B2B" },
+      { filterValueId: 211, name: "멜란지그레이", colorCode: "#B0AFAF" },
+      { filterValueId: 212, name: "라이트그레이", colorCode: "#D3D3D3" },
+      { filterValueId: 213, name: "아쿠아블루", colorCode: "#00BCD4" },
+      { filterValueId: 214, name: "인디핑크", colorCode: "#FF6F91" },
+      { filterValueId: 215, name: "옐로우", colorCode: "#FFEB3B" },
+      { filterValueId: 216, name: "노랑", colorCode: "#FDD835" },
+      { filterValueId: 217, name: "소라", colorCode: "#7FB3D5" },
+      { filterValueId: 218, name: "스카이블루", colorCode: "#87CEEB" },
+      { filterValueId: 219, name: "아이보리", colorCode: "#F5F1E6" },
+      { filterValueId: 220, name: "핑크", colorCode: "#F48FB1" }
+    ]
+  },
+  {
+    filterId: 3, name: "가격", exposed: true, sortOrder: 3, colorLinked: false,
+    exposedCategoryIds: [1, 2, 3, 4, 5, 6, 7],
+    values: [
+      { filterValueId: 301, name: "10,000원 이하", colorCode: null },
+      { filterValueId: 302, name: "10,000 - 30,000원", colorCode: null },
+      { filterValueId: 303, name: "30,000 - 50,000원", colorCode: null },
+      { filterValueId: 304, name: "50,000 - 100,000원", colorCode: null },
+      { filterValueId: 305, name: "100,000원 이상", colorCode: null }
+    ]
+  }
+];

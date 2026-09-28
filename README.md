@@ -10,5 +10,6 @@
 | [`google-channel/`](./google-channel) | Google 채널 연동(연결관리·상품피드·구글애즈) 프로토타입 | [바로가기](https://donghoim.github.io/Makeshop/google-channel/) |
 | [`meta-channel/`](./meta-channel) | Meta 채널 연동(연결관리·상품피드·광고관리·숍스관리) 프로토타입 | [바로가기](https://donghoim.github.io/Makeshop/meta-channel/) |
 | [`makeshop-mcp/`](./makeshop-mcp) | MakeShop MCP 연동 서비스 기획 — 요구사항/정책/Data-API/QA/개발 킥오프 문서 세트(조회형 MCP 1차 MVP, UI 프로토타입 없음) | — |
+| [`category-filter-improvement/`](./category-filter-improvement) | 분류 검색 필터 관리 개선(필터 설정·일괄 관리) 프로토타입 | [바로가기](https://donghoim.github.io/Makeshop/category-filter-improvement/) |
 
 각 프로젝트 폴더의 README에 상세 실행 방법이 있습니다.

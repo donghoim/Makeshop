@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>분류 검색 필터 설정 - make#</title>
+<link rel="stylesheet" href="src/css/common.css" />
+<link rel="stylesheet" href="src/css/components.css" />
+</head>
+<body>
+
+<header class="app-topbar">
+  <div class="logo">make<span>#</span></div>
+  <div class="util-links">
+    <span>네오테스트17</span><span>공지사항</span><span>업그레이드</span><span>고객센터</span>
+  </div>
+</header>
+<nav class="app-nav">
+  <span class="nav-item">설정</span><span class="nav-item">상품</span><span class="nav-item">주문</span>
+  <span class="nav-item">회원</span><span class="nav-item">게시판</span><span class="nav-item">디자인</span>
+  <span class="nav-item">프로모션</span><span class="nav-item active">부가서비스</span><span class="nav-item">통계</span>
+</nav>
+<div class="app-notice">
+  <span>등록된 스마트 폴더가 없습니다. 메뉴 우측의 ☆를 클릭하여 자주 사용하는 메뉴를 등록해주세요.</span>
+  <span>★ 설정</span>
+</div>
+
+<div class="app-body">
+  <aside class="app-sidebar">
+    <div class="side-title">부가서비스</div>
+    <span class="side-badge">메이크샵Premium</span>
+    <div class="side-group-label">부가서비스</div>
+    <ul>
+      <li><a href="#">부가서비스소개</a></li>
+      <li><a href="#">부가서비스이용현황</a></li>
+      <li><a href="#">메이크샵스토어</a></li>
+      <li><a href="index.html" class="active">상품 · 검색 필터</a></li>
+      <li><a href="src/html/bulk-management.html">검색 필터 일괄 관리</a></li>
+      <li><a href="#">이미지호스팅</a></li>
+      <li><a href="#">배송</a></li>
+      <li><a href="#">회원</a></li>
+      <li><a href="#">후기</a></li>
+      <li><a href="#">채널</a></li>
+      <li><a href="#">오픈API</a></li>
+    </ul>
+  </aside>
+
+  <main class="app-main">
+    <div class="breadcrumb">부가서비스 &gt; 부가서비스 &gt; 상품 &gt; 검색 필터 &gt; 분류 검색 필터 설정</div>
+    <h1 class="page-title">검색 필터 설정</h1>
+
+    <section class="panel">
+      <div class="panel-title">분류 검색엔진 셋팅</div>
+      <div class="row"><div class="row-label">분류검색엔진 사용여부</div>
+        <label class="radio-inline"><input type="radio" name="engine" checked>사용함</label>
+        <label class="radio-inline"><input type="radio" name="engine">사용안함</label>
+      </div>
+      <div class="row"><div class="row-label">결과 노출 방법 설정</div>
+        <label class="radio-inline"><input type="radio" name="expose" checked>즉시 노출</label>
+        <label class="radio-inline"><input type="radio" name="expose">검색 버튼 노출</label>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">분류 검색 필터 설정 (색상 코드 연동)</div>
+      <div class="row"><div class="row-label">색상 코드 연동 설정</div>
+        <label class="radio-inline"><input type="radio" name="colorlink" checked>사용함</label>
+        <label class="radio-inline"><input type="radio" name="colorlink">사용안함</label>
+      </div>
+      <div class="helper-text">색상 필터값과 실제 색상 코드를 연동하여 관리합니다. (AS-IS 기능 유지, 본 프로젝트 범위 외)</div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>분류 검색 필터 <span id="filter-count" style="font-weight:400;color:#8a909a;font-size:11.5px;"></span></span>
+        <button class="btn btn-primary btn-sm" id="btn-add-filter">필터추가 +</button>
+      </div>
+      <div class="info-box" id="hover-tooltip">필터 상세값에 마우스를 올린 후 수정 아이콘을 클릭하면 명칭을 수정할 수 있으며, 값을 드래그하여 순서를 변경할 수 있습니다.</div>
+      <table class="data-table" style="margin-top:12px;">
+        <thead>
+          <tr><th style="width:50px;">이동</th><th style="width:110px;">필터명</th><th>필터 상세값</th><th style="width:80px;">관리</th><th style="width:90px;">노출여부</th></tr>
+        </thead>
+        <tbody id="filter-table-body"></tbody>
+      </table>
+      <div style="text-align:center;margin-top:18px;">
+        <button class="btn btn-primary" id="btn-save-settings">저장</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- SCR-FILTER-002 / SCR-FILTER-003 공용 생성·수정 팝업 -->
+<div class="modal-overlay" id="filter-form-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="filter-form-title">분류 검색 필터 생성</h2>
+      <button class="modal-close" id="filter-form-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="row"><div class="row-label required">필터명</div>
+        <input type="text" id="filter-name-input" maxlength="40" style="flex:1;">
+        <span class="helper-text" id="filter-name-count" style="width:50px;">0/25</span>
+      </div>
+      <div class="row"><div class="row-label required">노출여부 설정</div>
+        <label class="radio-inline"><input type="radio" name="filter-expose" value="Y" checked>노출함</label>
+        <label class="radio-inline"><input type="radio" name="filter-expose" value="N">노출안함</label>
+      </div>
+      <div class="row" style="align-items:flex-start;">
+        <div class="row-label required" style="padding-top:6px;">필터 상세값</div>
+        <div style="flex:1;">
+          <input type="text" class="value-add-input" id="value-add-input" placeholder="필터 상세값을 입력 후 엔터를 클릭해주세요.">
+          <div id="filter-value-chip-container"></div>
+        </div>
+      </div>
+
+      <div class="panel-title" style="margin-top:18px;">필터 노출 분류 선택</div>
+      <div class="tree-scroll" id="expose-tree"></div>
+    </div>
+    <div class="modal-footer footer-split" id="filter-form-footer">
+      <button class="btn btn-danger-outline" id="btn-delete-filter" style="display:none;">삭제</button>
+      <div>
+        <button class="btn" id="btn-cancel-filter-form">취소</button>
+        <button class="btn btn-primary" id="btn-submit-filter-form" disabled>등록</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="src/components/toast.js"></script>
+<script src="src/components/modal.js"></script>
+<script src="src/components/chip-editor.js"></script>
+<script src="src/data/filters-data.js"></script>
+<script src="src/data/products-data.js"></script>
+<script src="src/js/filter-setting.js"></script>
+</body>
+</html>

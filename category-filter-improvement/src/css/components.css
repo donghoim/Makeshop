@@ -1,0 +1,166 @@
+/* ---------- Filter value chip ---------- */
+.chip-list { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 10px; border-radius: 14px;
+  border: 1px solid #ccd1d9; background: #fff; font-size: 12px; color: #333;
+  position: relative; cursor: default; user-select: none;
+}
+.chip.dragging { opacity: 0.4; }
+.chip.drag-disabled { cursor: default; }
+.chip-drag-handle {
+  display: grid; grid-template-columns: repeat(2, 3px); grid-template-rows: repeat(3, 3px);
+  gap: 2px; width: 8px; height: 13px; flex-shrink: 0; cursor: grab;
+}
+.chip-drag-handle span { width: 3px; height: 3px; border-radius: 50%; background: #b3b8c0; }
+.chip:active .chip-drag-handle span, .chip.dragging .chip-drag-handle span { background: #8a919c; }
+.chip .color-swatch {
+  width: 13px; height: 13px; border-radius: 50%; border: 1px solid #d3d3d3; flex-shrink: 0;
+}
+.chip .chip-edit-btn {
+  display: none; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%; border: none; background: transparent;
+  color: #6b7280; font-size: 11px; padding: 0;
+}
+.chip:hover .chip-edit-btn, .chip:focus-within .chip-edit-btn { display: inline-flex; }
+.chip .chip-edit-btn:hover { background: #eef1f6; color: #1b4fd8; }
+.chip .chip-remove-btn {
+  border: none; background: transparent; color: #9aa0a8; font-size: 12px; padding: 0 0 0 2px;
+  display: none;
+}
+.chip:hover .chip-remove-btn { display: inline-flex; }
+.chip .chip-remove-btn:hover { color: #d0342c; }
+
+.chip.editing {
+  padding: 3px; border-radius: 6px; border-color: #1b4fd8; background: #f7f9ff;
+}
+.chip.editing input {
+  border: none; outline: none; background: transparent; width: 84px; height: 22px; font-size: 12px; padding: 0 4px;
+}
+.chip.editing .chip-confirm-btn, .chip.editing .chip-cancel-btn {
+  width: 20px; height: 20px; border: none; border-radius: 4px; background: #fff;
+  color: #4b5563; font-size: 11px; display: inline-flex; align-items: center; justify-content: center;
+}
+.chip.editing .chip-confirm-btn:hover { background: #e7f7ec; color: #1b6b3a; }
+.chip.editing .chip-cancel-btn:hover { background: #fff1ec; color: #d0342c; }
+.chip.chip-error { border-color: #d0342c; background: #fff5f4; }
+.chip.chip-new { border-style: dashed; border-color: #1b8b3a; }
+.chip.chip-pending-delete { border-style: dashed; border-color: #d0342c; color: #d0342c; text-decoration: line-through; }
+
+.chip-input-wrap { position: relative; display: inline-block; }
+.chip-error-msg {
+  position: absolute; top: 32px; left: 0; white-space: nowrap;
+  font-size: 11px; color: #d0342c; background: #fff; border: 1px solid #f1b8b4;
+  border-radius: 3px; padding: 3px 8px; z-index: 5;
+}
+
+.value-add-input {
+  width: 100%; max-width: 460px; border: 1px solid #ccd1d9; border-radius: 3px;
+  height: 32px; padding: 0 10px; margin-bottom: 10px;
+}
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(20, 24, 34, 0.5);
+  display: none; align-items: flex-start; justify-content: center;
+  padding: 40px 16px; overflow-y: auto; z-index: 1000;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #fff; border-radius: 6px; width: 100%; max-width: 640px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25); max-height: calc(100vh - 80px); display: flex; flex-direction: column;
+}
+.modal-box.modal-narrow { max-width: 460px; }
+.modal-header {
+  padding: 18px 22px; border-bottom: 1px solid #edeef0; display: flex; align-items: center; justify-content: space-between;
+}
+.modal-header h2 { font-size: 15px; margin: 0; font-weight: 800; }
+.modal-close { border: none; background: transparent; font-size: 16px; color: #9aa0a8; }
+.modal-body { padding: 20px 22px; overflow-y: auto; }
+.modal-footer {
+  padding: 14px 22px; border-top: 1px solid #edeef0; display: flex; justify-content: center; gap: 8px;
+}
+.modal-footer.footer-split { justify-content: space-between; }
+
+/* ---------- Alert Box (네이티브 OS 알림창 스타일 얼럿창) ---------- */
+.alert-overlay { align-items: center; }
+.alert-box {
+  background: #fff; width: 380px; max-width: calc(100vw - 32px);
+  border: 1px solid #b9bec7; border-radius: 6px; box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+.alert-titlebar {
+  height: 32px; background: #f0f2f5; border-bottom: 1px solid #d6dae0;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 6px 0 12px;
+}
+.alert-titlebar-text { font-size: 11.5px; font-weight: 700; color: #444; }
+.alert-titlebar-close {
+  width: 24px; height: 24px; border: none; background: transparent; font-size: 15px; color: #666; border-radius: 3px;
+}
+.alert-titlebar-close:hover { background: #e3e6ea; }
+.alert-body { display: flex; gap: 14px; padding: 20px 20px 16px; align-items: flex-start; }
+.alert-icon { font-size: 30px; line-height: 1; flex-shrink: 0; }
+.alert-title { font-size: 13.5px; font-weight: 800; margin-bottom: 8px; }
+.alert-desc { font-size: 12px; color: #4b5563; line-height: 1.6; white-space: pre-line; }
+.alert-footer {
+  display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; background: #f7f8fa; border-top: 1px solid #e3e5e8;
+}
+.alert-footer .btn { min-width: 76px; }
+
+.tree-scroll { max-height: 220px; overflow-y: auto; border: 1px solid #e3e5e8; border-radius: 4px; }
+.tree-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px; border-bottom: 1px solid #f0f1f3; font-size: 12px;
+}
+.tree-row:last-child { border-bottom: none; }
+
+/* ---------- Toast ---------- */
+.toast-stack {
+  position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 8px; z-index: 2000; align-items: center;
+}
+.toast {
+  background: #2b2f36; color: #fff; padding: 12px 20px; border-radius: 6px;
+  font-size: 12.5px; box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  opacity: 0; transform: translateY(8px); transition: opacity .2s, transform .2s;
+  max-width: 480px; text-align: center;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.toast-error { background: #d0342c; }
+.toast.toast-success { background: #1b6b3a; }
+
+/* ---------- Dropdown (select styled) ---------- */
+select.styled-select {
+  min-width: 180px; height: 32px; border-radius: 3px; border: 1px solid #ccd1d9; padding: 0 8px;
+}
+select.styled-select:disabled { background: #f4f5f7; color: #9aa0a8; }
+
+/* ---------- Operation type radio group ---------- */
+.op-type-group { display: flex; flex-wrap: wrap; gap: 18px; }
+.op-type-group label { display: flex; align-items: center; gap: 6px; font-size: 12.5px; }
+.op-type-group input { accent-color: #1b4fd8; }
+
+.op-fields { border: 1px dashed #d7dbe2; border-radius: 5px; padding: 14px; margin-top: 12px; }
+.op-fields[hidden] { display: none; }
+
+/* ---------- Pagination ---------- */
+.pagination { display: flex; justify-content: center; gap: 4px; margin-top: 16px; }
+.pagination button {
+  min-width: 28px; height: 28px; border: 1px solid #e3e5e8; background: #fff; border-radius: 3px; font-size: 12px; color: #4b5563;
+}
+.pagination button.active { background: #1b4fd8; border-color: #1b4fd8; color: #fff; font-weight: 700; }
+.pagination button:disabled { color: #d1d5db; cursor: not-allowed; }
+
+/* ---------- Tabs (used inside bulk popup summary, optional) ---------- */
+.tabs { display: flex; border-bottom: 1px solid #e3e5e8; margin-bottom: 14px; }
+.tab-btn { padding: 8px 14px; font-size: 12.5px; color: #6b7280; border: none; background: transparent; border-bottom: 2px solid transparent; }
+.tab-btn.active { color: #1b4fd8; font-weight: 700; border-bottom-color: #1b4fd8; }
+
+/* ---------- Misc ---------- */
+.selected-count { font-weight: 700; color: #1b4fd8; }
+.drag-handle { cursor: grab; color: #b3b8c0; margin-right: 6px; }
+.spinner {
+  width: 14px; height: 14px; border: 2px solid #c7d6ff; border-top-color: #1b4fd8; border-radius: 50%;
+  display: inline-block; margin-right: 6px; animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
