@@ -1,161 +1,211 @@
 /* ==========================================================================
-   Mock 데이터 — 실 서비스 API 연동 없이 화면 시연을 위한 정적 데이터
-   (10_Prototype/src/data/*.json 에 동일 내용의 참고용 사본이 있음)
+   Mock 데이터 (Backend/DB 없음 — Prototype 전용)
+   - 04_Screen-Spec 의 예시값은 실제 커머스 데이터로 치환했다.
+   - src/data/*.json 은 동일 스키마의 참고용 사본이다.
    ========================================================================== */
-
-window.MOCK = {
-
-  /* ---------------- 연결 관리 : 비즈니스 자산 연동 정보 ---------------- */
-  account: {
-    fbAccountLabel: "테스트 (test@test.com)",
-    businessManagerName: "neotest17",
-    pageName: "neotest17 공식스토어",
-    pixelId: "1234567890",
-    commerceAccountName: "neotest17",
-    catalogName: "neotest17 카탈로그",
-    instagramUsername: "neotest17",
+window.MOCK = (function () {
+  /* ---------------- 연동 자산 (FBE Install 결과에 해당) ---------------- */
+  const account = {
+    fbAccountLabel: "김민지 (admin@noblystudio.kr)",
+    fbEmail: "admin@noblystudio.kr",
+    businessManagerName: "노블리 스튜디오",
+    businessId: "1029384756102938",
+    pageName: "노블리 스튜디오",
+    pageId: "104857392011846",
+    pixelId: "1234567890123456",
+    commerceAccountName: "노블리 스튜디오 커머스",
+    commerceAccountId: "2067673500710840",
+    catalogName: "노블리 스튜디오 카탈로그",
+    catalogId: "876350981244014",
+    instagramUsername: "nobly.studio",
     instagramConnected: true,
-  },
+    fbShopName: "노블리 스튜디오 공식 스토어",
+  };
 
-  /* ---------------- 광고 관리 : 광고 계정 정보 ---------------- */
-  adAccount: {
-    name: "neotest17",
+  const adAccount = {
+    name: "노블리 스튜디오 광고계정",
     id: "act_123456789012345",
-    status: "활성", // 활성 | 차단 | 비활성 | 미결제 | 펜딩
-    monthSpend: 1247500,
-    remainingCredit: 482300,
-    creditType: "후불",
-  },
+    monthSpend: 4827300,
+    prepaidCredit: 1250000,
+  };
 
-  /* ---------------- 쇼핑몰 카테고리 (최하위 분류만 매칭 대상) ---------------- */
-  shopCategories: [
-    { id: "sc1", path: "과실/견과류 > 국내산 과일" },
-    { id: "sc2", path: "과실/견과류 > 수입 과일" },
-    { id: "sc3", path: "과실/견과류 > 냉동/말린 과일" },
-    { id: "sc4", path: "과실/견과류 > 견과류" },
-    { id: "sc5", path: "채소류 > 고구마/감자/뿌리채소" },
-    { id: "sc6", path: "의류 > 여성 > 아우터 > 코트" },
-    { id: "sc7", path: "의류 > 여성 > 아우터 > 자켓" },
-  ],
+  /* ---------------- GPC (Google Product Category) — 메이크샵 DB 적재 분류표 일부 ---------------- */
+  const APPAREL = "의류 및 액세서리";
+  const gpcList = [
+    { id: "5598", path: APPAREL + " > 의류 > 아우터 > 코트 및 재킷" },
+    { id: "5506", path: APPAREL + " > 의류 > 아우터 > 패딩·다운 재킷" },
+    { id: "2271", path: APPAREL + " > 의류 > 원피스" },
+    { id: "212", path: APPAREL + " > 의류 > 셔츠 및 상의" },
+    { id: "5388", path: APPAREL + " > 의류 > 상의 > 맨투맨·스웨트셔츠" },
+    { id: "204", path: APPAREL + " > 의류 > 바지" },
+    { id: "1604", path: APPAREL + " > 의류" },
+    { id: "6551", path: APPAREL + " > 핸드백, 지갑 및 케이스 > 핸드백 > 숄더백" },
+    { id: "100", path: APPAREL + " > 핸드백, 지갑 및 케이스 > 백팩" },
+    { id: "187", path: APPAREL + " > 신발" },
+    { id: "1933", path: APPAREL + " > 신발 > 운동화" },
+    { id: "201", path: APPAREL + " > 주얼리 > 시계" },
+    { id: "167", path: APPAREL + " > 의류 액세서리 > 모자" },
+    { id: "2169", path: "가정 및 정원 > 주방 및 식당 > 식기 > 컵 및 머그" },
+    { id: "4171", path: "가정 및 정원 > 장식 > 향초" },
+    { id: "569", path: "가정 및 정원 > 린넨 및 침구 > 침구 > 이불" },
+    { id: "2660", path: "식품, 음료 및 담배 > 식품 > 과일 및 채소 > 견과류" },
+    { id: "5793", path: "식품, 음료 및 담배 > 식품 > 과일 및 채소 > 생과일" },
+    { id: "2915", path: "건강 및 미용 > 개인 관리 > 화장품 > 스킨케어" },
+    { id: "478", path: "건강 및 미용 > 개인 관리 > 화장품 > 메이크업" },
+    { id: "222", path: "전자제품 > 오디오 > 헤드폰" },
+    { id: "3561", path: "전자제품 > 통신 > 전화 > 휴대전화 액세서리" },
+  ];
 
-  /* 최초 자동 카테고리 매칭 팝업에서 아직 매칭되지 않은 상태로 시작 */
-  categoryMatch: {
-    sc1: null, sc2: null, sc3: null, sc4: null, sc5: null, sc6: null, sc7: null,
-  },
+  /* ---------------- 쇼핑몰 카테고리 (트리) ---------------- */
+  // googleGpc: Google 채널에서 먼저 설정된 공통 GPC (3-3 GPC 공통 매핑 → 기본 선택값)
+  const categories = [
+    { id: "c01", path: ["여성의류", "아우터", "코트"], googleGpc: "5598" },
+    { id: "c02", path: ["여성의류", "아우터", "패딩"], googleGpc: null },
+    { id: "c03", path: ["여성의류", "원피스", "미니원피스"], googleGpc: "2271" },
+    { id: "c04", path: ["여성의류", "원피스", "롱원피스"], googleGpc: null },
+    { id: "c05", path: ["여성의류", "블라우스"], googleGpc: null },
+    { id: "c06", path: ["남성의류", "상의", "맨투맨"], googleGpc: null },
+    { id: "c07", path: ["남성의류", "하의", "슬랙스"], googleGpc: "204" },
+    { id: "c08", path: ["가방", "숄더백"], googleGpc: null },
+    { id: "c09", path: ["가방", "백팩"], googleGpc: null },
+    { id: "c10", path: ["신발", "스니커즈"], googleGpc: null },
+    { id: "c11", path: ["액세서리", "시계"], googleGpc: null },
+    { id: "c12", path: ["리빙", "머그컵"], googleGpc: null },
+    { id: "c13", path: ["리빙", "캔들·디퓨저"], googleGpc: null },
+    { id: "c14", path: ["식품", "과실/견과류", "국내산"], googleGpc: null },
+    { id: "c15", path: ["식품", "과실/견과류", "수입산"], googleGpc: null },
+    { id: "c16", path: ["뷰티", "스킨케어"], googleGpc: null },
+  ];
 
-  /* ---------------- Meta 표준 카테고리(GPC, 일부 발췌) ---------------- */
-  gpcOptions: [
-    "식품, 음료 및 담배 > 식품 > 과일 및 채소 > 신선 과일",
-    "식품, 음료 및 담배 > 식품 > 과일 및 채소 > 신선 채소",
-    "식품, 음료 및 담배 > 식품 > 스낵 식품 > 견과류 및 씨앗류",
-    "식품, 음료 및 담배 > 식품 > 과일 및 채소 > 뿌리채소",
-    "의류 및 액세서리 > 의류 > 겉옷 > 코트",
-    "의류 및 액세서리 > 의류 > 겉옷 > 자켓",
-    "의류 및 액세서리 > 의류 > 겉옷 > 패딩",
-  ],
+  /* ---------------- 상품 ---------------- */
+  // r: 노출제한 판정용 원천 데이터 플래그 (display/sale/soldout/price0/priceText/noImage/noDesc/memberOnly/loginPrice/privatePay)
+  // meta: Meta 처리 결과 (활동중|검토중|미승인|null), reject: 미승인 사유 코드
+  function P(id, name, cat, price, opts, extra) {
+    return Object.assign(
+      { id, no: String(1000230 + id), name, cat, price, options: opts, useFeed: true, gpc: null, gender: null, age: null, meta: null, reject: null, sentGpc: null, r: {} },
+      extra || {}
+    );
+  }
+  const products = [
+    P(1, "울 블렌드 핸드메이드 롱코트", "c01", 289000, 8, { meta: "활동중" }),
+    P(2, "캐시미어 더블 하프코트", "c01", 359000, 6, { meta: "활동중" }),
+    P(3, "오버핏 트렌치코트 베이지", "c01", 189000, 4, { meta: "검토중" }),
+    P(4, "덕다운 숏패딩 점퍼", "c02", 239000, 10, { meta: "활동중" }),
+    P(5, "경량 구스다운 롱패딩", "c02", 319000, 0, { meta: "미승인", reject: "MISSING_BRAND" }),
+    P(6, "플라워 셔링 미니원피스", "c03", 69000, 6, { meta: "활동중" }),
+    P(7, "트위드 스퀘어넥 미니원피스", "c03", 89000, 4, { meta: "활동중" }),
+    P(8, "린넨 셔츠형 롱원피스", "c04", 79000, 6, { meta: "활동중" }),
+    P(9, "니트 랩 롱원피스", "c04", 99000, 6, { r: { soldout: true } }),
+    P(10, "실크 보우 블라우스", "c05", 59000, 4, {}),
+    P(11, "베이직 코튼 블라우스 화이트", "c05", 39000, 3, { r: { noImage: true } }),
+    P(12, "헤비 코튼 오버핏 맨투맨", "c06", 49000, 8, { meta: "활동중" }),
+    P(13, "레터링 기모 맨투맨", "c06", 45000, 6, { meta: "미승인", reject: "IMAGE_NOT_ACCESSIBLE" }),
+    P(14, "와이드 핀턱 슬랙스", "c07", 59000, 10, { meta: "활동중" }),
+    P(15, "밴딩 테이퍼드 슬랙스", "c07", 52000, 8, { meta: "검토중" }),
+    P(16, "[개인결제] 김OO 고객님 슬랙스 수선비", "c07", 15000, 0, {}),
+    P(17, "소프트 레더 숄더백", "c08", 129000, 3, { meta: "활동중" }),
+    P(18, "미니 퀼팅 체인 숄더백", "c08", 0, 2, {}),
+    P(19, "데일리 나일론 백팩", "c09", 79000, 4, { meta: "활동중" }),
+    P(20, "노트북 수납 비즈니스 백팩", "c09", 99000, 2, { meta: "미승인", reject: "COMMERCE_POLICY_VIOLATION" }),
+    P(21, "클래식 캔버스 스니커즈", "c10", 69000, 12, { meta: "활동중" }),
+    P(22, "청키솔 레더 스니커즈", "c10", 109000, 320, { r: { editionOver: true } }),
+    P(23, "애플워치 SE 4세대 스트랩 세트", "c11", 459000, 6, { meta: "활동중" }),
+    P(24, "메탈 밴드 오토매틱 시계", "c11", 289000, 0, { meta: "검토중" }),
+    P(25, "핸드드립 세라믹 머그 350ml", "c12", 18000, 4, { meta: "활동중" }),
+    P(26, "빈티지 법랑 머그 2P 세트", "c12", 26000, 2, { r: { display: true } }),
+    P(27, "소이 캔들 우드윅 200g", "c13", 32000, 5, { meta: "활동중" }),
+    P(28, "리드 디퓨저 대용량 500ml", "c13", 38000, 3, { r: { priceText: true } }),
+    P(29, "국내산 햇 통밤 1kg", "c14", 24000, 2, { meta: "활동중" }),
+    P(30, "무농약 생호두 500g", "c14", 29000, 0, {}),
+    P(31, "캘리포니아 아몬드 1kg", "c15", 19800, 0, { meta: "활동중" }),
+    P(32, "구운 캐슈넛 800g", "c15", 23500, 0, { r: { memberOnly: true } }),
+    P(33, "마카다미아 대용량 1kg (도매)", "c15", 31000, 0, { r: { loginPrice: true } }),
+    P(34, "히알루론 수분 앰플 50ml", "c16", 42000, 2, { meta: "활동중" }),
+    P(35, "시카 진정 토너 300ml", "c16", 28000, 0, { r: { sale: true } }),
+    P(36, "비타민C 브라이트닝 세럼", "c16", 39000, 0, { meta: "미승인", reject: "MISSING_DESCRIPTION" }),
+    P(37, "판매 대기 샘플 상품 (분류 없음)", null, 15000, 0, {}),
+    P(38, "울 혼방 버킷햇", null, 35000, 3, {}),
+    P(39, "오가닉 코튼 홈웨어 세트", "c05", 68000, 6, { useFeed: false }),
+    P(40, "커플 머그 선물세트", "c12", 34000, 2, { r: { noDesc: true } }),
+    P(41, "롱 패딩 베스트", "c02", 149000, 6, { meta: "활동중" }),
+    P(42, "체크 울 미니원피스", "c03", 98000, 4, { meta: "검토중" }),
+    P(43, "니트 집업 가디건 (데일리)", "c05", 62000, 6, {}),
+    P(44, "카고 와이드 슬랙스", "c07", 64000, 8, { meta: "활동중" }),
+    P(45, "가죽 미니 크로스 숄더백", "c08", 89000, 3, { meta: "활동중" }),
+    P(46, "에어 메쉬 러닝 스니커즈", "c10", 89000, 10, { meta: "미승인", reject: "DUPLICATE_ITEM" }),
+  ];
 
-  reasonMessages: {
-    // 미승인 사유
+  /* ---------------- 상품 피드 사유 문구 ---------------- */
+  const restrictReasons = [
+    { key: "display", label: "노출상태가 '노출 안함'인 경우", text: "노출하지 않은 상품입니다. 상품을 노출함 상태로 변경해 주세요." },
+    { key: "sale", label: "판매상태가 '판매불가능'인 경우", text: "판매하지 않는 상품입니다. 상품을 판매함 상태로 변경해 주세요." },
+    { key: "soldout", label: "품절 상품인 경우", text: "품절 상품입니다." },
+    { key: "price0", label: "판매가 0원인 경우", text: "판매가가 0원입니다. 정상 판매가를 입력해 주세요." },
+    { key: "priceText", label: "판매가 대체문구가 사용된 경우", text: "판매가에 대체문구가 설정되어 있습니다. 숫자 판매가로 변경해 주세요." },
+    { key: "noCategory", label: "기본 분류 미지정", text: "상품 분류가 지정되지 않았습니다. 기본 분류를 설정해 주세요." },
+    { key: "privatePay", label: "상품명에 '개인결' 포함", text: "개인결제 상품은 피드에 연동되지 않습니다." },
+    { key: "noImage", label: "상품이미지 없음", text: "상품 이미지가 없습니다. 이미지를 등록해주세요." },
+    { key: "noDesc", label: "상품 상세설명 없음", text: "상품 상세설명이 없습니다. 상세설명을 입력해 주세요." },
+    { key: "memberOnly", label: "특정 회원만 접근(도매회원 포함)", text: "특정 회원 등급만 접근할 수 있는 상품입니다. 전체 공개 상품만 피드에 연동됩니다." },
+    { key: "loginPrice", label: "로그인 후 가격 노출", text: "로그인 후에만 가격이 노출되는 상품입니다. 비로그인 상태에서도 가격이 노출되도록 설정해 주세요." },
+    { key: "editionOver", label: "Meta 에디션 수 300개 초과", text: "전송 가능한 옵션 에디션 수를 초과한 상품입니다. 옵션 조합 수를 300개 이하로 조정해 주세요." },
+  ];
+
+  const rejectReasons = {
     COMMERCE_POLICY_VIOLATION: "Meta 커머스 정책에 위반되어 거부되었습니다. Meta 커머스 정책을 확인해 주세요.",
-    INVALID_PRODUCT_CATEGORY: "페이스북 카테고리가 올바르지 않습니다. 페이스북 카테고리를 다시 매칭해 주세요.",
+    INVALID_PRODUCT_CATEGORY: "상품 카테고리가 올바르지 않습니다. 페이스북 카테고리를 다시 매칭해 주세요.",
     MISSING_PRICE: "가격 정보가 누락되었습니다. 판매가를 확인해 주세요.",
     MISSING_BRAND: "브랜드 정보가 누락되었습니다. 브랜드 값을 등록해 주세요.",
     IMAGE_NOT_ACCESSIBLE: "상품 이미지에 접근할 수 없습니다. 이미지 경로를 확인해 주세요.",
-    // 노출제한 사유
-    NOT_ON_DISPLAY: "노출하지 않은 상품입니다. 상품을 노출함 상태로 변경해 주세요.",
-    OUT_OF_STOCK_LOCAL: "품절 상품입니다.",
-    ZERO_PRICE: "판매가가 0원입니다. 정상 판매가를 입력해 주세요.",
-    NO_CATEGORY: "상품 분류가 지정되지 않았습니다. 기본 분류를 설정해 주세요.",
-    NO_IMAGE: "상품 이미지가 없습니다. 이미지를 등록해 주세요.",
-  },
-
-  /* ---------------- 상품 피드 목록 (24건, 페이지네이션 확인용) ---------------- */
-  products: [
-    p("Apple 정품 라이트닝 이어맷", 3, "의류 > 여성 > 아우터 > 코트", 89000, "active", "의류 및 액세서리 > 의류 > 겉옷 > 코트", "unisex", "adult"),
-    p("울 블렌드 롱 코트", 4, "의류 > 여성 > 아우터 > 코트", 158000, "active", "의류 및 액세서리 > 의류 > 겉옷 > 코트", "female", "adult"),
-    p("캐시미어 숏 자켓", 5, "의류 > 여성 > 아우터 > 자켓", 132000, "active", "의류 및 액세서리 > 의류 > 겉옷 > 자켓", "female", "adult"),
-    p("경량 다운 패딩 자켓", 6, "의류 > 여성 > 아우터 > 자켓", 99000, "active", "의류 및 액세서리 > 의류 > 겉옷 > 자켓", "unisex", "adult"),
-    p("국내산 부사 사과 5호 (10과)", 1, "과실/견과류 > 국내산 과일", 32900, "active", "식품, 음료 및 담배 > 식품 > 과일 및 채소 > 신선 과일", null, null),
-    p("햇밤 고구마 3kg", 1, "채소류 > 고구마/감자/뿌리채소", 21900, "active", "식품, 음료 및 담배 > 식품 > 과일 및 채소 > 뿌리채소", null, null),
-    p("무농약 방울토마토 1kg", 1, "과실/견과류 > 국내산 과일", 15900, "active", "식품, 음료 및 담배 > 식품 > 과일 및 채소 > 신선 과일", null, null),
-    p("칠레산 냉동 블루베리 500g", 1, "과실/견과류 > 냉동/말린 과일", 12900, "active", "식품, 음료 및 담배 > 식품 > 과일 및 채소 > 신선 과일", null, null),
-    p("볶음 아몬드 500g", 1, "과실/견과류 > 견과류", 18900, "active", "식품, 음료 및 담배 > 식품 > 스낵 식품 > 견과류 및 씨앗류", null, null),
-    p("호두 1kg (국내산)", 1, "과실/견과류 > 견과류", 27900, "active", "식품, 음료 및 담배 > 식품 > 스낵 식품 > 견과류 및 씨앗류", null, null),
-    p("여성 트위드 자켓", 4, "의류 > 여성 > 아우터 > 자켓", 142000, "active", "의류 및 액세서리 > 의류 > 겉옷 > 자켓", "female", "adult"),
-    p("남성 방풍 바람막이 자켓", 5, "의류 > 여성 > 아우터 > 자켓", 76000, "active", "의류 및 액세서리 > 의류 > 겉옷 > 자켓", "male", "adult"),
-
-    p("겨울 롱 패딩 코트", 4, "의류 > 여성 > 아우터 > 코트", 219000, "review", null, null, null),
-    p("수입 자몽 3kg (특대)", 1, "과실/견과류 > 수입 과일", 24900, "review", null, null, null),
-
-    p("무스탕 페이크 퍼 코트", 3, "의류 > 여성 > 아우터 > 코트", 178000, "rejected", null, null, null, "MISSING_BRAND"),
-    p("수입 아보카도 4입", 1, "과실/견과류 > 수입 과일", 8900, "rejected", null, null, null, "INVALID_PRODUCT_CATEGORY"),
-    p("프리미엄 캐시미어 100 코트", 2, "의류 > 여성 > 아우터 > 코트", 0, "rejected", null, null, null, "MISSING_PRICE"),
-
-    p("한정판 자수 패딩 자켓", 3, "의류 > 여성 > 아우터 > 자켓", 205000, "limited", null, null, null, "NO_IMAGE"),
-    p("겨울 방한 누빔 자켓 (품절)", 4, "의류 > 여성 > 아우터 > 자켓", 87000, "limited", null, null, null, "OUT_OF_STOCK_LOCAL"),
-    p("샘플 판매가 미설정 상품", 1, "과실/견과류 > 견과류", 0, "limited", null, null, null, "ZERO_PRICE"),
-
-    p("개인결제 전용 맞춤 코트", 1, "의류 > 여성 > 아우터 > 코트", 250000, "disabled", null, null, null),
-    p("도매회원 전용 대량 견과 세트", 1, "과실/견과류 > 견과류", 55000, "disabled", null, null, null),
-
-    p("여성 오버핏 하프 코트", 3, "의류 > 여성 > 아우터 > 코트", 121000, "active", "의류 및 액세서리 > 의류 > 겉옷 > 코트", "female", "adult"),
-    p("국내산 견과 혼합 선물세트", 1, "과실/견과류 > 견과류", 39000, "active", "식품, 음료 및 담배 > 식품 > 스낵 식품 > 견과류 및 씨앗류", null, null),
-  ],
-
-  /* ---------------- 광고 관리 : 캠페인 성과 요약 (조회기간별) ---------------- */
-  perfByPeriod: {
-    today:     { impressions: 61234,   clicks: 2210,  ctr: 3.61, purchases: 42,  spend: 18420,  roas: 7.1, deltaImp: 4.1,  deltaClk: 2.0,  deltaCtr: -0.2, deltaPur: 6.5 },
-    yesterday: { impressions: 1234567, clicks: 98765, ctr: 2.99, purchases: 842, spend: 312840, roas: 8.4, deltaImp: 12.4, deltaClk: 8.1,  deltaCtr: -0.3, deltaPur: 15.2 },
-    last7:     { impressions: 7845210, clicks: 612345,ctr: 3.12, purchases: 5210,spend: 2148000,roas: 7.9, deltaImp: 9.8,  deltaClk: 7.4,  deltaCtr: 0.1,  deltaPur: 11.0 },
-    last30:    { impressions: 30452100,clicks: 2354210,ctr:2.95, purchases:19850,spend: 8420500,roas: 8.0, deltaImp: 15.6, deltaClk: 12.1, deltaCtr: -0.4, deltaPur: 9.3 },
-    thisMonth: { impressions: 18452100,clicks: 1354210,ctr:3.05, purchases:11850,spend: 5120500,roas: 8.2, deltaImp: 10.2, deltaClk: 8.9,  deltaCtr: 0.2,  deltaPur: 13.7 },
-  },
-
-  /* ---------------- 광고 관리 : 캠페인 목록 ---------------- */
-  campaigns: [
-    { name: "캠페인명1", objective: "카탈로그 판매", impressions: 524810, clicks: 15240, purchases: 342, roas: 9.2, revenue: 1181280, cost: 128400, startDate: "2026-05-01", endDate: "2026-07-31" },
-    { name: "캠페인명2", objective: "전환", impressions: 312440, clicks: 9820, purchases: 298, roas: 11.4, revenue: 994280, cost: 87200, startDate: "2026-05-15", endDate: "2026-08-15" },
-    { name: "캠페인명3", objective: "트래픽", impressions: 284110, clicks: 8420, purchases: 124, roas: 6.8, revenue: 423480, cost: 62100, startDate: "2026-06-01", endDate: "-" },
-    { name: "캠페인명4", objective: "브랜드 인지도", impressions: 108200, clicks: 3840, purchases: 54, roas: 2.7, revenue: 76860, cost: 24800, startDate: "2026-06-20", endDate: "2026-07-20" },
-  ],
-
-  campaignColumns: {
-    available: [
-      { key: "objective", label: "목표", desc: "캠페인 목표 유형" },
-      { key: "startDate", label: "시작일시", desc: "광고 시작일" },
-      { key: "endDate", label: "종료일시", desc: "광고 종료일" },
-      { key: "reach", label: "도달수", desc: "광고를 본 순 사용자 수" },
-      { key: "frequency", label: "빈도", desc: "1인당 평균 광고 노출 횟수" },
-      { key: "cpm", label: "CPM", desc: "1,000회 노출당 비용" },
-      { key: "ctr", label: "CTR", desc: "클릭수 ÷ 노출수 × 100" },
-      { key: "cpc", label: "CPC", desc: "클릭 1회당 평균 광고 비용" },
-      { key: "cartAdd", label: "장바구니 추가", desc: "광고 클릭 후 장바구니에 담긴 횟수" },
-      { key: "checkoutStart", label: "결제 시작", desc: "광고 클릭 후 결제를 시작한 횟수" },
-      { key: "cvr", label: "전환율", desc: "구매수 ÷ 클릭수 × 100" },
-      { key: "cpa", label: "CPA", desc: "구매 1건당 평균 광고 비용" },
-    ],
-    selected: [
-      { key: "name", label: "캠페인명", desc: "캠페인 제목", fixed: true },
-      { key: "objective", label: "목표", desc: "캠페인 목표 유형" },
-      { key: "impressions", label: "노출수", desc: "광고가 노출된 총 횟수" },
-      { key: "clicks", label: "클릭수", desc: "광고 클릭 총 횟수" },
-      { key: "purchases", label: "구매수", desc: "광고 클릭 후 발생한 구매 수" },
-      { key: "roas", label: "ROAS", desc: "광고비 1원 대비 발생 매출 비율" },
-      { key: "revenue", label: "매출", desc: "광고로 발생한 총 매출액" },
-      { key: "cost", label: "광고비용", desc: "해당 기간 총 광고 집행 비용" },
-    ],
-  },
-};
-
-/* helper to build a product record concisely */
-function p(name, variantCount, shopCategoryPath, price, status, feedCategory, gender, ageGroup, reasonCode) {
-  return {
-    id: "PRD-" + Math.random().toString(36).slice(2, 9),
-    name, variantCount, shopCategoryPath, price, status,
-    feedCategory: feedCategory || null,
-    gender: gender || null,
-    ageGroup: ageGroup || null,
-    useYn: status !== "disabled",
-    reasonCode: reasonCode || null,
+    INVALID_IMAGE: "이미지 형식이 올바르지 않습니다. 이미지를 다시 등록해 주세요.",
+    OUT_OF_STOCK: "품절 상태로 Meta에서 노출이 제한되었습니다. 재고를 확인해 주세요.",
+    RESTRICTED_PRODUCT: "Meta에서 판매가 제한된 상품입니다. Meta 제한 상품 정책을 확인해 주세요.",
+    DUPLICATE_ITEM: "중복 상품으로 판단되었습니다. 동일 상품 여부를 확인해 주세요.",
+    MISSING_DESCRIPTION: "상품 설명이 누락되었습니다. 상세설명을 입력해 주세요.",
   };
-}
+
+  /* ---------------- 캠페인 (일 평균 지표 + 운영기간: 오늘 기준 상대 일수) ---------------- */
+  // s/e: 시작/종료 (오늘 기준 일수, e=null → 종료일 미설정)
+  function C(name, objective, s, e, imp, clk, buy, rev, spend, reach, atc, ic) {
+    return { name, objective, s, e, imp, clk, buy, rev, spend, reach, atc, ic };
+  }
+  const campaigns = [
+    C("2026 F/W 아우터 신상품 카탈로그 판매", "카탈로그 판매", -60, null, 82000, 1450, 21, 4385000, 512000, 51000, 96, 44),
+    C("가을 원피스 기획전 전환 캠페인", "전환", -45, -2, 54000, 1020, 18, 1734000, 241000, 33000, 70, 31),
+    C("브랜드 인지도 리치 캠페인", "브랜드 인지도", -90, null, 210000, 940, 2, 98000, 188000, 152000, 6, 3),
+    C("인스타그램 릴스 트래픽 캠페인", "트래픽", -30, null, 61000, 2380, 6, 412000, 132000, 40100, 31, 12),
+    C("리타겟팅 장바구니 이탈 고객", "전환", -120, null, 18000, 640, 15, 1625000, 96000, 6100, 40, 22),
+    C("신규 회원 가입 유도 캠페인", "잠재 고객", -20, null, 26000, 520, 1, 59000, 58000, 19800, 4, 2),
+    C("추석 선물세트 견과류 프로모션", "판매", -40, -15, 47000, 1310, 33, 1102000, 167000, 30200, 88, 51),
+    C("뷰티 스킨케어 앰플 런칭", "카탈로그 판매", -14, null, 33000, 780, 9, 401000, 84000, 22300, 27, 14),
+    C("남성 슬랙스 시즌오프", "판매", -75, -31, 29000, 690, 12, 721000, 71000, 18300, 35, 18),
+    C("리빙 캔들 감성 콘텐츠 홍보", "참여", -25, null, 39000, 860, 3, 112000, 52000, 27600, 9, 4),
+    C("블랙프라이데이 사전 알림 캠페인", "브랜드 인지도", 0, null, 15000, 120, 0, 0, 21000, 11200, 0, 0),
+    C("스니커즈 신상 다이나믹 광고", "카탈로그 판매", -55, null, 44000, 1180, 14, 1351000, 143000, 28400, 51, 26),
+    C("여름 린넨 원피스 클리어런스", "판매", -150, -95, 37000, 900, 16, 958000, 89000, 21400, 44, 20),
+    C("백팩 신학기 트래픽 캠페인", "트래픽", -110, -70, 52000, 2010, 7, 455000, 102000, 33900, 22, 9),
+    C("VIP 고객 유사 타겟 확장", "전환", -35, null, 22000, 560, 11, 1188000, 77000, 14800, 30, 17),
+    C("앱 설치 유도 테스트", "앱 홍보", -8, -3, 12000, 230, 0, 0, 19000, 9300, 0, 0),
+    C("머그컵 선물 패키지 프로모션", "판매", -18, null, 21000, 610, 8, 236000, 44000, 15200, 26, 12),
+    C("시계 브랜드 콜라보 캠페인", "브랜드 인지도", -50, -10, 98000, 470, 1, 289000, 121000, 71200, 3, 1),
+    C("패딩 얼리버드 카탈로그 판매", "카탈로그 판매", -10, null, 36000, 990, 12, 1612000, 98000, 24100, 41, 20),
+    C("숄더백 인플루언서 협업 광고", "참여", -28, null, 48000, 1530, 5, 612000, 87000, 35100, 19, 8),
+    C("주말 한정 타임세일", "판매", -4, -1, 16000, 520, 9, 412000, 39000, 11900, 23, 13),
+    C("구매 고객 재구매 리마인드", "전환", -65, null, 9000, 310, 7, 498000, 26000, 3800, 15, 9),
+  ];
+
+  const objectives = ["카탈로그 판매", "전환", "브랜드 인지도", "트래픽", "잠재 고객", "판매", "참여", "앱 홍보"];
+
+  return {
+    account,
+    adAccount,
+    gpcList,
+    APPAREL,
+    categories,
+    products,
+    restrictReasons,
+    rejectReasons,
+    campaigns,
+    objectives,
+  };
+})();
