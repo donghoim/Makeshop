@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" font-family="Pretendard, 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+<rect id="WF-003-bg" x="0" y="0" width="1400" height="900" fill="#FFFFFF"/>
+<g id="WF-003-header">
+<rect x="0" y="0" width="1400" height="44" fill="#E0E0E0" stroke="#E0E0E0" stroke-width="1"/>
+<text x="20" y="28" font-size="16" fill="#222222" font-weight="700">WF-003 상품목록 엑셀 다운로드 (양식관리와 다운로드 파일)</text>
+<text x="1380" y="28" font-size="12" fill="#666666" text-anchor="end">와이어프레임 초안 · [통합옵션] 포함 양식</text>
+</g>
+<g id="area-form-manage">
+<text x="20" y="82" font-size="14" fill="#222222" font-weight="700">A. 상품목록 엑셀 다운로드 양식관리 (팝업)</text>
+<rect x="20" y="94" width="620" height="34" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="34" y="116" font-size="12" fill="#222222" font-weight="700">엑셀 양식</text>
+<rect x="110" y="101" width="160" height="20" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="118" y="116" font-size="12" fill="#222222">- 새로 생성 -</text>
+<text x="262" y="116" font-size="11" fill="#666666" text-anchor="end">v</text>
+<rect x="278" y="101" width="150" height="20" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<rect x="436" y="98" width="70" height="26" fill="#FFFFFF" stroke="#333333" stroke-width="1" rx="3"/><text x="471" y="115" font-size="12" fill="#222222" text-anchor="middle">추가/저장</text>
+<text x="20" y="156" font-size="12" fill="#222222" font-weight="700">다운받는 상품(엑셀) 목록 관리</text>
+<rect x="20" y="166" width="200" height="26" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="120" y="184" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">선택 가능한 상품목록</text>
+<rect x="20" y="192" width="200" height="170" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="30" y="212" font-size="12" fill="#222222">상품 고유번호*</text>
+<text x="30" y="231" font-size="12" fill="#222222">상품명</text>
+<text x="30" y="250" font-size="12" fill="#222222">통합옵션</text>
+<text x="30" y="269" font-size="12" fill="#222222">기본옵션</text>
+<text x="30" y="288" font-size="12" fill="#222222">하이브리드 옵션</text>
+<text x="30" y="307" font-size="12" fill="#222222">판매가격</text>
+<text x="30" y="326" font-size="12" fill="#222222">재고 수량</text>
+<text x="30" y="345" font-size="12" fill="#222222">...</text>
+<rect x="234" y="224" width="44" height="26" fill="#E0E0E0" stroke="#333333" stroke-width="1" rx="3"/><text x="256" y="241" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">&gt;&gt;</text>
+<text x="256" y="266" font-size="11" fill="#222222" text-anchor="middle">추가/저장</text>
+<rect x="234" y="286" width="44" height="26" fill="#E0E0E0" stroke="#333333" stroke-width="1" rx="3"/><text x="256" y="303" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">X</text>
+<text x="256" y="328" font-size="11" fill="#222222" text-anchor="middle">삭제</text>
+<rect x="292" y="166" width="200" height="26" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="392" y="184" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">선택된 상품목록</text>
+<rect x="292" y="192" width="200" height="170" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="302" y="212" font-size="12" fill="#222222">상품 고유번호*</text>
+<text x="302" y="231" font-size="12" fill="#222222">상품명</text>
+<text x="302" y="250" font-size="12" fill="#222222">통합옵션</text>
+<text x="302" y="269" font-size="12" fill="#222222">재고 수량</text>
+<text x="504" y="214" font-size="11" fill="#666666">맨 위로</text>
+<text x="504" y="240" font-size="11" fill="#666666">위로</text>
+<text x="504" y="266" font-size="11" fill="#666666">배열 순서</text>
+<text x="504" y="292" font-size="11" fill="#666666">아래로</text>
+<text x="504" y="318" font-size="11" fill="#666666">맨 아래로</text>
+<text x="20" y="386" font-size="12" fill="#666666">항목 목록은 변경 없음. 품목코드는 별도 항목이 아니라 [통합옵션]의 옵션정보2에 포함됩니다.</text>
+</g>
+<g id="area-form-guide">
+<rect x="20" y="410" width="640" height="130" fill="#F2F2F2" stroke="#999999" stroke-width="1"/>
+<text x="32" y="432" font-size="12" fill="#222222">- 통합옵션은 엑셀 파일로 옵션정보1/옵션정보2로 구분됩니다.</text>
+<text x="32" y="453" font-size="12" fill="#222222">*옵션정보2: 옵션 조합 값, 옵션 조합 형태, 옵션 조합 가격, 옵션별 재고, 옵션 재고 관리 선택,</text>
+<text x="32" y="474" font-size="12" fill="#222222">확인요청수량 사용 여부, 확인요청수량, 판매중지수량 사용 여부, 판매중지수량, 관리코드,</text>
+<text x="32" y="495" font-size="12" fill="#222222">품목코드, 판매상태, 옵션 출력 방식</text>
+<text x="32" y="516" font-size="12" fill="#222222">- 품목코드는 시스템이 부여하는 값으로, 업로드할 때 입력값은 반영되지 않습니다.</text>
+<text x="32" y="537" font-size="12" fill="#222222">-[기본옵션]은 옵션 조합 정보(옵션정보2)가 포함되지 않습니다.</text>
+</g>
+<g id="CMP-FORM-GUIDE-ITEM-CODE">
+<rect x="28" y="480" width="50" height="21" fill="none" stroke="#000000" stroke-width="3"/>
+<rect x="256" y="482" width="44" height="18" fill="#000000" stroke="#000000" stroke-width="1" rx="2"/>
+<text x="278" y="495" font-size="11" fill="#FFFFFF" font-weight="700" text-anchor="middle">추가</text>
+<rect x="28" y="501" width="480" height="21" fill="none" stroke="#000000" stroke-width="3"/><rect x="514" y="502.5" width="79" height="18" fill="#000000" stroke="#000000" stroke-width="1" rx="2"/><text x="553.5" y="515.5" font-size="11" fill="#FFFFFF" font-weight="700" text-anchor="middle">추가 안내</text>
+</g>
+<g id="area-download-file">
+<text x="20" y="624" font-size="14" fill="#222222" font-weight="700">B. 다운로드 파일 ([통합옵션] 포함 양식)</text>
+<rect x="20" y="636" width="110" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="75" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">상품 고유번호</text>
+<rect x="130" y="636" width="120" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="190" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">상품명</text>
+<rect x="250" y="636" width="100" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="300" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">옵션 필수 여부</text>
+<rect x="350" y="636" width="80" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="390" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">옵션명</text>
+<rect x="430" y="636" width="40" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="450" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">...</text>
+<rect x="470" y="636" width="150" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="545" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">옵션 조합 값</text>
+<rect x="620" y="636" width="40" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="640" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">...</text>
+<rect x="660" y="636" width="110" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="715" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">관리코드</text>
+<rect x="770" y="636" width="130" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="835" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">품목코드</text>
+<rect x="900" y="636" width="80" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="940" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">판매상태</text>
+<rect x="980" y="636" width="40" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="1000" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">...</text>
+<rect x="1020" y="636" width="80" height="28" fill="#F2F2F2" stroke="#333333" stroke-width="1"/>
+<text x="1060" y="654" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">재고 수량</text>
+<rect x="20" y="664" width="110" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="28" y="682" font-size="12" fill="#222222">1100279113</text>
+<rect x="130" y="664" width="120" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="138" y="682" font-size="12" fill="#222222">와이드팬츠</text>
+<rect x="250" y="664" width="100" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="258" y="682" font-size="12" fill="#222222">필수</text>
+<rect x="350" y="664" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="358" y="682" font-size="12" fill="#222222">사이즈</text>
+<rect x="430" y="664" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="438" y="682" font-size="12" fill="#222222">...</text>
+<rect x="470" y="664" width="150" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="478" y="682" font-size="12" fill="#222222"></text>
+<rect x="620" y="664" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="628" y="682" font-size="12" fill="#222222"></text>
+<rect x="660" y="664" width="110" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="668" y="682" font-size="12" fill="#222222"></text>
+<rect x="770" y="664" width="130" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="778" y="682" font-size="12" fill="#222222"></text>
+<rect x="900" y="664" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="908" y="682" font-size="12" fill="#222222"></text>
+<rect x="980" y="664" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="988" y="682" font-size="12" fill="#222222">...</text>
+<rect x="1020" y="664" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="1028" y="682" font-size="12" fill="#222222">무제한</text>
+<rect x="20" y="692" width="110" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="28" y="710" font-size="12" fill="#222222"></text>
+<rect x="130" y="692" width="120" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="138" y="710" font-size="12" fill="#222222"></text>
+<rect x="250" y="692" width="100" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="258" y="710" font-size="12" fill="#222222">필수</text>
+<rect x="350" y="692" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="358" y="710" font-size="12" fill="#222222">기장</text>
+<rect x="430" y="692" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="438" y="710" font-size="12" fill="#222222">...</text>
+<rect x="470" y="692" width="150" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="478" y="710" font-size="12" fill="#222222">S,숏,숏-블랙</text>
+<rect x="620" y="692" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="628" y="710" font-size="12" fill="#222222">...</text>
+<rect x="660" y="692" width="110" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="668" y="710" font-size="12" fill="#222222">ABC-S-BK</text>
+<rect x="770" y="692" width="130" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="778" y="710" font-size="12" fill="#222222">{품목코드}</text>
+<rect x="900" y="692" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="908" y="710" font-size="12" fill="#222222">판매</text>
+<rect x="980" y="692" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="988" y="710" font-size="12" fill="#222222"></text>
+<rect x="1020" y="692" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="1028" y="710" font-size="12" fill="#222222"></text>
+<rect x="20" y="720" width="110" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="28" y="738" font-size="12" fill="#222222"></text>
+<rect x="130" y="720" width="120" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="138" y="738" font-size="12" fill="#222222"></text>
+<rect x="250" y="720" width="100" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="258" y="738" font-size="12" fill="#222222"></text>
+<rect x="350" y="720" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="358" y="738" font-size="12" fill="#222222"></text>
+<rect x="430" y="720" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="438" y="738" font-size="12" fill="#222222">...</text>
+<rect x="470" y="720" width="150" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="478" y="738" font-size="12" fill="#222222">S,숏,숏-핑크스완</text>
+<rect x="620" y="720" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="628" y="738" font-size="12" fill="#222222">...</text>
+<rect x="660" y="720" width="110" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="668" y="738" font-size="12" fill="#222222"></text>
+<rect x="770" y="720" width="130" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="778" y="738" font-size="12" fill="#222222">{품목코드}</text>
+<rect x="900" y="720" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="908" y="738" font-size="12" fill="#222222">판매</text>
+<rect x="980" y="720" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="988" y="738" font-size="12" fill="#222222"></text>
+<rect x="1020" y="720" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="1028" y="738" font-size="12" fill="#222222"></text>
+<rect x="20" y="748" width="110" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="28" y="766" font-size="12" fill="#222222">1100006926</text>
+<rect x="130" y="748" width="120" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="138" y="766" font-size="12" fill="#222222">노조합 상품</text>
+<rect x="250" y="748" width="100" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="258" y="766" font-size="12" fill="#222222">필수</text>
+<rect x="350" y="748" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="358" y="766" font-size="12" fill="#222222">사이즈</text>
+<rect x="430" y="748" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="438" y="766" font-size="12" fill="#222222">...</text>
+<rect x="470" y="748" width="150" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="478" y="766" font-size="12" fill="#222222"></text>
+<rect x="620" y="748" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="628" y="766" font-size="12" fill="#222222"></text>
+<rect x="660" y="748" width="110" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="668" y="766" font-size="12" fill="#222222"></text>
+<rect x="770" y="748" width="130" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="778" y="766" font-size="12" fill="#222222">{품목코드}</text>
+<rect x="900" y="748" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="908" y="766" font-size="12" fill="#222222"></text>
+<rect x="980" y="748" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="988" y="766" font-size="12" fill="#222222">...</text>
+<rect x="1020" y="748" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="1028" y="766" font-size="12" fill="#222222">100</text>
+<rect x="20" y="776" width="110" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="28" y="794" font-size="12" fill="#222222">1100000001</text>
+<rect x="130" y="776" width="120" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="138" y="794" font-size="12" fill="#222222">옵션 없는 상품</text>
+<rect x="250" y="776" width="100" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="258" y="794" font-size="12" fill="#222222"></text>
+<rect x="350" y="776" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="358" y="794" font-size="12" fill="#222222"></text>
+<rect x="430" y="776" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="438" y="794" font-size="12" fill="#222222">...</text>
+<rect x="470" y="776" width="150" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="478" y="794" font-size="12" fill="#222222"></text>
+<rect x="620" y="776" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="628" y="794" font-size="12" fill="#222222"></text>
+<rect x="660" y="776" width="110" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="668" y="794" font-size="12" fill="#222222"></text>
+<rect x="770" y="776" width="130" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="778" y="794" font-size="12" fill="#222222">{품목코드}</text>
+<rect x="900" y="776" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="908" y="794" font-size="12" fill="#222222"></text>
+<rect x="980" y="776" width="40" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="988" y="794" font-size="12" fill="#222222">...</text>
+<rect x="1020" y="776" width="80" height="28" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="1028" y="794" font-size="12" fill="#222222">100</text>
+</g>
+<g id="CMP-ITEM-CODE-EXCEL-COLUMN">
+<rect x="770" y="636" width="130" height="168" fill="none" stroke="#000000" stroke-width="3"/><rect x="770" y="616" width="170" height="18" fill="#000000" stroke="#000000" stroke-width="1" rx="2"/><text x="855" y="629" font-size="11" fill="#FFFFFF" font-weight="700" text-anchor="middle">추가 · 업로드 미반영</text>
+</g>
+<g id="area-file-notes">
+<text x="1120" y="664" font-size="12" fill="#666666">1행 조합옵션 상품의 상품 행: 빈 칸</text>
+<text x="1120" y="683" font-size="12" fill="#666666">2·3행 조합 행: 조합마다 품목코드</text>
+<text x="1120" y="702" font-size="12" fill="#666666">4·5행 노조합·옵션 없는 상품:</text>
+<text x="1120" y="721" font-size="12" fill="#666666">      상품 행에 기본 품목코드</text>
+<text x="1120" y="740" font-size="12" fill="#666666"></text>
+<text x="1120" y="759" font-size="12" fill="#666666">머리글 안내: 품목코드 - 변경 금지</text>
+<text x="1120" y="778" font-size="12" fill="#666666">(시스템 자동 부여) - 업로드 시</text>
+<text x="1120" y="797" font-size="12" fill="#666666">입력값 미반영</text>
+</g>
+<g id="area-notes">
+<text x="20" y="856" font-size="12" fill="#666666">- 상품 식별자는 기존 "상품 고유번호" 열을 그대로 씁니다. 열을 추가하지 않습니다.</text>
+</g>
+</svg>

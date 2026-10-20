@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" font-family="Pretendard, 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+<rect id="WF-002-bg" x="0" y="0" width="1280" height="640" fill="#FFFFFF"/>
+<g id="WF-002-header">
+<rect x="0" y="0" width="1280" height="44" fill="#E0E0E0" stroke="#E0E0E0" stroke-width="1"/>
+<text x="20" y="28" font-size="16" fill="#222222" font-weight="700">WF-002 상품 수정 &gt; 등록상품 수정 요약 박스</text>
+<text x="1260" y="28" font-size="12" fill="#666666" text-anchor="end">와이어프레임 초안 · 노조합 옵션 상품, 옵션 없는 상품</text>
+</g>
+<g id="area-tabs">
+<rect x="20" y="64" width="80" height="32" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="60" y="85" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">기본정보</text>
+<rect x="100" y="64" width="80" height="32" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="140" y="85" font-size="12" fill="#222222" text-anchor="middle">노출설정</text>
+<rect x="180" y="64" width="145" height="32" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="252.5" y="85" font-size="12" fill="#222222" text-anchor="middle">옵션/추가구성상품</text>
+<rect x="325" y="64" width="80" height="32" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="365" y="85" font-size="12" fill="#222222" text-anchor="middle">관련상품</text>
+<rect x="405" y="64" width="67" height="32" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="438.5" y="85" font-size="12" fill="#222222" text-anchor="middle">이미지</text>
+<rect x="472" y="64" width="80" height="32" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="512" y="85" font-size="12" fill="#222222" text-anchor="middle">상세정보</text>
+<rect x="552" y="64" width="67" height="32" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="585.5" y="85" font-size="12" fill="#222222" text-anchor="middle">아이콘</text>
+<rect x="619" y="64" width="106" height="32" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="672" y="85" font-size="12" fill="#222222" text-anchor="middle">이벤트/제한</text>
+<rect x="725" y="64" width="106" height="32" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="778" y="85" font-size="12" fill="#222222" text-anchor="middle">상세공통정보</text>
+<rect x="831" y="64" width="106" height="32" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="884" y="85" font-size="12" fill="#222222" text-anchor="middle">SEO 설정</text>
+</g>
+<g id="area-summary-box">
+<rect x="40" y="114" width="120" height="26" fill="#E0E0E0" stroke="#333333" stroke-width="1"/>
+<text x="100" y="132" font-size="12" fill="#222222" font-weight="700" text-anchor="middle">등록상품 수정</text>
+<rect x="40" y="140" width="1000" height="190" fill="#FFFFFF" stroke="#333333" stroke-width="2"/>
+<rect x="740" y="140" width="1" height="190" fill="#333333" stroke="#333333" stroke-width="1"/>
+<text x="60" y="170" font-size="12" fill="#222222">- 최초 등록 일시 : 2026-07-10 08:50:43</text>
+<text x="60" y="196" font-size="12" fill="#222222">- 최근 수정 일시 : 2026-07-10 09:09:54</text>
+<text x="60" y="222" font-size="12" fill="#222222">- 최초 등록 : 관리자</text>
+<text x="60" y="248" font-size="12" fill="#222222">- 최종 수정 : 관리자</text>
+<text x="60" y="274" font-size="12" fill="#222222">- 상품분류 : 메이크샵(대) &gt; 하의(중) &gt; 기타(소)</text>
+<text x="400" y="170" font-size="12" fill="#222222">- 상 품 코 드 : 004003000001</text>
+<text x="400" y="196" font-size="12" fill="#222222">- 상 품 번 호 : 1100006926</text>
+<text x="400" y="222" font-size="12" fill="#222222">- 상품 바코드 : 7234202791135</text>
+<text x="400" y="274" font-size="12" fill="#222222">- 최종 노출 : 2026-07-10 08:50:43</text>
+<text x="400" y="300" font-size="12" fill="#222222">- 사입/도매업체 :</text>
+<rect x="760" y="162" width="14" height="14" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="782" y="174" font-size="12" fill="#222222" font-weight="700">상품진열위치 고정(관리자별 설정)</text>
+<rect x="760" y="192" width="120" height="26" fill="#FFFFFF" stroke="#333333" stroke-width="1" rx="3"/><text x="820" y="209" font-size="12" fill="#222222" text-anchor="middle">진열상품 바로가기</text>
+<rect x="888" y="192" width="120" height="26" fill="#FFFFFF" stroke="#333333" stroke-width="1" rx="3"/><text x="948" y="209" font-size="12" fill="#222222" text-anchor="middle">상품URL 복사하기</text>
+</g>
+<g id="CMP-ITEM-CODE-ROW">
+<text x="400" y="248" font-size="12" fill="#222222">- 품 목 코 드 : {품목코드}</text>
+<rect x="580" y="236" width="16" height="16" fill="#FFFFFF" stroke="#999999" stroke-width="1" rx="8"/>
+<text x="588" y="248" font-size="11" fill="#222222" text-anchor="middle">?</text>
+<rect x="390" y="230" width="220" height="25" fill="none" stroke="#000000" stroke-width="3"/><rect x="616" y="233.5" width="144" height="18" fill="#000000" stroke="#000000" stroke-width="1" rx="2"/><text x="688" y="246.5" font-size="11" fill="#FFFFFF" font-weight="700" text-anchor="middle">추가 · 읽기 전용</text>
+</g>
+<g id="area-product-basic">
+<text x="40" y="370" font-size="14" fill="#222222" font-weight="700">상품 기본 정보</text>
+<rect x="40" y="382" width="1000" height="90" fill="#F2F2F2" stroke="#999999" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="540" y="432" font-size="13" fill="#666666" text-anchor="middle">기본 상품명 · 가격설정 · 재고설정 · 기본옵션설정 등 (변경 없음)</text>
+</g>
+<g id="area-notes">
+<text x="40" y="558" font-size="12" fill="#666666">- 품목코드 줄은 품목이 1개인 노조합 옵션 상품과 옵션 없는 상품에만 표시합니다. 조합옵션 상품은 WF-001에서 품목별로 확인합니다.</text>
+<text x="40" y="576" font-size="12" fill="#666666">- 상품 식별자: 기존 "상품 번호"를 그대로 쓰므로 박스에 줄을 추가하지 않습니다.</text>
+<text x="40" y="594" font-size="12" fill="#666666">- 노조합 옵션 상품은 기본 품목 1개입니다. 현행 화면·엑셀에서 재고를 상품 단위로만 관리합니다.</text>
+</g>
+</svg>
