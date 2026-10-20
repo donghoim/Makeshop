@@ -12,5 +12,6 @@
 | [`makeshop-mcp/`](./makeshop-mcp) | MakeShop MCP 연동 서비스 기획 — 요구사항/정책/Data-API/QA/개발 킥오프 문서 세트(조회형 MCP 1차 MVP, UI 프로토타입 없음) | — |
 | [`category-filter-improvement/`](./category-filter-improvement) | 분류 검색 필터 관리 개선(필터 설정·일괄 관리) 프로토타입 | [바로가기](https://donghoim.github.io/Makeshop/category-filter-improvement/) |
 | [`bundle-product-excel-upload/`](./bundle-product-excel-upload) | 묶음상품 엑셀 업로드 등록/수정 개선 기획 — PRD 분석·문제 정의·해결 방향(기존 양식에 구성상품·묶음수량 컬럼 추가), 정책서 작성 예정(UI 프로토타입 없음) | — |
+| [`product-option-identification/`](./product-option-identification) | 상품 옵션 식별 체계 개선 기획 — 품목코드(`{상품번호}-{순번}`) 형식·채번·유지/신규 발급 정책서와 기획 리뷰용 쉬운 설명(UI 프로토타입 없음) | — |
 
 각 프로젝트 폴더의 README에 상세 실행 방법이 있습니다.
