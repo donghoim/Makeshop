@@ -1,0 +1,57 @@
+/* 사이트 보안 설정 화면(2026 신규 관리자 UI) 구조를 다시 만든 정적 화면용 스타일 */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap");
+*{box-sizing:border-box;}
+html,body{margin:0; background:#fff;}
+body{font-family:"Noto Sans KR","Malgun Gothic",sans-serif; color:#222; font-size:13px; -webkit-font-smoothing:antialiased;}
+.screen{width:1100px; padding:22px 28px 26px; background:#fff;}
+
+.head{display:flex; align-items:center; justify-content:space-between;}
+.title{display:flex; align-items:center; gap:8px; font-size:20px; font-weight:700; letter-spacing:-.01em;}
+.manual{font-size:11px; font-weight:500; color:#3a74e8; background:#eaf1fe; border-radius:10px; padding:2px 9px;}
+.crumbs{font-size:11.5px; color:#8b909c;}
+
+.tabs{display:flex; gap:22px; margin-top:18px; border-bottom:1px solid #e6e8ee;}
+.tabs span{padding:0 2px 9px; font-size:13.5px; color:#7d828e;}
+.tabs span.on{color:#111; font-weight:700; border-bottom:2px solid #2f6fe4; margin-bottom:-1px;}
+
+.section{margin-top:18px; border-top:1px solid #e6e8ee;}
+.tabs + .section{margin-top:6px; border-top:0;}
+.section-title{font-size:15px; font-weight:700; padding:16px 14px; border-bottom:1px solid #eceef2;}
+
+.row{display:flex; align-items:center; min-height:62px; padding:12px 14px; border-bottom:1px solid #eceef2;}
+.row.sub{background:#f7f8fa; min-height:52px;}
+.row .label{width:160px; flex-shrink:0; color:#3b3f48; display:flex; align-items:center; gap:5px;}
+.row.sub .label{padding-left:14px; color:#4a4f59;}
+.q{display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border-radius:50%; background:#c9cdd6; color:#fff; font-size:9.5px; font-weight:700;}
+.field{flex:1; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+
+.seg{display:inline-flex; border:1px solid #d5d9e2; border-radius:4px; overflow:hidden;}
+.seg span{width:150px; text-align:center; padding:6px 0; font-size:12.5px; color:#444; background:#fff;}
+.seg span + span{border-left:1px solid #d5d9e2;}
+.seg span.on{background:#b9c5ea; color:#1d2a4d; font-weight:500;}
+
+.input{height:32px; border:1px solid #dde1e8; border-radius:4px; padding:0 11px; display:flex; align-items:center; color:#333; background:#fff; font-size:12.5px;}
+.input.ph{color:#a6abb5;}
+.input.wide{flex:1;}
+.input.date{width:150px; justify-content:space-between;}
+.input.date::after{content:""; width:13px; height:13px; border:1.5px solid #9aa0ac; border-radius:2px; border-top-width:3px;}
+.select{height:30px; border:1px solid #dde1e8; border-radius:4px; padding:0 10px; display:inline-flex; align-items:center; gap:14px; background:#fff;}
+.select::after{content:"⌄"; color:#777; margin-top:-5px;}
+
+.btn{height:32px; padding:0 14px; border-radius:4px; display:inline-flex; align-items:center; font-size:12.5px; border:1px solid #d5d9e2; background:#eef0f4; color:#333;}
+.btn.primary{background:#2f7cf6; border-color:#2f7cf6; color:#fff; font-weight:500; padding:0 24px; height:40px;}
+.btn.line{background:#fff;}
+
+.status{font-size:12px; color:#555; display:inline-flex; align-items:center; gap:6px;}
+.status::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--c,#2f7cf6);}
+.hint{font-size:12px; color:#2f6fe4;}
+.muted{font-size:12px; color:#8b909c;}
+.count{font-size:12.5px; color:#2f6fe4; font-weight:500;}
+
+.check{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:#333;}
+.check::before{content:"✓"; display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:3px; background:#2f7cf6; color:#fff; font-size:10px; font-weight:700;}
+.check.off::before{content:""; background:#fff; border:1px solid #c5cad3;}
+
+.notice{margin-top:14px; background:#f7f8fa; border:1px solid #eceef2; border-radius:4px; padding:12px 16px; font-size:12px; color:#555; line-height:1.75;}
+.notice b{color:#d64545; font-weight:500;}
+.actions{display:flex; justify-content:center; gap:8px; margin-top:18px;}

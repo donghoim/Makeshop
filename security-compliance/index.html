@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security &amp; Compliance — 화면 모음</title>
+<link rel="stylesheet" href="ui.css">
+<style>
+.screen{width:auto; max-width:1100px; margin:0 auto;}
+.cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; margin-top:20px;}
+.card{display:block; border:1px solid #e3e6ec; border-radius:6px; overflow:hidden; color:inherit; text-decoration:none; background:#fff;}
+.card:hover{border-color:#2f7cf6;}
+.card img{display:block; width:100%; aspect-ratio:1100/658; object-fit:cover; object-position:top left; border-bottom:1px solid #eceef2;}
+.card .t{font-weight:700; font-size:14px; padding:12px 14px 4px;}
+.card .d{font-size:12px; color:#666; padding:0 14px 14px; line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="head">
+    <div class="title">Security &amp; Compliance</div>
+    <div class="crumbs">로그인 보안 강화 · 휴면회원 정책 전환</div>
+  </div>
+  <p class="muted" style="margin-top:8px;">관리자 화면 구조를 다시 만든 정적 화면입니다. 값은 모두 예시입니다.</p>
+  <div class="cards">
+    <a class="card" href="ip-monitoring.html"><img src="images/ip-monitoring.jpg" alt=""><div class="t">로그인 활동 모니터링 — IP별 조회</div><div class="d">기간별·IP별 로그인 통계, 다중 계정 시도 IP, 로그 다운로드</div></a>
+    <a class="card" href="security-settings.html"><img src="images/security-settings.jpg" alt=""><div class="t">사이트 보안 설정 — 보안 설정 탭</div><div class="d">계정 잠금, Google reCAPTCHA 활성화(키 입력·연결 검증)</div></a>
+    <a class="card" href="dormant-bulk-release.html"><img src="images/dormant-bulk-release.jpg" alt=""><div class="t">휴면 상태 일괄 해제 신청</div><div class="d">전환 대상 기간·전환일, 사전 고지 확인, 법적 책임 안내</div></a>
+  </div>
+</div>
+</body>
+</html>

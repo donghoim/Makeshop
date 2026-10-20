@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>로그인 활동 모니터링 — IP별 조회</title>
+<link rel="stylesheet" href="ui.css">
+<style>
+.screen.narrow{width:880px;}
+.search .row{min-height:46px; padding:7px 14px;}
+.search .row .label{width:120px; font-size:12.5px;}
+.search .input{height:28px; font-size:12px;}
+.search .input.date{width:130px;}
+.quick{display:inline-flex; border:1px solid #d5d9e2; border-radius:4px; overflow:hidden;}
+.quick span{padding:4px 10px; font-size:11.5px; color:#555;}
+.quick span+span{border-left:1px solid #d5d9e2;}
+.quick span.on{background:#eaf1fe; color:#2f6fe4; font-weight:500;}
+.sub-title{font-size:14px; font-weight:700; margin:20px 0 10px;}
+.stats{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.stat{border:1px solid #e3e6ec; border-radius:6px; padding:14px 16px;}
+.stat .k{font-size:12px; color:#666;}
+.stat .v{font-size:22px; font-weight:700; margin-top:6px;}
+.stat .s{font-size:11px; color:#8b909c; margin-top:4px;}
+.tbl-tools{display:flex; justify-content:flex-end; gap:6px; margin-bottom:8px;}
+.tbl-tools .btn{height:28px; font-size:11.5px; padding:0 10px; background:#fff;}
+table{width:100%; border-collapse:collapse; font-size:12px; border-top:1px solid #cfd3db;}
+th{background:#f7f8fa; color:#555; font-weight:500; padding:9px 6px; border-bottom:1px solid #e3e6ec;}
+td{padding:9px 6px; text-align:center; border-bottom:1px solid #eef0f3; color:#333;}
+td.ip{font-family:"IBM Plex Mono",monospace; font-size:11.5px;}
+td.ok{color:#2f6fe4;} td.ng{color:#d64545;}
+</style>
+</head>
+<body>
+<div class="screen narrow">
+  <div class="head"><div class="title">로그인 활동 모니터링</div></div>
+  <div class="tabs"><span>기간별 조회</span><span class="on">IP별 조회</span></div>
+  <div class="search">
+    <div class="section" style="margin-top:12px;">
+      <div class="row"><div class="label">로그인 일시</div><div class="field"><div class="input date">2026-03-02</div><span class="muted">~</span><div class="input date">2026-03-11</div><span class="quick"><span>오늘</span><span>어제</span><span>3일</span><span class="on">7일</span><span>30일</span></span></div></div>
+      <div class="row"><div class="label">회원</div><div class="field"><span class="select" style="height:28px;">ID</span><div class="input ph" style="width:260px;">전체</div></div></div>
+      <div class="row"><div class="label">성공률 이하</div><div class="field"><span class="select" style="height:28px; width:260px; justify-content:space-between;">전체</span></div></div>
+      <div class="row"><div class="label">실패 횟수 이상</div><div class="field"><div class="input ph" style="width:260px;">숫자만 입력 가능합니다</div></div></div>
+      <div class="row"><div class="label">IP 주소</div><div class="field"><div class="input ph" style="width:260px;">예 : 192.168.0.1</div></div></div>
+    </div>
+    <div class="actions" style="margin-top:12px;"><span class="btn line" style="height:32px;">초기화</span><span class="btn primary" style="height:32px; padding:0 18px;">검색</span></div>
+  </div>
+
+  <div class="sub-title">IP별 로그인 활동 통계</div>
+  <div class="stats">
+    <div class="stat"><div class="k">총 접속 IP 수</div><div class="v">65</div><div class="s">이전 기간 대비 +47.73%</div></div>
+    <div class="stat"><div class="k">최다 시도 IP</div><div class="v">42</div><div class="s">192.168.0.14</div></div>
+    <div class="stat"><div class="k">최다 실패 IP</div><div class="v">39</div><div class="s">192.168.0.14</div></div>
+    <div class="stat"><div class="k">다중 계정 시도 IP 수</div><div class="v">2</div><div class="s">5개 이상 서로 다른 계정으로 로그인 시도</div></div>
+  </div>
+
+  <div class="sub-title">IP별 로그인 활동 내역</div>
+  <div class="tbl-tools"><span class="btn">전체 로그 다운로드</span><span class="btn">검색 항목 다운로드</span><span class="select" style="height:28px; font-size:11.5px;">로그인 시도 많은 순</span></div>
+  <table>
+    <tr><th>IP</th><th>로그인 회원</th><th>총 시도</th><th>성공</th><th>실패</th><th>성공률</th><th>실패율</th></tr>
+    <tr><td class="ip">192.168.0.14</td><td>9</td><td>42</td><td class="ok">3</td><td class="ng">39</td><td>7.14%</td><td>92.86%</td></tr>
+    <tr><td class="ip">192.168.0.27</td><td>6</td><td>18</td><td class="ok">1</td><td class="ng">17</td><td>5.56%</td><td>94.44%</td></tr>
+    <tr><td class="ip">192.168.0.3</td><td>1</td><td>6</td><td class="ok">6</td><td class="ng">0</td><td>100.00%</td><td>0.00%</td></tr>
+    <tr><td class="ip">192.168.0.8</td><td>2</td><td>5</td><td class="ok">4</td><td class="ng">1</td><td>80.00%</td><td>20.00%</td></tr>
+    <tr><td class="ip">192.168.0.5</td><td>1</td><td>3</td><td class="ok">3</td><td class="ng">0</td><td>100.00%</td><td>0.00%</td></tr>
+  </table>
+</div>
+</body>
+</html>
