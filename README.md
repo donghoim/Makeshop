@@ -7,7 +7,7 @@
 | 폴더 | 설명 | GitHub Pages |
 |---|---|---|
 | [`web-ide/`](./web-ide) | 메이크샵 개별디자인 편집 화면을 VS Code 스타일 Web IDE로 개편한 프로토타입 | [바로가기](https://donghoim.github.io/Makeshop/web-ide/) |
-| [`google-channel/`](./google-channel) | Google 채널 연동(연결관리·상품피드·구글애즈) 프로토타입 | [바로가기](https://donghoim.github.io/Makeshop/google-channel/) |
+| [`google-channel/`](./google-channel) | Google 채널 연동(연결관리·상품피드·구글애즈) 프로토타입 v0.1 + [`v0.2/`](./google-channel/v0.2) 마케팅 채널 관리 통합 기획(사양·요구사항·정책서·와이어프레임·CS 가이드, HTML 화면정의서 43개 화면, 목업) | [v0.1](https://donghoim.github.io/Makeshop/google-channel/) · [v0.2](https://donghoim.github.io/Makeshop/google-channel/v0.2/) · [화면정의서](https://donghoim.github.io/Makeshop/google-channel/v0.2/screen-spec.html) |
 | [`meta-channel/`](./meta-channel) | Meta 비즈니스 연동(홈·연결관리·상품피드·광고관리·Shops 관리) 프로토타입 v2 + QA 테스트 케이스(엑셀, 267건) | [바로가기](https://donghoim.github.io/Makeshop/meta-channel/) |
 | [`makeshop-mcp/`](./makeshop-mcp) | MakeShop MCP 연동 서비스 기획 — 요구사항/정책/Data-API/QA/개발 킥오프 문서 세트(조회형 MCP 1차 MVP, UI 프로토타입 없음) | — |
 | [`category-filter-improvement/`](./category-filter-improvement) | 분류 검색 필터 관리 개선(필터 설정·일괄 관리) 프로토타입 | [바로가기](https://donghoim.github.io/Makeshop/category-filter-improvement/) |

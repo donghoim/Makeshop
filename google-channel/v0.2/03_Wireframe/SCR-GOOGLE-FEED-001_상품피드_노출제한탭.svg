@@ -1,0 +1,106 @@
+<svg width="1440" height="820" viewBox="0 0 1440 820" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard, 'Malgun Gothic', sans-serif">
+<rect width="1440" height="820" fill="#FFFFFF"/>
+<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5B6472"/></marker></defs>
+<rect x="0" y="0" width="1440" height="48" rx="0" fill="#5B6472" stroke="#5B6472" stroke-width="1"/>
+<text x="24" y="30" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">make# 관리자</text>
+<rect x="0" y="48" width="1440" height="52" rx="0" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="24" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">설정</text>
+<text x="120" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">상품</text>
+<text x="216" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">주문</text>
+<text x="312" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">회원</text>
+<text x="408" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">게시판/메일</text>
+<text x="504" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">프로모션</text>
+<text x="600" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">디자인</text>
+<text x="696" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">부가서비스</text>
+<text x="792" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">통계</text>
+<text x="888" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">CRM</text>
+<text x="984" y="80" font-size="14" font-weight="700" fill="#2B2F36" text-anchor="start">마케팅</text>
+<line x1="978" y1="99" x2="1034" y2="99" stroke="#3B4250" stroke-width="3"/>
+<rect x="0" y="100" width="220" height="720" rx="0" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="110" y="146" font-size="20" font-weight="700" fill="#2B2F36" text-anchor="middle">마케팅</text>
+<text x="24" y="190" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">· …</text>
+<rect x="8" y="202" width="204" height="30" rx="4" fill="#F2F4F7" stroke="#F2F4F7" stroke-width="1"/>
+<text x="24" y="222" font-size="13" font-weight="700" fill="#2B2F36" text-anchor="start">· 마케팅 채널 관리</text>
+<text x="24" y="254" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">· …</text>
+<rect x="220" y="100" width="1220" height="720" rx="0" fill="#F7F8FA" stroke="#F7F8FA" stroke-width="1"/>
+<text x="260" y="152" font-size="22" font-weight="700" fill="#2B2F36" text-anchor="start">마케팅 채널 관리</text>
+<text x="1400" y="152" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="end">마케팅 &gt; 마케팅 채널 관리 &gt; Google &gt; 상품피드</text>
+<line x1="260" y1="214" x2="1400" y2="214" stroke="#C9CED6" stroke-width="1"/>
+<text x="313" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">통합 현황</text>
+<text x="448" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">통합 상품 피드</text>
+<text x="576" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">Meta</text>
+<text x="690" y="200" font-size="14" font-weight="700" fill="#2B2F36" text-anchor="middle">Google</text>
+<line x1="630" y1="213" x2="750" y2="213" stroke="#3B4250" stroke-width="3"/>
+<text x="818" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">TikTok</text>
+<rect x="260" y="240" width="150" height="260" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<rect x="310" y="262" width="50" height="40" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="310" y1="262" x2="360" y2="302" stroke="#C9CED6" stroke-width="1"/>
+<line x1="360" y1="262" x2="310" y2="302" stroke="#C9CED6" stroke-width="1"/>
+<text x="282" y="330" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">홈</text>
+<text x="282" y="372" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">연결관리</text>
+<rect x="260" y="392" width="150" height="36" rx="0" fill="#F2F4F7" stroke="#F2F4F7" stroke-width="1"/>
+<line x1="261" y1="392" x2="261" y2="428" stroke="#3B4250" stroke-width="3"/>
+<text x="282" y="414" font-size="13" font-weight="700" fill="#2B2F36" text-anchor="start">상품피드</text>
+<text x="282" y="456" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">구글애즈</text>
+<rect x="430" y="240" width="970" height="520" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="454" y="276" font-size="16" font-weight="700" fill="#2B2F36" text-anchor="start">상품 피드 (노출제한 탭)</text>
+<text x="521" y="316" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="middle">전체 (1,183)</text>
+<text x="666.5" y="316" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="middle">활동중 (1,120)</text>
+<text x="795.5" y="316" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="middle">검토중 (4)</text>
+<text x="908" y="316" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="middle">미승인 (14)</text>
+<text x="1031.5" y="316" font-size="13" font-weight="700" fill="#2B2F36" text-anchor="middle">노출제한 (27)</text>
+<line x1="970" y1="328" x2="1093" y2="328" stroke="#3B4250" stroke-width="3"/>
+<text x="1155" y="316" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="middle">사용안함 (6)</text>
+<text x="1278.5" y="316" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="middle">반영대기 (12)</text>
+<line x1="454" y1="329" x2="1376" y2="329" stroke="#C9CED6" stroke-width="1"/>
+<rect x="454" y="350" width="922" height="52" rx="0" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<text x="468" y="381" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start"></text>
+<text x="508" y="381" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">상품정보</text>
+<text x="758" y="381" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">가격</text>
+<text x="848" y="381" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">연동 상품 수</text>
+<text x="938" y="381" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">Google 상품 카테고리</text>
+<text x="1148" y="381" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">노출제한 사유</text>
+<text x="1308" y="381" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">관리</text>
+<line x1="454" y1="454" x2="1376" y2="454" stroke="#C9CED6" stroke-width="1"/>
+<rect x="466" y="420" width="16" height="16" rx="2" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<rect x="500" y="410" width="36" height="36" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="500" y1="410" x2="536" y2="446" stroke="#C9CED6" stroke-width="1"/>
+<line x1="536" y1="410" x2="500" y2="446" stroke="#C9CED6" stroke-width="1"/>
+<text x="546" y="426" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">라이트 울 재킷</text>
+<text x="546" y="444" font-size="11" font-weight="400" fill="#8A93A0" text-anchor="start">아우터 &gt; 재킷</text>
+<text x="758" y="433" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">129,000원</text>
+<text x="848" y="433" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">3</text>
+<text x="938" y="433" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">-</text>
+<text x="1148" y="433" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">카테고리 미매칭</text>
+<rect x="1304" y="412" width="56" height="32" rx="4" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="1332" y="433" font-size="13" font-weight="400" fill="#2B2F36" text-anchor="middle">상세</text>
+<line x1="454" y1="506" x2="1376" y2="506" stroke="#C9CED6" stroke-width="1"/>
+<rect x="466" y="472" width="16" height="16" rx="2" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<rect x="500" y="462" width="36" height="36" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="500" y1="462" x2="536" y2="498" stroke="#C9CED6" stroke-width="1"/>
+<line x1="536" y1="462" x2="500" y2="498" stroke="#C9CED6" stroke-width="1"/>
+<text x="546" y="478" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">여름 린넨 셔츠</text>
+<text x="546" y="496" font-size="11" font-weight="400" fill="#8A93A0" text-anchor="start">상의 &gt; 셔츠</text>
+<text x="758" y="485" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">39,000원</text>
+<text x="848" y="485" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">6</text>
+<text x="938" y="485" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">의류 및 액세서리 &gt; 의류 &gt; 셔츠·탑</text>
+<text x="1148" y="485" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">진열 안 함</text>
+<rect x="1304" y="464" width="56" height="32" rx="4" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="1332" y="485" font-size="13" font-weight="400" fill="#2B2F36" text-anchor="middle">상세</text>
+<line x1="454" y1="558" x2="1376" y2="558" stroke="#C9CED6" stroke-width="1"/>
+<rect x="466" y="524" width="16" height="16" rx="2" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<rect x="500" y="514" width="36" height="36" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="500" y1="514" x2="536" y2="550" stroke="#C9CED6" stroke-width="1"/>
+<line x1="536" y1="514" x2="500" y2="550" stroke="#C9CED6" stroke-width="1"/>
+<text x="546" y="530" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">개인결제 전용</text>
+<text x="546" y="548" font-size="11" font-weight="400" fill="#8A93A0" text-anchor="start">기타</text>
+<text x="758" y="537" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">10,000원</text>
+<text x="848" y="537" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">1</text>
+<text x="938" y="537" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">-</text>
+<text x="1148" y="537" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">개인 결제 문구 포함</text>
+<rect x="1304" y="516" width="56" height="32" rx="4" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="1332" y="537" font-size="13" font-weight="400" fill="#2B2F36" text-anchor="middle">상세</text>
+<text x="454" y="580" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">· 노출제한 사유: 진열 안 함 / 판매 안 함 / 판매가 0원 / 판매가 대체문구 체크 / 상품명에 '개인 결제' 문구 포함 / 상품 상세이미지 없음</text>
+<text x="454" y="602" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">  / 상품 상세설명 없음 / 카테고리 미매칭(v0.2 신규)</text>
+<text x="454" y="632" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">· 미승인 탭은 같은 위치에 '미승인 사유', 활동중·검토중·반영대기 탭은 사유 컬럼 없음, 사용안함 탭은 Google 상품 카테고리 컬럼 없음</text>
+</svg>

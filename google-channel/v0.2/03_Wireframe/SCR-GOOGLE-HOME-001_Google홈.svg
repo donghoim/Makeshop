@@ -1,0 +1,77 @@
+<svg width="1440" height="1020" viewBox="0 0 1440 1020" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard, 'Malgun Gothic', sans-serif">
+<rect width="1440" height="1020" fill="#FFFFFF"/>
+<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5B6472"/></marker></defs>
+<rect x="0" y="0" width="1440" height="48" rx="0" fill="#5B6472" stroke="#5B6472" stroke-width="1"/>
+<text x="24" y="30" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">make# 관리자</text>
+<rect x="0" y="48" width="1440" height="52" rx="0" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="24" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">설정</text>
+<text x="120" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">상품</text>
+<text x="216" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">주문</text>
+<text x="312" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">회원</text>
+<text x="408" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">게시판/메일</text>
+<text x="504" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">프로모션</text>
+<text x="600" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">디자인</text>
+<text x="696" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">부가서비스</text>
+<text x="792" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">통계</text>
+<text x="888" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">CRM</text>
+<text x="984" y="80" font-size="14" font-weight="700" fill="#2B2F36" text-anchor="start">마케팅</text>
+<line x1="978" y1="99" x2="1034" y2="99" stroke="#3B4250" stroke-width="3"/>
+<rect x="0" y="100" width="220" height="920" rx="0" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="110" y="146" font-size="20" font-weight="700" fill="#2B2F36" text-anchor="middle">마케팅</text>
+<text x="24" y="190" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">· …</text>
+<rect x="8" y="202" width="204" height="30" rx="4" fill="#F2F4F7" stroke="#F2F4F7" stroke-width="1"/>
+<text x="24" y="222" font-size="13" font-weight="700" fill="#2B2F36" text-anchor="start">· 마케팅 채널 관리</text>
+<text x="24" y="254" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">· …</text>
+<rect x="220" y="100" width="1220" height="920" rx="0" fill="#F7F8FA" stroke="#F7F8FA" stroke-width="1"/>
+<text x="260" y="152" font-size="22" font-weight="700" fill="#2B2F36" text-anchor="start">마케팅 채널 관리</text>
+<text x="1400" y="152" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="end">마케팅 &gt; 마케팅 채널 관리 &gt; Google &gt; 홈</text>
+<line x1="260" y1="214" x2="1400" y2="214" stroke="#C9CED6" stroke-width="1"/>
+<text x="313" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">통합 현황</text>
+<text x="448" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">통합 상품 피드</text>
+<text x="576" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">Meta</text>
+<text x="690" y="200" font-size="14" font-weight="700" fill="#2B2F36" text-anchor="middle">Google</text>
+<line x1="630" y1="213" x2="750" y2="213" stroke="#3B4250" stroke-width="3"/>
+<text x="818" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">TikTok</text>
+<rect x="260" y="240" width="150" height="260" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<rect x="310" y="262" width="50" height="40" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="310" y1="262" x2="360" y2="302" stroke="#C9CED6" stroke-width="1"/>
+<line x1="360" y1="262" x2="310" y2="302" stroke="#C9CED6" stroke-width="1"/>
+<rect x="260" y="308" width="150" height="36" rx="0" fill="#F2F4F7" stroke="#F2F4F7" stroke-width="1"/>
+<line x1="261" y1="308" x2="261" y2="344" stroke="#3B4250" stroke-width="3"/>
+<text x="282" y="330" font-size="13" font-weight="700" fill="#2B2F36" text-anchor="start">홈</text>
+<text x="282" y="372" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">연결관리</text>
+<text x="282" y="414" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">상품피드</text>
+<text x="282" y="456" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">구글애즈</text>
+<rect x="430" y="240" width="970" height="210" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="462" y="284" font-size="18" font-weight="700" fill="#2B2F36" text-anchor="start">연결관리</text>
+<text x="462" y="318" font-size="13" font-weight="400" fill="#5B6472" text-anchor="start">Google 계정을 연결하고 Merchant Center와 Google Ads를 각각 연결하는 공간입니다.</text>
+<text x="462" y="340" font-size="13" font-weight="400" fill="#5B6472" text-anchor="start">Google 계정 연결 후 두 서비스는 따로 연결할 수 있으며, 연결 상태와 계정 정보를 확인할 수 있습니다.</text>
+<rect x="462" y="380" width="120" height="32" rx="4" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="522" y="401" font-size="13" font-weight="400" fill="#2B2F36" text-anchor="middle">자세히 보기</text>
+<text x="600" y="401" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">(Google 계정 연결됨)</text>
+<rect x="1260" y="290" width="100" height="100" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="1260" y1="290" x2="1360" y2="390" stroke="#C9CED6" stroke-width="1"/>
+<line x1="1360" y1="290" x2="1260" y2="390" stroke="#C9CED6" stroke-width="1"/>
+<rect x="430" y="470" width="970" height="210" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="462" y="514" font-size="18" font-weight="700" fill="#2B2F36" text-anchor="start">상품피드</text>
+<text x="462" y="548" font-size="13" font-weight="400" fill="#5B6472" text-anchor="start">메이크샵 상품을 Merchant Center로 보내고 상품별 상태와 전송 결과를 확인하는 공간입니다.</text>
+<text x="462" y="570" font-size="13" font-weight="400" fill="#5B6472" text-anchor="start">카테고리를 매칭한 상품을 자동으로 전송하고, 상품 수정 내용도 자동으로 반영합니다.</text>
+<rect x="462" y="610" width="120" height="32" rx="4" fill="#3B4250" stroke="#3B4250" stroke-width="1"/>
+<text x="522" y="631" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">설정하기</text>
+<text x="600" y="631" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">(Merchant Center 미연결)</text>
+<rect x="1260" y="520" width="100" height="100" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="1260" y1="520" x2="1360" y2="620" stroke="#C9CED6" stroke-width="1"/>
+<line x1="1360" y1="520" x2="1260" y2="620" stroke="#C9CED6" stroke-width="1"/>
+<rect x="430" y="700" width="970" height="210" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="462" y="744" font-size="18" font-weight="700" fill="#2B2F36" text-anchor="start">구글애즈</text>
+<text x="462" y="778" font-size="13" font-weight="400" fill="#5B6472" text-anchor="start">Google Ads 광고 측정 상태와 캠페인·상품 광고 성과를 확인하는 공간입니다.</text>
+<text x="462" y="800" font-size="13" font-weight="400" fill="#5B6472" text-anchor="start">광고 운영 상태와 Google이 제안하는 개선 권장사항을 함께 확인할 수 있습니다.</text>
+<rect x="462" y="840" width="120" height="32" rx="4" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="522" y="861" font-size="13" font-weight="400" fill="#2B2F36" text-anchor="middle">자세히 보기</text>
+<text x="600" y="861" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">(Google Ads 연결됨)</text>
+<rect x="1260" y="750" width="100" height="100" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="1260" y1="750" x2="1360" y2="850" stroke="#C9CED6" stroke-width="1"/>
+<line x1="1360" y1="750" x2="1260" y2="850" stroke="#C9CED6" stroke-width="1"/>
+<rect x="260" y="942" width="1140" height="42" rx="4" fill="#FFFBEA" stroke="#E6D9A2" stroke-width="1" stroke-dasharray="6 4"/>
+<text x="276" y="968" font-size="12" font-weight="400" fill="#7A6A2A" text-anchor="start">카드별로 연동 여부를 따로 판정합니다. 미연동: [설정하기] → 연결관리(해당 영역), 연동: [자세히 보기] → 해당 하위 탭. 예시는 계정 연결·MC 미연결·Ads 연결 상태입니다.</text>
+</svg>

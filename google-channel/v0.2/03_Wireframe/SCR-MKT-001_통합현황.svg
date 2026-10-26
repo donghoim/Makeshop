@@ -1,0 +1,102 @@
+<svg width="1440" height="1000" viewBox="0 0 1440 1000" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard, 'Malgun Gothic', sans-serif">
+<rect width="1440" height="1000" fill="#FFFFFF"/>
+<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5B6472"/></marker></defs>
+<rect x="0" y="0" width="1440" height="48" rx="0" fill="#5B6472" stroke="#5B6472" stroke-width="1"/>
+<text x="24" y="30" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="start">make# 관리자</text>
+<rect x="0" y="48" width="1440" height="52" rx="0" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="24" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">설정</text>
+<text x="120" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">상품</text>
+<text x="216" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">주문</text>
+<text x="312" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">회원</text>
+<text x="408" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">게시판/메일</text>
+<text x="504" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">프로모션</text>
+<text x="600" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">디자인</text>
+<text x="696" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">부가서비스</text>
+<text x="792" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">통계</text>
+<text x="888" y="80" font-size="14" font-weight="400" fill="#2B2F36" text-anchor="start">CRM</text>
+<text x="984" y="80" font-size="14" font-weight="700" fill="#2B2F36" text-anchor="start">마케팅</text>
+<line x1="978" y1="99" x2="1034" y2="99" stroke="#3B4250" stroke-width="3"/>
+<rect x="0" y="100" width="220" height="900" rx="0" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="110" y="146" font-size="20" font-weight="700" fill="#2B2F36" text-anchor="middle">마케팅</text>
+<text x="24" y="190" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">· …</text>
+<rect x="8" y="202" width="204" height="30" rx="4" fill="#F2F4F7" stroke="#F2F4F7" stroke-width="1"/>
+<text x="24" y="222" font-size="13" font-weight="700" fill="#2B2F36" text-anchor="start">· 마케팅 채널 관리</text>
+<text x="24" y="254" font-size="13" font-weight="400" fill="#8A93A0" text-anchor="start">· …</text>
+<rect x="220" y="100" width="1220" height="900" rx="0" fill="#F7F8FA" stroke="#F7F8FA" stroke-width="1"/>
+<text x="260" y="152" font-size="22" font-weight="700" fill="#2B2F36" text-anchor="start">마케팅 채널 관리</text>
+<text x="1400" y="152" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="end">마케팅 &gt; 마케팅 채널 관리 &gt; 통합 현황</text>
+<line x1="260" y1="214" x2="1400" y2="214" stroke="#C9CED6" stroke-width="1"/>
+<text x="313" y="200" font-size="14" font-weight="700" fill="#2B2F36" text-anchor="middle">통합 현황</text>
+<line x1="260" y1="213" x2="366" y2="213" stroke="#3B4250" stroke-width="3"/>
+<text x="448" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">통합 상품 피드</text>
+<text x="576" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">Meta</text>
+<text x="690" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">Google</text>
+<text x="818" y="200" font-size="14" font-weight="400" fill="#8A93A0" text-anchor="middle">TikTok</text>
+<rect x="260" y="240" width="1140" height="300" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="284" y="276" font-size="16" font-weight="700" fill="#2B2F36" text-anchor="start">채널 연결 현황</text>
+<rect x="284" y="300" width="348" height="210" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<rect x="304" y="320" width="40" height="40" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="304" y1="320" x2="344" y2="360" stroke="#C9CED6" stroke-width="1"/>
+<line x1="344" y1="320" x2="304" y2="360" stroke="#C9CED6" stroke-width="1"/>
+<text x="356" y="346" font-size="15" font-weight="700" fill="#2B2F36" text-anchor="start">Meta</text>
+<text x="304" y="390" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">상품 피드 · 광고 관리 · Shops 관리</text>
+<rect x="304" y="466" width="56" height="22" rx="11" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<text x="332" y="481" font-size="11" font-weight="400" fill="#5B6472" text-anchor="middle">연결됨</text>
+<rect x="520" y="462" width="92" height="32" rx="4" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="566" y="483" font-size="13" font-weight="400" fill="#2B2F36" text-anchor="middle">관리하기</text>
+<rect x="652" y="300" width="348" height="210" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<rect x="672" y="320" width="40" height="40" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="672" y1="320" x2="712" y2="360" stroke="#C9CED6" stroke-width="1"/>
+<line x1="712" y1="320" x2="672" y2="360" stroke="#C9CED6" stroke-width="1"/>
+<text x="724" y="346" font-size="15" font-weight="700" fill="#2B2F36" text-anchor="start">Google</text>
+<text x="672" y="390" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">상품 피드 · 구글애즈</text>
+<rect x="672" y="466" width="56" height="22" rx="11" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<text x="700" y="481" font-size="11" font-weight="400" fill="#5B6472" text-anchor="middle">미연결</text>
+<rect x="888" y="462" width="92" height="32" rx="4" fill="#3B4250" stroke="#3B4250" stroke-width="1"/>
+<text x="934" y="483" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">연동하기</text>
+<rect x="1020" y="300" width="348" height="210" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<rect x="1040" y="320" width="40" height="40" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="1040" y1="320" x2="1080" y2="360" stroke="#C9CED6" stroke-width="1"/>
+<line x1="1080" y1="320" x2="1040" y2="360" stroke="#C9CED6" stroke-width="1"/>
+<text x="1092" y="346" font-size="15" font-weight="700" fill="#2B2F36" text-anchor="start">TikTok</text>
+<text x="1040" y="390" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">준비 중</text>
+<rect x="1040" y="466" width="68" height="22" rx="11" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<text x="1074" y="481" font-size="11" font-weight="400" fill="#5B6472" text-anchor="middle">준비 중</text>
+<rect x="260" y="564" width="1140" height="330" rx="8" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="284" y="600" font-size="16" font-weight="700" fill="#2B2F36" text-anchor="start">채널별 운영 현황</text>
+<rect x="284" y="620" width="1092" height="44" rx="0" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<text x="298" y="647" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">채널</text>
+<text x="468" y="647" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">연결 상태</text>
+<text x="638" y="647" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">채널 등록 상품 수</text>
+<text x="808" y="647" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">광고비(최근 7일) 10.15–10.21</text>
+<text x="1058" y="647" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">ROAS(최근 7일)</text>
+<text x="1228" y="647" font-size="12" font-weight="700" fill="#5B6472" text-anchor="start">관리</text>
+<line x1="284" y1="708" x2="1376" y2="708" stroke="#C9CED6" stroke-width="1"/>
+<rect x="298" y="674" width="24" height="24" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="298" y1="674" x2="322" y2="698" stroke="#C9CED6" stroke-width="1"/>
+<line x1="322" y1="674" x2="298" y2="698" stroke="#C9CED6" stroke-width="1"/>
+<text x="332" y="691" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">Meta</text>
+<rect x="468" y="675" width="56" height="22" rx="11" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<text x="496" y="690" font-size="11" font-weight="400" fill="#5B6472" text-anchor="middle">연결됨</text>
+<text x="638" y="691" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">1,086</text>
+<text x="808" y="691" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">₩1,240,000</text>
+<text x="1058" y="691" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">312%</text>
+<rect x="1228" y="670" width="90" height="32" rx="4" fill="#FFFFFF" stroke="#C9CED6" stroke-width="1"/>
+<text x="1273" y="691" font-size="13" font-weight="400" fill="#2B2F36" text-anchor="middle">바로가기</text>
+<line x1="284" y1="752" x2="1376" y2="752" stroke="#C9CED6" stroke-width="1"/>
+<rect x="298" y="718" width="24" height="24" rx="4" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<line x1="298" y1="718" x2="322" y2="742" stroke="#C9CED6" stroke-width="1"/>
+<line x1="322" y1="718" x2="298" y2="742" stroke="#C9CED6" stroke-width="1"/>
+<text x="332" y="735" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">Google</text>
+<rect x="468" y="719" width="56" height="22" rx="11" fill="#F2F4F7" stroke="#C9CED6" stroke-width="1"/>
+<text x="496" y="734" font-size="11" font-weight="400" fill="#5B6472" text-anchor="middle">미연결</text>
+<text x="638" y="735" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">-</text>
+<text x="808" y="735" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">-</text>
+<text x="1058" y="735" font-size="12" font-weight="400" fill="#2B2F36" text-anchor="start">-</text>
+<rect x="1228" y="714" width="90" height="32" rx="4" fill="#3B4250" stroke="#3B4250" stroke-width="1"/>
+<text x="1273" y="735" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">연동하기</text>
+<text x="284" y="780" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">· 채널을 합산한 값(전체 상품 수, 확인 필요 건수 등)은 두지 않습니다.</text>
+<text x="284" y="802" font-size="12" font-weight="400" fill="#8A93A0" text-anchor="start">· 조회 실패한 값만 '확인불가' + [다시 시도], 다른 채널 값은 그대로 표시합니다.</text>
+<rect x="260" y="920" width="1140" height="42" rx="4" fill="#FFFBEA" stroke="#E6D9A2" stroke-width="1" stroke-dasharray="6 4"/>
+<text x="276" y="946" font-size="12" font-weight="400" fill="#7A6A2A" text-anchor="start">상태 예시: Meta 연결됨, Google 미연결. 재인증 필요 시 연결 상태 '재인증 필요', 채널 등록 상품 수·광고비·ROAS '-', 관리 [바로가기]</text>
+</svg>

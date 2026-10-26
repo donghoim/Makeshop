@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>마케팅 채널 관리 — 메이크샵 어드민 Prototype v0.2</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<link rel="stylesheet" href="src/css/style.css" />
+<link rel="stylesheet" href="src/css/fbe.css" />
+<link rel="stylesheet" href="src/css/mkt.css" />
+</head>
+<body>
+  <!-- ============ Top bar ============ -->
+  <header class="topbar">
+    <div class="topbar__left">
+      <span class="logo">make<b>#</b></span>
+      <span class="ver-chip">사용버전 ‹</span>
+      <span class="topbar__meta">주문 1.0</span><span class="topbar__meta">디자인 D4</span><span class="topbar__meta">모바일 4.0</span><span class="topbar__meta">통합옵션 사용</span>
+    </div>
+    <div class="topbar__right">
+      <b>noblystudio</b><span>번호 : 244082</span><span>공지사항</span><span class="dot">업그레이드</span><span>로그아웃</span>
+    </div>
+  </header>
+  <nav class="gnb">
+    <ul>
+      <li>설정</li><li>상품</li><li>주문</li><li>회원</li><li>게시판/메일</li><li>프로모션</li><li>디자인</li>
+      <li>부가서비스</li><li>통계</li><li>CRM</li><li class="is-active">마케팅</li>
+    </ul>
+    <div class="gnb__right"><span>내 쇼핑몰 ▾</span><span>고객센터 ▾</span><label class="gnb__search"><input type="text" aria-label="메뉴 검색" /></label></div>
+  </nav>
+  <div class="subbar">등록된 스마트 폴더가 없습니다. 메뉴 우측의 ☆를 클릭하여 자주 사용하는 메뉴를 등록해주세요. <span class="subbar__btn">★ 설정</span></div>
+
+  <div class="layout">
+    <!-- ============ 마케팅 LNB ============ -->
+    <aside class="lnb">
+      <div class="lnb__head"><h2>마케팅</h2><span class="chip-manual">매뉴얼</span></div>
+      <div class="lnb__group">
+        <div class="lnb__gtitle">마케팅 <i>⌃</i></div>
+        <ul id="lnb-menu"></ul>
+      </div>
+      <div class="lnb__qs">
+        <div class="lnb__qs-title">Quick Search</div>
+        <div class="lnb__qs-radios"><label><input type="radio" name="qs" checked /> 상품</label><label><input type="radio" name="qs" /> 회원</label><label><input type="radio" name="qs" /> 주문</label></div>
+        <div class="lnb__qs-row"><div><select aria-label="검색 대상"><option>전체상품</option></select><input type="text" placeholder="검색어를 입력하세요" /></div><button type="button">검색</button></div>
+      </div>
+    </aside>
+
+    <!-- ============ Content ============ -->
+    <main class="content" id="app"></main>
+  </div>
+
+  <!-- ============ 프로토타입 시나리오 패널 (Drawer) ============ -->
+  <button class="scn-fab" id="scn-open" type="button">⚙ 시나리오 패널</button>
+  <div class="drawer-dim" id="drawer-dim"></div>
+  <aside class="drawer" id="scn-drawer" aria-label="프로토타입 시나리오 패널"></aside>
+
+  <script src="src/js/data.js"></script>
+  <script src="src/js/gdata.js"></script>
+  <script src="src/js/ui.js"></script>
+  <script src="src/js/store.js"></script>
+  <script src="src/js/gstore.js"></script>
+  <script src="src/js/fbe-oauth.js"></script>
+  <script src="src/components/info.js"></script>
+  <script src="src/js/pages/meta/home.js"></script>
+  <script src="src/js/pages/meta/connect.js"></script>
+  <script src="src/js/pages/meta/feed.js"></script>
+  <script src="src/js/pages/meta/ads.js"></script>
+  <script src="src/js/pages/meta/shops.js"></script>
+  <script src="src/js/perf.js"></script>
+  <script src="src/js/pages/google/common.js"></script>
+  <script src="src/js/pages/google/connect.js"></script>
+  <script src="src/js/pages/google/feed.js"></script>
+  <script src="src/js/pages/google/ads.js"></script>
+  <script src="src/js/pages/google/index.js"></script>
+  <script src="src/js/pages/mkt/overview.js"></script>
+  <script src="src/js/pages/mkt/feed.js"></script>
+  <script src="src/js/pages/mkt/tiktok.js"></script>
+  <script src="src/js/app.js"></script>
+</body>
+</html>
