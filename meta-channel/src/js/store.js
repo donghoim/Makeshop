@@ -1,12 +1,13 @@
 /* ==========================================================================
    상태 저장소 + 상품 피드 판정 로직 (05_Policy 5장 기준)
    - 상태는 localStorage 에 저장되어 새로고침 후에도 유지된다(시나리오 패널에서 초기화).
-   - 상태 판정 우선순위: 사용안함 → 노출제한 → 미전송 → Meta 상태(활동중/검토중/미승인)
+   - 상태 판정 우선순위: 사용안함 → 노출제한 → 반영대기 → Meta 상태(활동중/검토중/미승인)
+   - 반영대기: 전송 조건을 충족해 전송 큐에 등록된 상태. 큐가 자동으로 Meta 전송(검토중)하며 운영자 수동 전송은 없다.
    ========================================================================== */
 const Store = (function () {
-  const KEY = "metaProto.v2";
+  const KEY = "metaProto.v3"; // v3: 반영대기·전송 큐, 커머스 계정 제외 (2026-10-20)
   const M = window.MOCK;
-  const FEED_STATES = ["활동중", "검토중", "미승인", "노출제한", "사용안함", "미전송"];
+  const FEED_STATES = ["활동중", "검토중", "미승인", "노출제한", "사용안함", "반영대기"];
   const META_STATES = ["활동중", "검토중", "미승인"];
   const DEFAULT_COLUMNS = ["campaign_name", "objective", "impressions", "clicks", "purchases", "roas", "revenue", "spend"];
 
@@ -21,6 +22,7 @@ const Store = (function () {
   function baseState() {
     return {
       connected: false,
+      legacy: false, migrationComplete: false, legacyConnection: null, consentHistory: [],
       ig: true,               // Instagram 연결 여부 (FBE 위저드에서 스킵 시 false)
       assetError: "none",     // 'none' | 'page' | 'pixel' — 자산 조회 실패(확인불가) 시뮬레이션
       domainVerified: false,
@@ -30,9 +32,9 @@ const Store = (function () {
       lastUpdate: null,
       products: clone(M.products).map((p) => Object.assign(p, { meta: null, reject: null, dirty: false })),
       ads: { status: "활성", billing: "선불", capi: "off", naver: "off", kakao: "off" },
+      queueAuto: true,        // 전송 큐 자동 처리 (시나리오 패널에서 일시정지 가능)
       prereq: { naver: true, kakao: false },
       columns: DEFAULT_COLUMNS.slice(),
-      commerceName: M.account.commerceAccountName,
     };
   }
   function presetConnected() {
@@ -74,6 +76,7 @@ const Store = (function () {
 
   function restriction(p) {
     const r = p.r || {};
+    if (!effGpc(p)) return "noGpc";
     if (r.display) return "display";
     if (r.sale) return "sale";
     if (r.soldout) return "soldout";
@@ -89,16 +92,15 @@ const Store = (function () {
     return null;
   }
   function status(p) {
-    if (!p.useFeed || !effGpc(p)) return "사용안함";
+    if (!p.useFeed) return "사용안함";
     if (restriction(p)) return "노출제한";
     if (p.meta && !p.dirty) return p.meta;
-    return "미전송";
+    return "반영대기";
   }
   function reason(p) {
     const st = status(p);
     if (st === "노출제한") return M.restrictReasons.find((x) => x.key === restriction(p)).text;
     if (st === "미승인") return M.rejectReasons[p.reject] || M.rejectReasons.COMMERCE_POLICY_VIOLATION;
-    if (st === "미전송") return "최신 상품 정보가 아직 Meta에 전송되지 않았습니다. 상품을 선택해 Meta로 전송해 주세요.";
     return "";
   }
   /** 연동 상품 수: Meta Catalog 에 실제 등록된 item(옵션 조합) 수. 미반영·제외 상품은 0 */
@@ -112,6 +114,18 @@ const Store = (function () {
     return c;
   }
 
+  /* ---------------- 전송 큐 (자동 처리 시뮬레이션) ---------------- */
+  let qTimer = null;
+  function scheduleQueue() {
+    if (!state.queueAuto || !state.connected) return;
+    clearTimeout(qTimer);
+    qTimer = setTimeout(() => {
+      const n = api.processQueue();
+      if (n && window.UI) UI.toast(`전송 큐 처리 완료 — 반영대기 상품 ${n}건이 Meta로 전송되어 검토중으로 바뀌었습니다.`, "info");
+      if (n && window.App && !document.querySelector(".modal-overlay")) App.render();
+    }, 5000);
+  }
+
   /* ---------------- 액션 ---------------- */
   const api = {
     FEED_STATES,
@@ -120,14 +134,29 @@ const Store = (function () {
     get s() { return state; },
     onChange(fn) { listeners.push(fn); },
     save,
+    scheduleQueue,
     cat, catPath, gpc, isApparel, effGpc, restriction, status, reason, linkedCount, counts,
     leafCategories: () => M.categories,
 
     reset(preset) {
-      state = preset === "connected" ? presetConnected() : baseState();
+      clearTimeout(qTimer);
+      state = preset === "connected" || preset === "legacy" ? presetConnected() : baseState();
+      if (preset === "legacy") {
+        state.legacy = true; state.connected = false;
+        state.legacyConnection = { active: true, pixel: M.account.pixelId || "existing-pixel", domainCode: "existing-domain", naver: "on" };
+        state.ads.naver = "on";
+      }
       save();
     },
 
+    migrationPending() { return !!state.legacy && !state.migrationComplete; },
+    completeMigration(sel) {
+      state.connected = true;
+      state.migrationComplete = true;
+      state.categorySaved = false;
+      api.reconfigure(sel);
+      save(); scheduleQueue();
+    },
     /** FBE 연동 완료 (최초) */
     connect(sel) {
       state.connected = true;
@@ -137,19 +166,21 @@ const Store = (function () {
       state.lastUpdate = null;
       state.products = clone(M.products).map((p) => Object.assign(p, { meta: null, reject: null, dirty: false }));
       save();
+      scheduleQueue();
     },
     /** [설정] 재연동 — 변경된 자산 반영 */
     reconfigure(sel) {
       if (sel) state.ig = sel.igChoice !== "skip";
       state.assetError = "none";
       save();
+      if (sel && sel.catalogChanged) api.changeCatalog();
     },
     disconnect() {
       const keep = { domainVerified: state.domainVerified, unlinkResult: state.unlinkResult, prereq: state.prereq, columns: state.columns };
       state = Object.assign(baseState(), keep);
       save();
     },
-    /** 카테고리 단위 매칭 저장 → 해당 상품은 미전송 상태로 저장 (즉시 전송 X) */
+    /** 카테고리 단위 매칭 [상품 피드 반영] → 매칭값 저장 + 전송 대상 상품 큐 등록(반영대기) */
     saveCategoryMap(map) {
       Object.keys(map).forEach((cid) => {
         const before = state.catMap[cid] || null;
@@ -158,36 +189,35 @@ const Store = (function () {
         else delete state.catMap[cid];
         if (before !== after) {
           state.products.forEach((p) => {
-            if (p.cat === cid && !p.gpc && p.meta) p.dirty = true;
+            if (p.cat === cid && !p.gpc) p.dirty = true;
           });
         }
       });
       state.categorySaved = true;
       state.lastUpdate = nowStr();
       save();
+      scheduleQueue();
     },
-    /** 미전송 탭 선택 전송 — 전송 시점 재검증 후 전송 가능 상품만 Meta 전송(검토중) */
-    transmit(ids) {
-      const res = { sent: 0, restricted: 0, unused: 0, skipped: 0 };
-      ids.forEach((id) => {
-        const p = state.products.find((x) => x.id === id);
-        const st = status(p);
-        if (st === "미전송") {
+    /** 전송 큐 처리 — 전송 시점 최신 정보로 재판정, 통과 상품만 최신 1건 Meta 전송(검토중) */
+    processQueue() {
+      if (!state.connected || api.migrationPending()) return 0;
+      let n = 0;
+      state.products.forEach((p) => {
+        if (status(p) === "반영대기") {
           p.meta = "검토중";
           p.reject = null;
           p.dirty = false;
-          res.sent++;
-        } else if (st === "노출제한") res.restricted++;
-        else if (st === "사용안함") res.unused++;
-        else res.skipped++;
+          n++;
+        }
       });
-      state.lastUpdate = nowStr();
+      if (n) state.lastUpdate = nowStr();
       save();
-      return res;
+      return n;
     },
-    /** 상품 단위 설정 저장(상품 피드 반영) — 사용여부 ON + 전송 가능 상품은 즉시 Meta 전송 */
+    queueSize: () => state.products.filter((p) => status(p) === "반영대기").length,
+    /** 상품 단위 설정 [상품 피드 반영] — 상품 단위 저장 + 전송 대상 상품 큐 등록(반영대기) */
     saveProductSettings(rows) {
-      const res = { sent: 0, restricted: 0, unused: 0 };
+      const res = { queued: 0, restricted: 0, unused: 0 };
       rows.forEach((row) => {
         const p = state.products.find((x) => x.id === row.id);
         p.useFeed = row.useFeed;
@@ -196,19 +226,16 @@ const Store = (function () {
           p.gpc = row.gpc || null;
           p.gender = isApparel(p.gpc || effGpc(p)) ? row.gender : null;
           p.age = isApparel(p.gpc || effGpc(p)) ? row.age : null;
-          p.dirty = true; // 저장 = 전송 트리거
+          p.dirty = true; // 반영 = 큐 등록
         }
         const st = status(p);
-        if (st === "미전송") {
-          p.meta = "검토중";
-          p.reject = null;
-          p.dirty = false;
-          res.sent++;
-        } else if (st === "노출제한") res.restricted++;
+        if (st === "반영대기") res.queued++;
+        else if (st === "노출제한") res.restricted++;
         else if (st === "사용안함") res.unused++;
       });
       state.lastUpdate = nowStr();
       save();
+      scheduleQueue();
       return res;
     },
     /** Meta 심사 결과 동기화 시뮬레이션: 검토중 → 활동중/미승인 */
@@ -227,9 +254,8 @@ const Store = (function () {
       save();
       return n;
     },
-    /** Commerce 계정 변경 — 내부 피드 정보 초기화 → 미전송 (4-2-4) */
-    changeCommerce() {
-      state.commerceName = state.commerceName === M.account.commerceAccountName ? "노블리 스튜디오 커머스 2" : M.account.commerceAccountName;
+    /** 카탈로그 변경(재설정) — 내부 피드 정보 초기화 → 전송 대상 상품 큐 재등록(반영대기) */
+    changeCatalog() {
       state.products.forEach((p) => {
         p.meta = null;
         p.reject = null;
@@ -237,6 +263,7 @@ const Store = (function () {
       });
       state.lastUpdate = nowStr();
       save();
+      scheduleQueue();
     },
   };
   return api;

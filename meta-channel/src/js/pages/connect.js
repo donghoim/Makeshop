@@ -44,8 +44,7 @@ const ConnectPage = (function () {
       ["비즈니스 관리자", UI.esc(a.businessManagerName), ["비즈니스 관리자 바로가기", `https://business.facebook.com/settings/info?business_id=${bid}`]],
       ["페이지", fail("page") ? failCell : UI.esc(a.pageName), fail("page") ? null : ["페이지 바로가기", `https://www.facebook.com/${a.pageId}`]],
       ["픽셀 정보", fail("pixel") ? failCell : `픽셀 ID : ${a.pixelId}`, fail("pixel") ? null : ["이벤트 관리자 바로가기", `https://business.facebook.com/events_manager2/list/pixel/${a.pixelId}/overview?business_id=${bid}`]],
-      ["커머스 계정", UI.esc(s.commerceName), ["커머스 관리자 바로가기", `https://business.facebook.com/commerce_manager/?business_id=${bid}`]],
-      ["인스타그램 계정", s.ig ? "@" + UI.esc(a.instagramUsername) : '<span class="pill pill--gray">미연결</span>', s.ig ? ["인스타그램 설정 바로가기", `https://business.facebook.com/settings/instagram-accounts?business_id=${bid}`] : null],
+      ["인스타그램 계정", s.ig ? "@" + UI.esc(a.instagramUsername) : '<span class="pill pill--gray">미연결</span>', s.ig ? ["인스타그램 설정 바로가기", `https://business.facebook.com/settings/instagram-account-v2s?business_id=${bid}`] : null],
     ];
     const body = `<dl class="kv">${rows
       .map((r) => `<div class="kv__row"><dt>${r[0]}</dt><dd>${r[1]}</dd><dd class="kv__link">${r[2] ? `<a class="ext" data-ext="${r[2][0]}" data-url="${r[2][1]}">${r[2][0]} ${UI.icon.ext}</a>` : ""}</dd></div>`)
@@ -72,7 +71,7 @@ const ConnectPage = (function () {
     const s = Store.s;
     const matched = Object.keys(s.catMap).length;
     const active = s.categorySaved && matched > 0;
-    const c = active ? Store.counts(s.products) : { 전체: 0, 활동중: 0, 검토중: 0, 미승인: 0, 노출제한: 0, 사용안함: 0, 미전송: 0 };
+    const c = active ? Store.counts(s.products) : { 전체: 0, 활동중: 0, 검토중: 0, 미승인: 0, 노출제한: 0, 사용안함: 0, 반영대기: 0 };
     const body = `
       <dl class="kv">
         <div class="kv__row"><dt>카테고리 설정</dt><dd>${active ? `<span class="pill pill--solid-blue">설정완료</span><span class="muted">매칭 ${matched} / ${Store.leafCategories().length}개 카테고리</span>` : "미설정"} <button type="button" class="btn btn--line btn--sm" data-act="match">상품 카테고리 매칭</button></dd></div>
@@ -129,7 +128,7 @@ const ConnectPage = (function () {
     const items = window.MOCK.gpcList.map((g) => ({ value: g.id, label: g.path }));
     const cats = Store.leafCategories();
     const body = `
-      <div class="infobox">${UI.icon.info}<div>내 쇼핑몰의 상품 분류와 가장 유사한 Meta 상품 카테고리를 선택해주세요.<br>카테고리 매칭 후 상품은 미전송 상태로 저장되며, 상품 피드 &gt; 미전송 탭에서 전송할 상품을 선택하여 Meta로 전송할 수 있습니다.</div></div>
+      <div class="infobox">${UI.icon.info}<div>내 쇼핑몰의 상품 분류와 가장 유사한 페이스북의 상품 분류를 선택해주세요.<br>매칭된 카테고리의 상품은 자동으로 다음 업데이트 시 페이스북 상품 피드로 자동 수집됩니다.</div></div>
       <div class="mtable-wrap"><table class="mtable">
         <thead><tr><th>쇼핑몰 카테고리</th><th>페이스북 카테고리</th></tr></thead>
         <tbody>${cats.map((c) => `<tr><td>${UI.esc(c.path.join(" > "))}${!s.catMap[c.id] && c.googleGpc ? '<span class="tag-gray">Google 채널 설정값</span>' : ""}</td><td><div class="gpc-dd" data-cat="${c.id}"></div></td></tr>`).join("")}</tbody>
@@ -144,7 +143,7 @@ const ConnectPage = (function () {
       title: "상품 카테고리 매칭",
       size: "lg",
       body,
-      footer: '<button type="button" class="btn btn--line btn--lg" data-act="later">다음에 반영</button><button type="button" class="btn btn--dark btn--lg" data-act="save">저장</button>',
+      footer: '<button type="button" class="btn btn--line btn--lg" data-act="later">다음에 반영</button><button type="button" class="btn btn--dark btn--lg" data-act="save">상품 피드 반영</button>',
       onClose: confirmClose,
     });
     m.el.querySelectorAll(".gpc-dd").forEach((d) => {
@@ -156,7 +155,7 @@ const ConnectPage = (function () {
       const map = {};
       Object.keys(dds).forEach((k) => (map[k] = dds[k].value || null));
       Store.saveCategoryMap(map);
-      await UI.alert("상품 카테고리 매칭이 저장되었습니다.");
+      await UI.alert("선택한 카테고리가 상품 피드에 반영되었습니다.");
       m.close(true);
       App.render();
     });

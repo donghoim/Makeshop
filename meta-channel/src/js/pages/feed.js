@@ -2,7 +2,7 @@
    SCR 3-4 · 상품 피드 탭 (미연동 / 연동완료) + 3-4-2 선택 상품 카테고리 매칭
    ========================================================================== */
 const FeedPage = (function () {
-  const TABS = ["전체", "활동중", "검토중", "미승인", "노출제한", "사용안함", "미전송"];
+  const TABS = ["전체", "활동중", "검토중", "미승인", "노출제한", "사용안함", "반영대기"];
   const SIZES = [20, 30, 50, 70, 100];
   const GENDERS = [["unisex", "남녀공용"], ["male", "남성"], ["female", "여성"]];
   const AGES = [["all ages", "전연령"], ["adult", "성인"], ["teen", "청소년"], ["kids", "어린이"], ["toddler", "유아"], ["infant", "영아"], ["newborn", "신생아"]];
@@ -57,7 +57,7 @@ const FeedPage = (function () {
       "상품 피드 등록 현황",
       `<button type="button" class="btn btn--line btn--sm" data-ext="Meta Catalog 바로가기" data-url="https://business.facebook.com/commerce/catalogs/${a.catalogId}/products?business_id=${a.businessId}">Meta Catalog 바로가기</button>`,
       ConnectPage.statusBar(Store.counts(s.products), s.lastUpdate, true) +
-        (!s.categorySaved ? `<p class="note note--warn">${UI.icon.info}<span>상품 카테고리 매칭 전입니다. 연결 관리 &gt; 상품 카테고리 매칭에서 카테고리를 매칭하면 상품이 미전송 상태로 저장되어 Meta로 전송할 수 있습니다.</span></p>` : "")
+        (!s.categorySaved ? `<p class="note note--warn">${UI.icon.info}<span>상품 카테고리 매칭 전입니다. 연결 관리 &gt; 상품 카테고리 매칭에서 카테고리를 매칭하고 [상품 피드 반영]을 누르면 전송 대상 상품이 반영대기로 등록되어 Meta로 자동 전송됩니다.</span></p>` : "")
     );
     summary.querySelector(".sec__toggle").remove();
     ConnectPage.bindExt(summary);
@@ -94,7 +94,7 @@ const FeedPage = (function () {
         <thead><tr>${cols.map((k) => `<th class="col-${k}">${head(k)}</th>`).join("")}</tr></thead>
         <tbody>${pageRows.length ? pageRows.map((p) => `<tr>${cols.map((k) => `<td class="col-${k}">${cell(k, p)}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${cols.length}" class="table__empty">표시할 상품이 없습니다.</td></tr>`}</tbody>
       </table></div>
-      <div class="list-foot"><div class="list-foot__left"><button type="button" class="btn btn--line" data-act="bulk">선택 수정</button>${view.tab === "미전송" ? '<button type="button" class="btn btn--primary" data-act="send">선택 상품 Meta 전송</button><span class="muted small">1회 최대 100개 · 현재 페이지에서 선택한 상품만 전송됩니다.</span>' : ""}</div><div id="feed-pager"></div><div class="list-foot__right muted small">총 ${UI.fmt(rows.length)}건 · 선택 ${view.sel.size}건</div></div>`;
+      <div class="list-foot"><div class="list-foot__left"><button type="button" class="btn btn--line" data-act="bulk">선택 수정</button>${view.tab === "반영대기" ? '<span class="muted small">반영대기 상품은 전송 큐에서 순서대로 Meta에 자동 전송됩니다. 직접 전송하는 기능은 없습니다.</span>' : ""}</div><div id="feed-pager"></div><div class="list-foot__right muted small">총 ${UI.fmt(rows.length)}건 · 선택 ${view.sel.size}건</div></div>`;
 
     box.querySelector("#feed-pager").appendChild(UI.pagination(rows.length, view.page, view.size, (p) => { view.page = p; view.sel.clear(); paintList(box); }));
     box.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => { view.tab = b.dataset.tab; view.page = 1; view.sel.clear(); paintList(box); }));
@@ -119,17 +119,6 @@ const FeedPage = (function () {
       if (!ids.length) return UI.alert("선택된 상품이 없습니다.");
       openProductModal(ids, box);
     });
-    const send = box.querySelector('[data-act="send"]');
-    if (send)
-      send.addEventListener("click", async () => {
-        const ids = pageRows.filter((p) => view.sel.has(p.id)).map((p) => p.id);
-        if (!ids.length) return UI.alert("선택된 상품이 없습니다.");
-        if (ids.length > 100) return UI.alert("1회 최대 100개 상품까지 전송할 수 있습니다.");
-        const r = Store.transmit(ids);
-        view.sel.clear();
-        UI.toast(`Meta 전송 요청 완료 — 전송 ${r.sent}건(검토중)${r.restricted ? ` · 노출제한 ${r.restricted}건` : ""}${r.unused ? ` · 사용안함 ${r.unused}건` : ""}`, "success");
-        App.render();
-      });
     INFO.bind(box);
   }
   function paintFootCount(box, total) {
@@ -204,7 +193,7 @@ const FeedPage = (function () {
           </tr>`
           )
           .join("")}</tbody></table></div>`;
-    const m = UI.modal({ title: "선택 상품 카테고리 매칭", size: "xl", body, footer: '<button type="button" class="btn btn--line btn--lg" data-act="cancel">취소</button><button type="button" class="btn btn--dark btn--lg" data-act="save">저장</button>' });
+    const m = UI.modal({ title: "선택 상품 카테고리 매칭", size: "xl", body, footer: '<button type="button" class="btn btn--line btn--lg" data-act="cancel">취소</button><button type="button" class="btn btn--dark btn--lg" data-act="save">상품 피드 반영</button>' });
     m.el.querySelectorAll("tbody tr").forEach((tr) => {
       const r = rows[+tr.dataset.i];
       const use = tr.querySelector(".m-use");
@@ -248,7 +237,7 @@ const FeedPage = (function () {
       m.close(true);
       view.sel.clear();
       App.render();
-      if (changed.length) UI.toast(`반영 결과 — Meta 전송 ${res.sent}건(검토중)${res.restricted ? ` · 노출제한 ${res.restricted}건` : ""}${res.unused ? ` · 사용안함 ${res.unused}건` : ""}`, "info");
+      if (changed.length) UI.toast(`반영 결과 — 반영대기(전송 큐 등록) ${res.queued}건${res.restricted ? ` · 노출제한 ${res.restricted}건` : ""}${res.unused ? ` · 사용안함 ${res.unused}건` : ""}`, "info");
     });
   }
 

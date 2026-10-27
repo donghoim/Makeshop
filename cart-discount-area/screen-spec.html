@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>장바구니 할인 화면정의서</title>
+<link rel="stylesheet" href="./src/css/cart.css">
+<style>
+  :root { --b:#e3e5e8; --tx:#1b1d21; --mu:#6b7280; --pin:#e5484d; --hi:#1d3f8f; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:13px/1.6 "Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif; color:var(--tx); background:#f4f5f7; }
+  .sp { display:grid; grid-template-columns:260px minmax(0,1fr) 400px; height:100vh; }
+  nav { background:#fff; border-right:1px solid var(--b); overflow:auto; padding:16px 12px; }
+  nav h1 { font-size:15px; margin:0 0 2px; }
+  nav .meta { color:var(--mu); font-size:11px; margin-bottom:12px; }
+  nav input { width:100%; height:32px; border:1px solid var(--b); border-radius:4px; padding:0 8px; font:inherit; margin-bottom:10px; }
+  nav .grp { font-size:11px; color:var(--mu); font-weight:700; margin:12px 4px 4px; }
+  nav a { display:block; padding:6px 8px; border-radius:4px; color:var(--tx); text-decoration:none; font-size:12px; }
+  nav a small { display:block; color:var(--mu); font-size:10px; }
+  nav a.on { background:#eef2fb; color:var(--hi); font-weight:700; }
+  main { overflow:auto; padding:20px; }
+  .shead { background:#fff; border:1px solid var(--b); border-radius:6px; padding:12px 16px; margin-bottom:12px; display:grid; grid-template-columns:auto 1fr auto 1fr; gap:4px 14px; font-size:12px; }
+  .shead b { color:var(--mu); font-weight:600; }
+  .stage-wrap { background:#fff; border:1px solid var(--b); border-radius:6px; padding:16px; overflow:auto; }
+  .stage { position:relative; margin:0 auto; background:#fff; }
+  .stage.mobile { border:1px solid #ccc; }
+  .pin { position:absolute; z-index:40; width:22px; height:22px; border-radius:50%; background:var(--pin); color:#fff; font:700 12px/22px sans-serif; text-align:center; transform:translate(-60%,-60%); box-shadow:0 0 0 2px #fff; pointer-events:none; }
+  .box { position:absolute; z-index:39; border:2px solid var(--pin); border-radius:3px; pointer-events:none; }
+  .hint { color:var(--mu); font-size:11px; margin:8px 2px 0; }
+  aside.desc { background:#fff; border-left:1px solid var(--b); overflow:auto; padding:16px; }
+  aside.desc h2 { font-size:12px; letter-spacing:.5px; color:var(--mu); margin:0 0 10px; }
+  .card { border:1px solid var(--b); border-radius:6px; padding:10px 12px; margin-bottom:10px; }
+  .card h3 { margin:0 0 4px; font-size:13px; display:flex; gap:8px; align-items:center; }
+  .card h3 span { flex:0 0 20px; height:20px; border-radius:50%; background:var(--pin); color:#fff; font-size:11px; text-align:center; line-height:20px; }
+  .card ul { margin:4px 0 0; padding-left:16px; }
+  .card li { margin:2px 0; }
+  .card .ref { color:var(--hi); font-size:11px; margin-top:6px; }
+  .card table { border-collapse:collapse; width:100%; margin-top:6px; font-size:11px; }
+  .card th, .card td { border:1px solid var(--b); padding:3px 5px; text-align:left; vertical-align:top; }
+  .card th { background:#f7f8fa; }
+  @media (max-width:1100px) { .sp { grid-template-columns:200px minmax(0,1fr); } aside.desc { grid-column:1/3; border-left:0; border-top:1px solid var(--b); } .sp { height:auto; } }
+</style>
+</head>
+<body>
+<div class="sp">
+  <nav>
+    <h1>장바구니 할인 화면정의서</h1>
+    <div class="meta">원본 요청 · 샵단 &gt; 장바구니 · 반응형 스킨 기준 · 2026-10-27</div>
+    <input id="q" placeholder="화면 검색" aria-label="화면 검색">
+    <div id="toc"></div>
+  </nav>
+  <main>
+    <div class="shead" id="shead"></div>
+    <div class="stage-wrap"><div class="stage" id="stage"></div></div>
+    <p class="hint">화면 안의 버튼·토글·체크박스는 실제로 동작합니다. 조작하면 번호 위치가 함께 갱신됩니다. 목업 금액은 정책서 계산 기준으로 산출한 예시입니다.</p>
+  </main>
+  <aside class="desc"><h2>DESCRIPTION</h2><div id="desc"></div></aside>
+</div>
+<script src="./src/data/scenarios.js"></script>
+<script src="./src/js/engine.js"></script>
+<script src="./src/js/app.js"></script>
+<script>
+var SKIN_TABLE = '<table><tr><th>스킨</th><th>개별·통합2(통합쿠폰)</th><th>통합1·통합2(개별쿠폰)</th></tr>' +
+  '<tr><td>반응형</td><td>상품 목록 하단, 견적서 출력 오른쪽</td><td>공급사 묶음 합계 아래</td></tr>' +
+  '<tr><td>basic_simple · modern_simple</td><td>결제 정보 박스 안, 총 상품 금액 하위 항목 아래</td><td>공급사 묶음 합계 행</td></tr>' +
+  '<tr><td>모바일 4.0</td><td>결제 정보 박스 안, 헤더 아래 전체 폭</td><td>공급사 묶음 하단</td></tr></table>';
+
+var COMMON = {
+  tabs: { t: '일반구매 / 정기배송 탭', b: ['할인 영역, 최대 할인 적용 토글, 쿠폰 버튼은 일반구매 탭에만 노출합니다.', '정기배송 탭은 현행 결제 정보를 그대로 유지합니다.'], r: 'POL-001, POL-002, POL-003' },
+  toggle: { t: '최대 할인 적용 토글', b: ['기본값 ON. 페이지 안에서만 상태를 유지하고 다시 들어오면 ON입니다.', 'ON: 상품 할인 + 중복 사용 가능 상품 쿠폰·장바구니 쿠폰을 최저 결제 금액 조합으로 자동 적용합니다. 중복 사용 불가 쿠폰은 자동 적용하지 않습니다.', 'OFF로 변경: 자동 적용·직접 선택한 쿠폰을 모두 해제하고 상품 할인만 적용합니다.', '다시 ON으로 변경: 직접 선택한 쿠폰을 해제하고 최대 할인 조합을 다시 적용합니다.'], r: 'POL-033, POL-034, POL-035, POL-036, POL-037, POL-038' },
+  goods: { t: '총 상품 금액', b: ['선택한 상품의 (판매가 + 옵션 추가 금액) × 수량 합계 + 배송비입니다. 할인 전 금액입니다.', '하위 항목: 상품 금액(부가세 포함), 배송비(상품별 추가 배송비 포함, 지역별 추가 배송비 제외).', '︿ 아이콘으로 하위 항목을 접고 펼칩니다. 처음에는 펼친 상태입니다.'], r: 'POL-004, POL-005, POL-006, POL-007, POL-008, POL-009, POL-010, POL-047, POL-048, POL-049, POL-050, POL-051' },
+  disc: { t: '총 할인 금액', b: ['상품 할인 + 상품 쿠폰 + 장바구니 쿠폰 합계를 음수로 표기합니다.', '하위 항목은 할인 금액이 0원이면 노출하지 않습니다.', '세 항목이 모두 0원이면 영역 전체를 노출하지 않습니다.'], r: 'POL-012, POL-013, POL-014, POL-015, POL-016, POL-018, POL-019, POL-020, POL-021, POL-027, POL-028, POL-029, POL-030' },
+  notice: { t: '주문서 단계 항목', b: ['주문 할인, 보유 적립금, 적립금 즉시 할인은 금액 대신 "주문서에서 확인 가능"으로 노출합니다.', '상품 쿠폰·장바구니 쿠폰 할인이 모두 0원이면 3개 항목 모두 노출하지 않습니다.', '합계에는 포함하지 않습니다.'], r: 'POL-027, POL-028, POL-029, POL-030' },
+  final: { t: '최종 결제 금액', b: ['총 상품 금액 − 총 할인 금액입니다. 0원 미만이면 0원으로 노출합니다.', '할인 후 금액만 노출하고 정가 취소선은 노출하지 않습니다. 적립 예정 금액은 노출하지 않습니다.', '수량·체크·옵션·쿠폰·토글이 바뀌면 새로고침 없이 즉시 다시 계산합니다.'], r: 'POL-004, POL-005, POL-006, POL-007, POL-011, POL-031, POL-032' },
+  pcoupon: { t: '상품쿠폰 버튼', b: ['장바구니 타입과 관계없이 상품마다 노출합니다.', '누르면 해당 상품의 상품 쿠폰 선택 모달을 엽니다. 적용할 쿠폰이 없어도 노출합니다.'], r: 'POL-040, POL-041, POL-042, POL-043' },
+  ccouponAll: { t: '장바구니 쿠폰 버튼 (전체 1개)', b: ['개별 장바구니, 통합 장바구니2(통합쿠폰)에서 장바구니 전체에 1개 노출합니다.', '누르면 장바구니 쿠폰 선택 모달을 엽니다. 배송비 쿠폰은 노출하지 않습니다.', '스킨별 버튼 위치:' ], extra: SKIN_TABLE, r: 'POL-020, POL-021, POL-040, POL-041, POL-042, POL-043' },
+  ccouponGroup: { t: '장바구니 쿠폰 버튼 (공급사 묶음별)', b: ['통합 장바구니1, 통합 장바구니2(개별쿠폰)에서 공급사 묶음마다 1개 노출합니다.', '전체 버튼과 함께 노출하지 않습니다.', '누르면 해당 공급사 묶음 기준 장바구니 쿠폰 모달을 엽니다. 할인은 묶음별로 계산하고 결제 정보에는 합계 1줄로 표시합니다.'], extra: SKIN_TABLE, r: 'POL-020, POL-021, POL-040, POL-041, POL-042, POL-043' },
+  groupSum: { t: '공급사 묶음 합계', b: ['현행 묶음 합계(상품 금액 + 배송비)를 유지하며, 수량·체크 변경 시 함께 다시 계산합니다.'], r: 'POL-011' }
+};
+
+var SCREENS = [
+  { g: '일반구매 · 개별 장바구니', id: 'SCR-CART-001', name: '최대 할인 적용 ON (기본)', st: '진입 기본 상태', opts: { cartType: 'single', preset: 'base' },
+    pins: [['tabs', COMMON.tabs], ['toggle', COMMON.toggle], ['goods', COMMON.goods], ['disc', COMMON.disc], ['order-notice', COMMON.notice], ['final', COMMON.final], ['pcoupon-btn', COMMON.pcoupon], ['ccoupon-all', COMMON.ccouponAll]] },
+  { g: '일반구매 · 개별 장바구니', id: 'SCR-CART-002', name: '최대 할인 적용 OFF', st: '고객이 토글을 끈 상태', opts: { cartType: 'single', preset: 'base' }, setup: function (c) { c.set({ toggle: false, manualSel: { P: {}, C: {} } }); },
+    pins: [['toggle', { t: '토글 OFF', b: ['자동 적용한 쿠폰을 모두 해제하고 상품 할인만 적용합니다.', '상품 쿠폰·장바구니 쿠폰 할인이 0원이므로 해당 항목과 주문서 단계 항목 3개를 노출하지 않습니다.'], r: 'POL-027, POL-028, POL-029, POL-030, POL-033, POL-034, POL-035, POL-036, POL-037, POL-038' }], ['disc', { t: '총 할인 금액', b: ['상품 할인만 합산합니다.'], r: 'POL-027, POL-028, POL-029, POL-030' }]] },
+  { g: '일반구매 · 개별 장바구니', id: 'SCR-CART-003', name: '쿠폰 직접 선택 후', st: '토글 ON에서 중복 불가 쿠폰을 직접 적용한 결과', opts: { cartType: 'single', preset: 'base' }, setup: function (c) { c.set({ toggle: false, manualSel: { P: { hq2: { single: 'P2', dups: [] } }, C: {} } }); },
+    pins: [['toggle', { t: '토글 자동 OFF', b: ['토글 ON에서 쿠폰을 직접 선택하면 토글을 OFF로 바꿉니다.', '자동 적용 결과를 해제하고 직접 선택한 쿠폰만 적용합니다.', '토글을 다시 켜면 직접 선택한 쿠폰을 해제하고 최대 할인 조합을 다시 적용합니다.'], r: 'POL-033, POL-034, POL-035, POL-036, POL-037, POL-038' }], ['disc-pc', { t: '상품 쿠폰', b: ['직접 선택한 중복 불가 쿠폰(5,000원)만 단독 적용합니다.'], r: 'POL-018, POL-019, POL-033, POL-034, POL-035, POL-036, POL-037, POL-038' }]] },
+  { g: '쿠폰 선택 모달', id: 'SCR-CART-004', name: '상품쿠폰 적용 모달', st: '상품쿠폰 버튼 클릭', opts: { cartType: 'single', preset: 'base' }, setup: function (c) { c.openModal('P', 'hq2'); },
+    pins: [['m-reg', { t: '쿠폰 등록', b: ['쿠폰 번호를 입력해 등록합니다. 처리는 주문서 쿠폰 등록과 같습니다.'], r: 'POL-044, POL-045, POL-046' }],
+      ['m-single', { t: '적용 쿠폰 선택', b: ['해당 상품에 쓸 수 있는 상품 쿠폰과 "쿠폰 적용 안함" 중 1개만 선택합니다.', '모달을 열면 현재 적용된 쿠폰이 선택되어 있습니다.', '다른 상품에 적용 중인 쿠폰은 선택할 수 없습니다.'], r: 'POL-022, POL-023, POL-024, POL-025, POL-026, POL-044, POL-045, POL-046' }],
+      ['m-dup', { t: '적용 중복 쿠폰 선택', b: ['상품 중복 쿠폰을 여러 개 선택할 수 있습니다.', '중복 사용 불가 쿠폰을 선택하면 중복 쿠폰은 선택할 수 없습니다.'], r: 'POL-044, POL-045, POL-046' }],
+      ['m-na', { t: '적용 불가 쿠폰', b: ['보유했지만 사용 조건을 충족하지 못한 쿠폰과 조건을 보여 주며 선택할 수 없습니다.'], r: 'POL-044, POL-045, POL-046' }],
+      ['m-apply', { t: '쿠폰적용', b: ['선택을 적용하고 모달을 닫은 뒤 결제 정보를 다시 계산합니다.', '토글이 ON이었다면 OFF로 바뀝니다.', '× 또는 바깥 영역, Esc는 변경 없이 닫습니다.'], r: 'POL-033, POL-034, POL-035, POL-036, POL-037, POL-038, POL-044, POL-045, POL-046' }]] },
+  { g: '쿠폰 선택 모달', id: 'SCR-CART-005', name: '중복 불가 쿠폰 선택 중', st: '모달에서 중복 사용 불가 쿠폰을 고른 상태', opts: { cartType: 'single', preset: 'base' }, setup: function (c) { c.openModal('P', 'hq2'); c.selectInModal('P2', []); },
+    pins: [['m-dup', { t: '중복 쿠폰 비활성화', b: ['중복 사용 불가 쿠폰을 선택하면 중복 쿠폰 선택을 해제하고 비활성화합니다.', '적용하면 선택한 쿠폰만 단독으로 적용합니다.'], r: 'POL-033, POL-034, POL-035, POL-036, POL-037, POL-038, POL-044, POL-045, POL-046' }]] },
+  { g: '쿠폰 선택 모달', id: 'SCR-CART-006', name: '장바구니 쿠폰 적용 모달', st: '장바구니 쿠폰 버튼 클릭', opts: { cartType: 'single', preset: 'base' }, setup: function (c) { c.openModal('C', 'ALL'); },
+    pins: [['m-single', { t: '장바구니 쿠폰 목록', b: ['버튼의 적용 단위(장바구니 전체 또는 공급사 묶음)에 쓸 수 있는 장바구니 쿠폰만 노출합니다.', '할인은 상품 할인·상품 쿠폰 적용 후 금액 합계에 1회 적용합니다.'], r: 'POL-020, POL-021, POL-044, POL-045, POL-046' }],
+      ['m-na', { t: '적용 불가 쿠폰', b: ['최소 구매 금액 등 사용 조건을 충족하지 못한 쿠폰입니다.'], r: 'POL-022, POL-023, POL-024, POL-025, POL-026, POL-044, POL-045, POL-046' }]] },
+  { g: '할인 상태', id: 'SCR-CART-007', name: '상품 할인만 (쿠폰 0건)', st: '보유 쿠폰 없음', opts: { cartType: 'single', preset: 'productOnly' },
+    pins: [['disc', { t: '총 할인 금액', b: ['상품 할인만 노출합니다.', '쿠폰 할인이 없으므로 주문서 단계 항목 3개를 노출하지 않습니다.'], r: 'POL-027, POL-028, POL-029, POL-030' }], ['pcoupon-btn', { t: '쿠폰 버튼', b: ['적용할 쿠폰이 없어도 버튼을 노출합니다. 누르면 쿠폰이 없는 모달을 엽니다.'], r: 'POL-040, POL-041, POL-042, POL-043' }]] },
+  { g: '할인 상태', id: 'SCR-CART-008', name: '할인 0건', st: '적용 가능한 할인 없음', opts: { cartType: 'single', preset: 'noDiscount' },
+    pins: [['toggle', { t: '토글 비활성화', b: ['적용 가능한 할인(상품 할인, 사용 조건을 충족한 보유 쿠폰)이 없으면 OFF 모양으로 비활성화하고 바꿀 수 없게 합니다.', '수량·체크 변경으로 할인이 생기면 다시 활성화하고 ON으로 계산합니다.'], r: 'POL-039' }], ['goods', { t: '총 할인 금액 미노출', b: ['총 할인 금액 영역 전체를 노출하지 않습니다. "0원" 빈 줄도 노출하지 않습니다.'], r: 'POL-027, POL-028, POL-029, POL-030' }]] },
+  { g: '할인 상태', id: 'SCR-CART-009', name: '하위 항목 접힘', st: '︿ 아이콘으로 접은 상태', opts: { cartType: 'single', preset: 'base' }, setup: function (c) { c.set({ fold: { goods: true, disc: true } }); },
+    pins: [['goods', { t: '접기/펼치기', b: ['총 상품 금액·총 할인 금액의 하위 항목을 각각 접고 펼칩니다.', '페이지 안에서만 상태를 유지하고 다시 들어오면 펼친 상태입니다.'], r: 'POL-004, POL-005, POL-006, POL-007' }]] },
+  { g: '할인 상태', id: 'SCR-CART-010', name: '담긴 상품 없음', st: '빈 장바구니', opts: { cartType: 'single', preset: 'empty' },
+    pins: [['empty', { t: '빈 장바구니', b: ['현행 안내 문구를 유지합니다.'], r: 'POL-001, POL-002, POL-003' }], ['paybox', { t: '결제 정보', b: ['금액은 0원, 총 할인 금액 영역 미노출, 토글 비활성화입니다.'], r: 'POL-027, POL-028, POL-029, POL-030, POL-039' }]] },
+  { g: '장바구니 타입', id: 'SCR-CART-011', name: '통합 장바구니1 · 통합2(개별쿠폰)', st: '공급사 묶음별 장바구니 쿠폰', opts: { cartType: 'int1', preset: 'base' },
+    pins: [['group-sum', COMMON.groupSum], ['ccoupon-group', COMMON.ccouponGroup], ['disc-cc', { t: '장바구니 쿠폰 합계', b: ['공급사 묶음별로 계산한 장바구니 쿠폰 할인의 합계를 1줄로 노출합니다.'], r: 'POL-020, POL-021' }]] },
+  { g: '장바구니 타입', id: 'SCR-CART-012', name: '통합 장바구니2(통합쿠폰)', st: '전체 1개 장바구니 쿠폰', opts: { cartType: 'int2all', preset: 'base' },
+    pins: [['ccoupon-all', COMMON.ccouponAll], ['disc-cc', { t: '장바구니 쿠폰', b: ['장바구니 전체 합계에 1회 적용합니다. 본사+공급사 쿠폰은 공급사 구분 없이 적용합니다.'], r: 'POL-020, POL-021, POL-022, POL-023, POL-024, POL-025, POL-026' }]] },
+  { g: '기타', id: 'SCR-CART-013', name: '정기배송 탭', st: '현행 유지', opts: { cartType: 'single', preset: 'base', tab: 'subs' },
+    pins: [['tabs', COMMON.tabs], ['paybox', { t: '정기배송 결제 정보', b: ['총 상품 금액, 배송비, 총 결제 금액, 정기배송 신청 버튼을 현행대로 유지합니다.', '할인 영역·토글·쿠폰 버튼을 노출하지 않습니다.'], r: 'POL-001, POL-002, POL-003' }], ['subs-note', { t: '자동결제 금액 안내', b: ['현행 안내 문구를 유지합니다.'], r: 'POL-001, POL-002, POL-003' }]] },
+  { g: '기타', id: 'SCR-CART-014', name: '모바일 (반응형)', st: '390px', width: 390, opts: { cartType: 'single', preset: 'base' },
+    pins: [['toggle', COMMON.toggle], ['disc', COMMON.disc], ['final', COMMON.final], ['order-btn', { t: '주문하기', b: ['모바일에서는 결제 정보가 상품 목록 아래로 내려가며, 결제 정보 구성과 동작은 PC와 같습니다.', '주문하기 버튼 위치·고정 여부는 현행 반응형 스킨을 따릅니다.'], r: 'POL-004, POL-005, POL-006, POL-007' }]] },
+  { g: '기타', id: 'SCR-CART-015', name: '비회원', st: '로그인하지 않은 상태', opts: { cartType: 'single', preset: 'base', loggedIn: false },
+    pins: [['disc', { t: '상품 할인만 적용', b: ['비회원은 보유 쿠폰이 없어 쿠폰 할인이 없습니다. 쿠폰 처리는 현행 주문서와 같습니다.'], r: 'POL-022, POL-023, POL-024, POL-025, POL-026' }]] }
+];
+
+var ctrl, cur;
+function el(id) { return document.getElementById(id); }
+function renderToc(filter) {
+  var h = '', last = '';
+  SCREENS.forEach(function (s, i) {
+    var text = s.id + ' ' + s.name + ' ' + s.g;
+    if (filter && text.indexOf(filter) < 0) return;
+    if (s.g !== last) { h += '<div class="grp">' + s.g + '</div>'; last = s.g; }
+    h += '<a href="#' + s.id + '" data-i="' + i + '" class="' + (cur === i ? 'on' : '') + '">' + s.name + '<small>' + s.id + '</small></a>';
+  });
+  el('toc').innerHTML = h;
+}
+function placePins() {
+  var s = SCREENS[cur], stage = el('stage');
+  stage.querySelectorAll('.pin,.box').forEach(function (n) { n.remove(); });
+  var sr = stage.getBoundingClientRect(), cards = '';
+  s.pins.forEach(function (p, i) {
+    var n = i + 1, t = stage.querySelector('[data-mk="' + p[0] + '"]');
+    if (t) {
+      var r = t.getBoundingClientRect();
+      var box = document.createElement('div'); box.className = 'box';
+      box.style.cssText = 'left:' + (r.left - sr.left - 3) + 'px;top:' + (r.top - sr.top - 3) + 'px;width:' + (r.width + 6) + 'px;height:' + (r.height + 6) + 'px';
+      var pin = document.createElement('div'); pin.className = 'pin'; pin.textContent = n;
+      pin.style.left = (r.left - sr.left) + 'px'; pin.style.top = (r.top - sr.top) + 'px';
+      stage.appendChild(box); stage.appendChild(pin);
+    }
+    var d = p[1];
+    cards += '<div class="card"><h3><span>' + n + '</span>' + d.t + '</h3><ul>' + d.b.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>' + (d.extra || '') + '<div class="ref">' + d.r + '</div></div>';
+  });
+  el('desc').innerHTML = cards;
+}
+function show(i) {
+  cur = i; var s = SCREENS[i];
+  location.hash = s.id;
+  el('shead').innerHTML = '<b>화면 ID</b><span>' + s.id + '</span><b>경로</b><span>샵단 &gt; 장바구니</span><b>화면</b><span>' + s.g + ' · ' + s.name + '</span><b>상태</b><span>' + s.st + ' · ' + CART_DATA.CART_TYPES[s.opts.cartType].label + '</span>';
+  var stage = el('stage'); stage.innerHTML = ''; stage.className = 'stage' + (s.width ? ' mobile' : ''); stage.style.width = (s.width || 1180) + 'px';
+  var root = document.createElement('div'); stage.appendChild(root);
+  var opts = Object.assign({ chrome: false, onRender: function () { requestAnimationFrame(placePins); } }, s.opts);
+  ctrl = CartApp.mount(root, opts);
+  if (s.setup) s.setup(ctrl);
+  renderToc(el('q').value.trim());
+  requestAnimationFrame(placePins);
+}
+el('toc').addEventListener('click', function (e) { var a = e.target.closest('a'); if (!a) return; e.preventDefault(); show(+a.getAttribute('data-i')); });
+el('q').addEventListener('input', function () { renderToc(this.value.trim()); });
+window.addEventListener('resize', function () { placePins(); });
+var start = SCREENS.findIndex(function (s) { return '#' + s.id === location.hash; });
+show(start < 0 ? 0 : start);
+</script>
+</body>
+</html>

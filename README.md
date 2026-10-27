@@ -8,11 +8,12 @@
 |---|---|---|
 | [`web-ide/`](./web-ide) | 메이크샵 개별디자인 편집 화면을 VS Code 스타일 Web IDE로 개편한 프로토타입 | [바로가기](https://donghoim.github.io/Makeshop/web-ide/) |
 | [`google-channel/`](./google-channel) | Google 채널 연동(연결관리·상품피드·구글애즈) 프로토타입 v0.1 + [`v0.2/`](./google-channel/v0.2) 마케팅 채널 관리 통합 기획(사양·요구사항·정책서·와이어프레임·CS 가이드, HTML 화면정의서 43개 화면, 목업) | [v0.1](https://donghoim.github.io/Makeshop/google-channel/) · [v0.2](https://donghoim.github.io/Makeshop/google-channel/v0.2/) · [화면정의서](https://donghoim.github.io/Makeshop/google-channel/v0.2/screen-spec.html) |
-| [`meta-channel/`](./meta-channel) | Meta 비즈니스 연동(홈·연결관리·상품피드·광고관리·Shops 관리) 프로토타입 v2 + QA 테스트 케이스(엑셀, 267건) | [바로가기](https://donghoim.github.io/Makeshop/meta-channel/) |
+| [`meta-channel/`](./meta-channel) | Meta 비즈니스 연동(홈·연결관리·상품피드·광고관리·Shops 관리) — 목업, HTML 화면정의서 16개 화면, 사양·요구사항·정책서·와이어프레임 초안·CS 가이드, TC 111건(기존 FBE 연동 상점 재연동 전환 포함) | [목업](https://donghoim.github.io/Makeshop/meta-channel/) · [화면정의서](https://donghoim.github.io/Makeshop/meta-channel/screen-spec.html) |
 | [`makeshop-mcp/`](./makeshop-mcp) | MakeShop MCP 연동 서비스 기획 — 요구사항/정책/Data-API/QA/개발 킥오프 문서 세트(조회형 MCP 1차 MVP, UI 프로토타입 없음) | — |
 | [`category-filter-improvement/`](./category-filter-improvement) | 분류 검색 필터 관리 개선(필터 설정·일괄 관리) 프로토타입 | [바로가기](https://donghoim.github.io/Makeshop/category-filter-improvement/) |
 | [`bundle-product-excel-upload/`](./bundle-product-excel-upload) | 묶음상품 엑셀 업로드 등록/수정 개선 기획 — PRD 분석, 사양 정의서·요구사항 정의서·정책서·CS 가이드, TC 사전 작성서(42건), 신규 엑셀 양식(UI 프로토타입 없음) | — |
 | [`product-option-identification/`](./product-option-identification) | 상품 옵션 식별 체계 개선 기획 — 품목코드(`{상품번호}-{순번}`) 정책서, 와이어프레임 SVG 3장, 기획 리뷰용 쉬운 설명 | — |
 | [`security-compliance/`](./security-compliance) | 보안·컴플라이언스 기능 기획 3건(로그인 보안 강화·휴면회원 정책 전환·사업자 인증 개선) — 설계 원칙·주요 결정·결과, 관리자 화면 3종 정적 재현 | [바로가기](https://donghoim.github.io/Makeshop/security-compliance/) |
+| [`cart-discount-area/`](./cart-discount-area) | 장바구니 결제 정보 할인 영역 추가 기획 — 할인 상세·최대 할인 기준 결제 금액 노출, 사양·요구사항·정책서·와이어프레임 초안·CS 가이드, 와이어프레임 SVG 4장, HTML 화면정의서 15개 화면, 목업 | [목업](https://donghoim.github.io/Makeshop/cart-discount-area/) · [화면정의서](https://donghoim.github.io/Makeshop/cart-discount-area/screen-spec.html) |
 
 각 프로젝트 폴더의 README에 상세 실행 방법이 있습니다.

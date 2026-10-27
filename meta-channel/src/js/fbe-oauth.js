@@ -4,6 +4,7 @@
      최대한 유사하게 재현한 시뮬레이션. Meta가 소유·제공하는 화면이므로
      실제 서비스에서는 이 팝업이 Meta 도메인에서 그대로 렌더링된다.
    — 참고: 11_Reference/3-4. FBE 자산 연동(추정).png (전 구간 실 화면 캡처)
+   — 2026-10-19 결정: 커머스 계정 연동 제외. 커머스 계정 확인·커머스 계정 설정 완료 단계를 넣지 않는다.
    ========================================================================== */
 
 const FbeOAuth = (function () {
@@ -413,44 +414,13 @@ const FbeOAuth = (function () {
         footStyle: "nav",
       },
 
-      /* 10: COMMERCE ACCOUNT */
-      {
-        winTitle: "Facebook으로 로그인 - Chrome",
-        url: "/v22.0/dialog/oauth?app_id=" + APP_ID,
-        sideTitle: "커머스 계정 확인",
-        sideDesc: `
-          <p>선택한 페이지에 연결된 커머스(상거래) 계정을 함께 연동할지 확인하는 화면입니다.</p>
-          <p>커머스 계정은 Shops 기능과 결제·주문 관련 정보를 관리하는 데 사용됩니다.</p>
-          <p>확인을 누르면 화면에 표시된 커머스 계정 그대로 연결이 진행됩니다.</p>
-        `,
-        render(body, ctx) {
-          body.innerHTML = `
-            <h2 class="fbstep-head">커머스 계정 확인</h2>
-            <p class="fbstep-desc">선택된 페이지는 아래 상거래 계정에 연결되어 있습니다. 이 상거래 계정을 연결할지 확인해주세요.</p>
-            <div id="fb-list"></div>
-          `;
-          const items = [{ id: "commerce1", name: sel.commerce, desc: "2067673590710840", round: true }];
-          const list = body.querySelector("#fb-list");
-          function paint() {
-            radioList(list, items, sel.commerceChoice, (id) => {
-              sel.commerceChoice = id;
-              paint();
-              ctx.setNextEnabled(true);
-            });
-          }
-          paint();
-          ctx.setNextEnabled(!!sel.commerceChoice);
-        },
-        footStyle: "nav",
-      },
-
-      /* 11: SETTINGS REVIEW */
+      /* 10: SETTINGS REVIEW */
       {
         winTitle: "Facebook으로 로그인 - Chrome",
         url: "/v22.0/dialog/oauth?app_id=" + APP_ID,
         sideTitle: "설정 확인",
         sideDesc: `
-          <p>지금까지 선택한 비즈니스 포트폴리오, 페이지, Instagram, 카탈로그, 광고 계정, 커머스 계정, 픽셀 정보를 최종 확인하는 화면입니다.</p>
+          <p>지금까지 선택한 비즈니스 포트폴리오, 페이지, Instagram, 카탈로그, 광고 계정, 픽셀 정보를 최종 확인하는 화면입니다.</p>
           <p>각 항목을 눌러 세부 설정을 다시 확인할 수 있습니다.</p>
           <p>'계속'을 클릭하면 Meta 이용약관에 동의한 것으로 처리되어 다음 단계로 진행됩니다.</p>
         `,
@@ -462,7 +432,6 @@ const FbeOAuth = (function () {
             ["Instagram 프로필", sel.igChoice === "skip" ? "연결 안 함" : "@" + sel.instagramHandle],
             ["카탈로그", sel.catalog],
             ["광고 계정", sel.adAccount],
-            ["커머스 계정", sel.commerce],
             ["Meta 픽셀", sel.pixel],
           ];
           body.innerHTML = `
@@ -488,7 +457,7 @@ const FbeOAuth = (function () {
         footStyle: "links",
       },
 
-      /* 12: PERMISSIONS */
+      /* 11: PERMISSIONS */
       {
         winTitle: "Facebook으로 로그인 - Chrome",
         url: "/v22.0/dialog/oauth?app_id=" + APP_ID,
@@ -524,35 +493,7 @@ const FbeOAuth = (function () {
         footStyle: "nav",
       },
 
-      /* 13: COMMERCE SETUP COMPLETE */
-      {
-        winTitle: "Facebook으로 로그인 - Chrome",
-        url: "/v22.0/dialog/oauth?app_id=" + APP_ID,
-        sideTitle: "커머스 계정 설정 완료",
-        sideDesc: `
-          <p>Facebook 커머스 계정 연결을 마무리하는 화면입니다.</p>
-          <p>자산이 아직 커머스 계정에 연결되어 있지 않다면 이 단계에서 새 커머스 계정이 자동으로 생성됩니다.</p>
-          <p>Shops 기능을 사용하려면 커머스 제품 판매자 계약에 동의해야 합니다.</p>
-        `,
-        custom: true,
-        render(body, ctx) {
-          body.innerHTML = `
-            <div class="fbwin__illust">&#128717;</div>
-            <h2 class="fbwin__title" style="font-size:16px;">커머스 계정 설정 완료</h2>
-            <p class="fbwin__sub">Facebook에 대한 커머스 계정 연결을 완료하세요. 자산이 아직 커머스 계정에 연결되지 않은 경우 새 커머스 계정이 생성됩니다.</p>
-            <p class="fbwin__sub" style="font-size:11px;">Shops를 사용하려면 커머스 제품 판매자 계약을 준수해야 합니다. <a class="fbbtn--link" style="display:inline; margin:0;">더 알아보기</a></p>
-            <div style="display:flex; gap:10px; margin-top:6px;">
-              <button class="fbbtn fbbtn--outline" id="fb-commerce-cancel" style="flex:1;">취소</button>
-              <button class="fbbtn fbbtn--primary" id="fb-commerce-ok" style="flex:1;">다음</button>
-            </div>
-          `;
-          body.querySelector("#fb-commerce-cancel").addEventListener("click", () => ctx.cancel());
-          body.querySelector("#fb-commerce-ok").addEventListener("click", () => ctx.next());
-        },
-        footStyle: "links",
-      },
-
-      /* 14: DONE */
+      /* 12: DONE */
       {
         winTitle: "Facebook으로 로그인 - Chrome",
         url: "/v22.0/dialog/oauth?app_id=" + APP_ID,
@@ -609,8 +550,6 @@ const FbeOAuth = (function () {
       pixel: "Meta 픽셀(" + account.businessManagerName + ")",
       pixelId: account.pixelId,
       pixelChoice: "pixel1",
-      commerce: account.commerceAccountName,
-      commerceChoice: "commerce1",
     };
 
     const steps = buildSteps(sel);

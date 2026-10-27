@@ -13,8 +13,6 @@ window.MOCK = (function () {
     pageName: "노블리 스튜디오",
     pageId: "104857392011846",
     pixelId: "1234567890123456",
-    commerceAccountName: "노블리 스튜디오 커머스",
-    commerceAccountId: "2067673500710840",
     catalogName: "노블리 스튜디오 카탈로그",
     catalogId: "876350981244014",
     instagramUsername: "nobly.studio",
@@ -137,6 +135,7 @@ window.MOCK = (function () {
 
   /* ---------------- 상품 피드 사유 문구 ---------------- */
   const restrictReasons = [
+    { key: "noGpc", label: "메타 카테고리를 설정하지 않은 경우", text: "페이스북 카테고리가 설정되지 않았습니다. 페이스북 카테고리를 설정해 주세요." },
     { key: "display", label: "노출상태가 '노출 안함'인 경우", text: "노출하지 않은 상품입니다. 상품을 노출함 상태로 변경해 주세요." },
     { key: "sale", label: "판매상태가 '판매불가능'인 경우", text: "판매하지 않는 상품입니다. 상품을 판매함 상태로 변경해 주세요." },
     { key: "soldout", label: "품절 상품인 경우", text: "품절 상품입니다." },

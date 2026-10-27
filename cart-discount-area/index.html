@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>장바구니 할인 목업</title>
+<link rel="stylesheet" href="src/css/cart.css">
+<style>
+  body { margin:0; background:#fff; }
+  .pt-fab { position:fixed; right:16px; bottom:16px; z-index:50; background:#1d3f8f; color:#fff; border:0; border-radius:24px; padding:12px 18px; font:600 13px "Pretendard","Malgun Gothic",sans-serif; box-shadow:0 4px 14px rgba(0,0,0,.25); cursor:pointer; }
+  .pt-drawer { position:fixed; top:0; right:0; bottom:0; width:300px; max-width:90vw; background:#fff; z-index:60; box-shadow:-6px 0 20px rgba(0,0,0,.15); padding:20px; font:13px "Pretendard","Malgun Gothic",sans-serif; transform:translateX(105%); transition:transform .2s; overflow:auto; }
+  .pt-drawer.open { transform:none; }
+  .pt-drawer h3 { margin:0 0 4px; font-size:16px; }
+  .pt-drawer p { color:#666; margin:0 0 16px; line-height:1.6; }
+  .pt-drawer label { display:block; font-weight:700; margin:14px 0 6px; }
+  .pt-drawer select { width:100%; height:36px; border:1px solid #ccc; font:inherit; padding:0 8px; }
+  .pt-drawer .row { display:flex; justify-content:space-between; align-items:center; margin-top:18px; }
+  .pt-close { background:none; border:0; font-size:20px; cursor:pointer; }
+  .pt-frame { margin:0 auto; transition:max-width .2s; }
+  .pt-frame.mobile { max-width:390px; border-left:1px solid #ddd; border-right:1px solid #ddd; }
+</style>
+</head>
+<body>
+<div id="frame" class="pt-frame"><div id="app"></div></div>
+<button class="pt-fab" id="fab" aria-controls="drawer">시나리오 설정</button>
+<aside class="pt-drawer" id="drawer" aria-label="목업 시나리오 설정">
+  <div class="row" style="margin-top:0"><h3>시나리오 설정</h3><button class="pt-close" id="close" aria-label="닫기">×</button></div>
+  <p>목업 전용 패널입니다. 실제 화면에는 노출하지 않습니다.</p>
+  <label for="cartType">장바구니 타입</label><select id="cartType"></select>
+  <label for="preset">데이터</label><select id="preset"></select>
+  <label for="member">회원 상태</label><select id="member"><option value="1">로그인 회원(쿠폰 보유)</option><option value="0">비회원</option></select>
+  <label for="ship">배송비 청구 기준</label><select id="ship"><option value="before">할인 전 정상판매가격 기준</option><option value="after">최종 주문금액 기준</option></select>
+  <label for="view">화면 폭</label><select id="view"><option value="pc">PC</option><option value="mobile">모바일(390px)</option></select>
+</aside>
+<script src="src/data/scenarios.js"></script>
+<script src="src/js/engine.js"></script>
+<script src="src/js/app.js"></script>
+<script>
+(function () {
+  var D = window.CART_DATA, $ = function (id) { return document.getElementById(id); };
+  Object.keys(D.CART_TYPES).forEach(function (k) { $('cartType').add(new Option(D.CART_TYPES[k].label, k)); });
+  Object.keys(D.PRESETS).forEach(function (k) { $('preset').add(new Option(D.PRESETS[k].label, k)); });
+  var q = new URLSearchParams(location.search);
+  ['cartType', 'preset', 'ship', 'view', 'member'].forEach(function (k) { if (q.get(k)) $(k).value = q.get(k); });
+  function remount() {
+    var old = $('app'), fresh = document.createElement('div'); fresh.id = 'app'; old.replaceWith(fresh);
+    $('frame').classList.toggle('mobile', $('view').value === 'mobile');
+    window.cart = CartApp.mount(fresh, { live: true, cartType: $('cartType').value, preset: $('preset').value, shipBasis: $('ship').value, loggedIn: $('member').value === '1' });
+  }
+  ['cartType', 'preset', 'ship', 'view', 'member'].forEach(function (k) { $(k).addEventListener('change', remount); });
+  $('fab').onclick = function () { $('drawer').classList.add('open'); };
+  $('close').onclick = function () { $('drawer').classList.remove('open'); };
+  remount();
+})();
+</script>
+</body>
+</html>
