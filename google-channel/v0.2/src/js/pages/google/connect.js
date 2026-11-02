@@ -59,8 +59,19 @@ const GConnect = (function () {
     let body;
     let actions = "";
     if (st === "none") {
-      body = `<p class="sec__lead">연결된 Merchant Center 계정과 도메인 인증, 판매국가·배송 설정 상태입니다.<br>Merchant Center를 연결하면 메이크샵 상품을 Google에 무료 리스팅·쇼핑 광고로 노출할 수 있습니다.</p>
-        <button type="button" class="btn btn--primary btn--lg" data-act="mc-connect">Merchant Center 연동하기</button>`;
+      const pre = GStore.pre();
+      const allDone = PRE_ITEMS.every((x) => pre.done[x.key]);
+      body = `<p class="sec__lead">Merchant Center를 연결하면 메이크샵 상품을 Google에 무료 리스팅·쇼핑 광고로 노출할 수 있습니다.<br>아래 항목이 모두 완료되어야 Merchant Center를 연결할 수 있습니다. 항목을 누르면 설정 방법을 안내합니다.</p>
+        <ul class="precheck">${PRE_ITEMS.map((x) => {
+          const ok = pre.done[x.key];
+          const auto = x.key === "connect";
+          return `<li class="precheck__item ${ok ? "is-done" : ""}">${auto ? '<div class="precheck__row">' : `<button type="button" class="precheck__row" data-pre="${x.key}">`}
+            <span class="precheck__mark ${ok ? "is-ok" : "is-no"}">${ok ? "O" : "X"}</span>
+            <span class="precheck__txt"><b>${x.title}</b><span class="muted small">${x.desc}</span></span>
+            <span class="precheck__end">${auto ? '<span class="muted small">자동 완료</span>' : "›"}</span>
+          ${auto ? "</div>" : "</button>"}</li>`;
+        }).join("")}</ul>
+        <button type="button" class="btn btn--primary btn--lg" data-act="mc-connect" ${allDone ? "" : 'disabled title="준비 항목을 모두 완료해 주세요."'}>Merchant Center 연결하기</button>`;
     } else {
       const a = s.mcAccount || G().merchantCandidates[0];
       const statePill = st === "reauth" ? C().pill("재인증 필요", "red") : C().pill("연결됨");
@@ -82,6 +93,7 @@ const GConnect = (function () {
     C().bindExt(el);
     const on = (k, fn) => { const b = el.querySelector(`[data-act="${k}"]`); if (b) b.addEventListener("click", fn); };
     on("mc-connect", () => openMcWizard(false));
+    el.querySelectorAll("[data-pre]").forEach((b) => b.addEventListener("click", () => openPreItem(b.dataset.pre)));
     on("mc-change", async () => {
       if (!(await UI.confirm("Merchant Center 계정을 바꾸면 Google 상품 피드 정보를 초기화하고 전송 대상 상품을 다시 전송합니다.\n계정을 변경하시겠습니까?"))) return;
       openMcWizard(true);
@@ -128,9 +140,82 @@ const GConnect = (function () {
       afterSetup();
     });
   }
-  /** Merchant Center 연결 마법사: 준비사항 → 계정 선택 → 사업자 정보 제공 동의 → 전화번호 인증 → 약관 동의 */
+  /* ---------------- Merchant Center 준비 항목 (POL-042) ---------------- */
+  const PRE_ITEMS = [
+    { key: "connect", title: "커넥트 정보 등록", desc: "Google 로그인 정보로 자동 등록되어 별도 설정이 필요 없어요" },
+    { key: "ssl", title: "SSL 인증 도메인 사용", desc: "체크아웃 과정이 유효한 SSL 인증서로 보호되어야 해요" },
+    { key: "terms", title: "쇼핑몰 이용약관·환불정책 등록", desc: "개인정보처리방침·이용약관·배송·환불정책이 쇼핑몰에 공개되어 있어야 해요" },
+    { key: "pay", title: "결제 수단 등록", desc: "쇼핑몰 체크아웃에서 결제가 정상적으로 완료될 수 있어야 해요" },
+  ];
+  /** 항목별 안내 모달. 현재 상태는 메이크샵 설정값으로 판정하고, [설정 완료 확인]을 눌러야 항목이 완료된다 */
+  function openPreItem(key) {
+    const pre = GStore.pre();
+    const DEF = {
+      ssl: {
+        title: "SSL 인증 도메인 사용",
+        lead: "Google Merchant Center는 쇼핑몰이 HTTPS(https://)로 연결되고, 체크아웃 과정이 유효한 SSL 인증서로 보호될 것을 요구해요.",
+        ask: "아래에서 SSL 인증서 및 HTTPS 도메인 등록 여부를 확인해주세요.",
+        state: () => (pre.raw.ssl === "done" ? "설정완료" : "미설정"),
+        guide: () => (pre.raw.ssl === "nodomain" ? "설정 > 기본 설정 > 도메인에서 내 쇼핑몰 주도메인을 연결 후 체크해주세요." : "설정 > 기본 설정 > SSL 보안서버에서 SSL 인증서 발급을 확인해주세요."),
+        btn: "도메인 설정으로 이동",
+        check: null,
+      },
+      terms: {
+        title: "쇼핑몰 이용약관 및 환불 정책 등록",
+        lead: "Google Merchant Center 연동 시 쇼핑몰에 개인정보처리방침·이용약관·배송정책·환불정책 4가지가 모두 공개되어 있을 것을 요구합니다. 쇼핑몰 내 이용약관 및 환불 정책 등 누락된 경우에는 Google Merchant Center 이용이 제한될 수 있어요.",
+        ask: "아래에서 등록된 약관 정보를 확인해주세요.",
+        state: null,
+        guide: () => "설정 > 기본 설정 > 약관 설정에서 약관을 확인하세요.",
+        btn: "약관 설정으로 이동",
+        check: "서비스 이용 약관 및 환불 정책이 등록된 쇼핑몰임을 확인하였습니다.",
+      },
+      pay: {
+        title: "결제 수단 등록",
+        lead: "Google Merchant Center는 쇼핑몰 체크아웃에서 결제가 정상적으로 완료될 수 있는 결제 수단이 등록되어 있을 것을 요구해요.",
+        ask: "아래에서 결제 수단 등록 여부를 확인해주세요.",
+        state: () => (pre.raw.pay ? "설정완료" : "미설정"),
+        guide: () => "설정 > 결제 설정 > 전자결제(PG) 신청/관리에서 사용 가능한 결제 수단을 등록해주세요.",
+        btn: "전자결제(PG) 신청/관리로 이동",
+        check: "결제서비스가 정상적으로 등록된 쇼핑몰임을 확인하였습니다.",
+      },
+    }[key];
+    const m = UI.modal({ title: DEF.title, size: "md", body: '<div id="pre-b"></div>', footer: '<button type="button" class="btn btn--line btn--lg" data-act="c">닫기</button><button type="button" class="btn btn--dark btn--lg" data-act="ok">설정 완료 확인</button>' });
+    const box = m.el.querySelector("#pre-b");
+    const ok = m.el.querySelector('[data-act="ok"]');
+    let checked = !!pre.done[key];
+    function paint() {
+      const stv = DEF.state ? DEF.state() : null;
+      box.innerHTML = `<p class="sec__lead">${DEF.lead}</p><p class="sec__lead">${DEF.ask}</p>
+        <div class="graybox pre-state">${stv ? `<b>현재 상태: <span class="${stv === "설정완료" ? "txt-blue" : "txt-red"}">${stv}</span></b>` : ""}<ul><li>${DEF.guide()}</li></ul></div>
+        <button type="button" class="btn btn--line" data-act="go">${DEF.btn}</button>
+        <p class="muted small" style="margin:14px 0 8px">설정을 완료하셨다면 아래 확인 버튼을 눌러주세요.</p>
+        ${DEF.check ? `<label class="chk"><input type="checkbox" id="pre-chk" ${checked ? "checked" : ""}/><span>${DEF.check}</span></label>` : ""}`;
+      // SSL: 메이크샵 설정이 완료되어야, 약관: 확인 체크, 결제 수단: 설정완료 + 확인 체크
+      ok.disabled = !((!DEF.state || stv === "설정완료") && (!DEF.check || checked));
+      const ck = box.querySelector("#pre-chk");
+      if (ck) ck.addEventListener("change", () => { checked = ck.checked; paint(); });
+      box.querySelector('[data-act="go"]').addEventListener("click", () => {
+        UI.toast("메이크샵 설정 화면이 새 창으로 열립니다. (프로토타입: 설정을 마친 것으로 가정합니다)", "info");
+        if (key === "ssl") pre.raw.ssl = pre.raw.ssl === "nossl" ? "nodomain" : "done"; // 인증서 발급 → 주도메인 연결 순서로 시뮬레이션
+        if (key === "pay") pre.raw.pay = true;
+        GStore.save();
+        paint();
+      });
+    }
+    m.el.querySelector('[data-act="c"]').addEventListener("click", () => m.close(true));
+    ok.addEventListener("click", () => {
+      pre.done[key] = true;
+      GStore.save();
+      m.close(true);
+      UI.toast(`${DEF.title} 항목이 완료되었습니다.`, "success");
+      App.render();
+    });
+    paint();
+  }
+
+  /** Merchant Center 연결 마법사: 계정 선택 → 사업자 정보 제공 동의 → 전화번호 인증 → 약관 동의 (준비 항목은 연결관리 화면 체크리스트에서 완료) */
   function openMcWizard(isChange) {
-    const steps = isChange ? ["계정 선택"] : ["준비사항 확인", "계정 선택", "사업자 정보 제공 동의", "대표 전화번호 인증", "판매자 약관 동의"];
+    const steps = isChange ? ["계정 선택"] : ["계정 선택", "사업자 정보 제공 동의", "대표 전화번호 인증", "판매자 약관 동의"];
     let i = 0;
     let picked = G().merchantCandidates[0];
     const phone = { verified: false, googleDone: false }; // 전화번호 인증은 Google 화면에서 직접 진행 (POL-043)
@@ -141,7 +226,6 @@ const GConnect = (function () {
       const name = steps[i];
       const stepper = `<ol class="wstep">${steps.map((x, k) => `<li class="${k === i ? "is-on" : k < i ? "is-done" : ""}">${k + 1}. ${x}</li>`).join("")}</ol>`;
       let h = "";
-      if (name === "준비사항 확인") h = `<p class="sec__lead">Merchant Center 연결 전에 아래 4가지가 준비되어야 합니다.</p><ul class="checklist">${["커넥트 정보(사업자 정보) 등록", "SSL 보안 인증서 적용", "쇼핑몰 이용약관·환불 정책 등록", "결제 수단 등록"].map((x) => `<li><span class="ok">✓</span>${x}<span class="muted">완료</span></li>`).join("")}</ul>`;
       if (name === "계정 선택") h = `<p class="sec__lead">연결할 Merchant Center 계정을 선택하세요.</p>${G().merchantCandidates.map((c, k) => `<label class="radio-card"><input type="radio" name="mc" value="${k}" ${c.id === picked.id ? "checked" : ""}/><span><b>${UI.esc(c.name)}</b><br><span class="muted">${c.id}</span></span></label>`).join("")}<label class="radio-card"><input type="radio" name="mc" value="new"/><span><b>새 Merchant Center 계정 만들기</b></span></label>`;
       if (name === "사업자 정보 제공 동의") h = `<div class="graybox"><b>Google에 제공하는 사업자 정보</b><ul><li>사업장 주소: 서울특별시 성동구 성수이로 ●● (마스킹)</li><li>대표 전화번호: ${G().merchant.phoneMasked}</li></ul></div><label class="chk"><input type="checkbox" id="mc-agree"/><span><em>(필수)</em>사업자 정보를 Google에 제공하는 데 동의합니다.</span></label>`;
       if (name === "대표 전화번호 인증") h = `<p class="sec__lead">대표 전화번호 인증은 Google 화면에서 직접 진행합니다. 인증번호 받기와 입력도 Google 화면에서 하며, 마친 뒤 [인증 확인]을 눌러 주세요. 이 단계는 건너뛸 수 없습니다.</p>

@@ -5,7 +5,7 @@
    - 판정 순서: 사용안함 → 노출제한 → 반영대기 → 미승인 → 검토중 → 활동중 (POL-052)
    ========================================================================== */
 const GStore = (function () {
-  const KEY = "mktProto.google.v1";
+  const KEY = "mktProto.google.v2";
   const G = window.GMOCK;
   const STATES = ["활동중", "검토중", "미승인", "노출제한", "사용안함", "반영대기"];
   const GOOGLE_STATES = ["활동중", "검토중", "미승인"];
@@ -36,6 +36,9 @@ const GStore = (function () {
       lastAuto: null,
       lastResult: null,
       history: [],
+      // Merchant Center 준비 항목 (POL-042): raw = 메이크샵 설정값, done = [설정 완료 확인]으로 완료한 항목
+      pre: { raw: { ssl: "nossl", pay: false }, done: { connect: true, ssl: false, terms: false, pay: false } },
+      cols: {}, // 구글애즈 항목 설정 저장값 (POL-085) — 키: 광고 기준 서브탭별 "ad:{서브탭}", 상품 기준 "product"
       queueAuto: true,
       syncing: false,
       // 통합 화면·권한 시나리오
@@ -62,7 +65,8 @@ const GStore = (function () {
       ads: "connected", adsAccount: clone(G.adsAccounts[0]), mcLink: "linked",
       lastFull: nowStr(-3), lastAuto: nowStr(-0.1), lastResult: "일부 실패",
     });
-    s.history = clone(G.syncHistory).map((h) => Object.assign(h, { atStr: nowStr(h.at) }));
+    s.history = clone(G.syncHistory).map((h) => Object.assign(h, { atStr: nowStr(h.at), endStr: h.result === "진행 중" ? null : nowStr(h.at + 0.004) }));
+    s.pre = { raw: { ssl: "done", pay: true }, done: { connect: true, ssl: true, terms: true, pay: true } };
     seedProducts(s);
     return s;
   }
@@ -154,6 +158,10 @@ const GStore = (function () {
     STATES,
     GOOGLE_STATES,
     get s() { return state; },
+    /** 준비 항목 상태 (이전 저장값에 없으면 기본값 생성) */
+    pre() { if (!state.pre) state.pre = baseState().pre; return state.pre; },
+    /** 항목 설정 저장값 */
+    cols() { if (!state.cols) state.cols = {}; return state.cols; },
     save,
     nowStr,
     accountOk, mcState, adsState, feedConnected, queueBlocked,
@@ -297,8 +305,8 @@ const GStore = (function () {
         state.lastAuto = nowStr();
         state.lastResult = "성공";
         const pending = state.history.find((h) => h.result === "진행 중");
-        if (pending) Object.assign(pending, { result: "성공", ok: n, target: n });
-        else state.history.unshift({ atStr: nowStr(), type: "자동 동기화", result: "성공", target: n, ok: n, fail: 0 });
+        if (pending) Object.assign(pending, { result: "성공", ok: n, target: n, endStr: nowStr() });
+        else state.history.unshift({ atStr: nowStr(), endStr: nowStr(), type: "자동 동기화", result: "성공", target: n, ok: n, fail: 0 });
         state.syncing = false;
       }
       save();

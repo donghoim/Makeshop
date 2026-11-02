@@ -99,7 +99,7 @@
 .bulkbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: #f4f6f9; padding: 12px 16px; border-radius: 8px; margin-bottom: 14px; }
 .bulkbar b { margin-right: 6px; font-size: 12.5px; }
 .mtable .td-left, .table .td-left { text-align: left; }
-.hist-filter { display: flex; gap: 8px; margin-bottom: 12px; }
+.hist-filter { display: flex; gap: 8px; margin-bottom: 12px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
 
 /* ---------------- Google 구글애즈 ---------------- */
 .perf-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -131,3 +131,43 @@
 .st, .table .col-price, .table .col-status, .table .col-sku { white-space: nowrap; }
 .lnb__group li.is-disabled { color: #b4bcc8; cursor: not-allowed; }
 .phone-box { display: flex; align-items: center; gap: 12px; background: #f4f6f9; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+
+/* ---------------- Google MC 준비 항목 (POL-042) ---------------- */
+.precheck { border: 1px solid var(--c-border); border-radius: 6px; margin: 16px 0 18px; }
+.precheck__item + .precheck__item { border-top: 1px solid var(--c-border); }
+.precheck__row { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px; background: none; border: 0; text-align: left; font: inherit; color: inherit; }
+button.precheck__row { cursor: pointer; }
+button.precheck__row:hover { background: #f7f9fc; }
+.precheck__item:first-child .precheck__row { background: #f7f8fa; }
+.precheck__mark { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex: none; border: 1.5px solid; }
+.precheck__mark.is-ok { color: var(--c-green); border-color: var(--c-green); }
+.precheck__mark.is-no { color: var(--c-red); border-color: var(--c-red); }
+.precheck__txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.precheck__end { margin-left: auto; color: var(--c-text-faint); font-size: 16px; }
+.pre-state { margin: 12px 0 14px; }
+.txt-red { color: var(--c-red); }
+.txt-blue { color: var(--c-primary); }
+.seg--sm button { height: 30px; padding: 0 12px; font-size: 12px; }
+.seg--sm > span { display: inline-flex; align-items: center; padding-left: 8px; }
+
+/* ---------------- 오른쪽 드로어형 모달 (동기화 실패 상세) ---------------- */
+.modal.modal--side { position: fixed; top: 0; right: 0; bottom: 0; max-width: 480px; max-height: none; height: 100vh; border-radius: 0; }
+.modal.modal--side .modal__body { overflow-y: auto; }
+.fail-sum { margin-bottom: 12px; }
+.fail-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.fail-card { border: 1px solid var(--c-border-2); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 3px; }
+
+/* ---------------- 구글애즈 항목 설정 (POL-085) ---------------- */
+.perf-sub { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.colset { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.colset__box { border: 1px solid var(--c-border); border-radius: 6px; display: flex; flex-direction: column; min-height: 360px; }
+.colset__head { padding: 10px 14px; border-bottom: 1px solid var(--c-border); font-weight: 600; font-size: 12.5px; background: #f7f8fa; }
+.colset__list { overflow-y: auto; max-height: 420px; }
+.colset__list li { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid #f0f2f5; font-size: 12.5px; }
+.colset__list li .muted { font-size: 11.5px; }
+.colset__list li .btns { margin-left: auto; display: flex; gap: 4px; flex: none; }
+.colset__fixed { font-size: 10.5px; color: var(--c-primary); background: var(--c-primary-l); padding: 1px 6px; border-radius: 3px; }
+.colset__empty { padding: 30px 14px; text-align: center; color: var(--c-text-faint); font-size: 12px; }
+@media (max-width: 720px) { .colset { grid-template-columns: 1fr; } }
+.input--sm { height: 30px; font-size: 12px; padding: 0 8px; }
+.hist-custom .row-inline { align-items: center; font-size: 12px; }

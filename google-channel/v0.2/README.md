@@ -9,7 +9,7 @@ v0.1(Google 채널 단독 기획)은 상위 폴더 [`../`](../)에 그대로 있
 | 자료 | 설명 | GitHub Pages |
 |---|---|---|
 | 목업 | `index.html` — 통합 현황·통합 상품 피드·Meta·Google·TikTok 탭, 우측 하단 시나리오 패널로 연동 상태 전환 | [바로가기](https://donghoim.github.io/Makeshop/google-channel/v0.2/) |
-| HTML 화면정의서 | `screen-spec.html` — 화면 43개, 왼쪽 목차·검색, 목업 위 번호 마커와 오른쪽 DESCRIPTION | [바로가기](https://donghoim.github.io/Makeshop/google-channel/v0.2/screen-spec.html) |
+| HTML 화면정의서 | `screen-spec.html` — 화면 47개, 왼쪽 목차·검색, 목업 위 번호 마커와 오른쪽 DESCRIPTION | [바로가기](https://donghoim.github.io/Makeshop/google-channel/v0.2/screen-spec.html) |
 
 ## IA
 
@@ -29,6 +29,8 @@ GNB: 마케팅
 - 메뉴 권한이 없는 운영자에게는 메뉴를 숨기지 않고 비활성화로 표시합니다.
 - Merchant Center 대표 전화번호 인증은 운영자가 Google 화면에서 직접 합니다. 메이크샵은 [Google에서 인증하기]로 Google 화면을 열고, [인증 확인]을 누를 때만 인증 상태를 조회해 미인증·인증 완료를 표시합니다.
 - Google 상품 분류(GPC)는 Meta·Google이 같은 값을 공유하고, 카테고리를 매칭한 상품만 전송합니다.
+- Merchant Center 연결 전 준비 항목 4개(커넥트 정보·SSL 인증 도메인·이용약관·환불정책·결제 수단)를 체크리스트로 보여주고, 항목별 안내 모달에서 [설정 완료 확인]을 눌러 4개를 모두 완료해야 연결할 수 있습니다.
+- 구글애즈 캠페인 목록은 캠페인 유형이 아니라 보는 관점(기본 정보·광고 성과·전환 성과·캠페인 운영·쇼핑 광고)으로 서브탭을 나누고, 서브탭마다 기본 항목을 두며 [항목 설정]으로 항목과 순서를 바꿀 수 있습니다.
 
 ## 문서 구성
 

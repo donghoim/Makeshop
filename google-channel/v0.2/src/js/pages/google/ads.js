@@ -6,8 +6,72 @@
 const GAds = (function () {
   const C = () => GCommon;
   const PERIODS = [["today", "오늘"], ["yesterday", "어제"], ["7d", "최근 7일"], ["30d", "최근 30일"], ["month", "이번 달"]];
-  const SUBS = ["전체", "실적 최대화", "쇼핑", "검색", "디스플레이", "동영상"];
-  const view = { mode: "ad", period: "7d", sub: "전체" };
+  /** 광고 기준 서브탭: 보는 관점별로 기본 항목을 다르게 둔다 (POL-085). 캠페인 유형으로 나누지 않는다 */
+  const SUBS = [["basic", "기본 정보"], ["perf", "광고 성과"], ["conv", "전환 성과"], ["ops", "캠페인 운영"], ["shopping", "쇼핑 광고"]];
+  const view = { mode: "ad", period: "7d", sub: "basic" };
+
+  /* ---------------- 항목 카탈로그와 서브탭별 기본값 ---------------- */
+  const BID = { "실적 최대화": "전환 가치 극대화", 쇼핑: "타깃 광고 투자수익(ROAS)", 검색: "클릭수 최대화", 디스플레이: "전환수 최대화", 동영상: "타깃 CPM" };
+  const won = (n) => UI.fmt(Math.round(n)) + "원";
+  const pct = (a, b) => (b ? ((a / b) * 100).toFixed(2) + "%" : "-");
+  const dstr = (n) => { const d = Perf.addDays(Perf.today0(), n); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+  const AD_COLS = {
+    name: { label: "캠페인명", desc: "캠페인 이름", fixed: true, left: true, r: (a) => `<span class="camp-name">${UI.esc(a.name)}</span>` },
+    type: { label: "캠페인 유형", desc: "광고 캠페인 유형", r: (a) => a.type },
+    status: { label: "상태", desc: "캠페인 운영 상태", r: (a) => (a.c.e != null && a.c.e < 0 ? C().pill("종료", "gray") : C().pill("운영 중")) },
+    budget: { label: "일 예산", desc: "일일 광고 예산", r: (a) => won(Math.round((a.c.cost * 1.1) / 1000) * 1000) },
+    start: { label: "시작일", desc: "광고 시작일", r: (a) => dstr(a.c.s) },
+    end: { label: "종료일", desc: "광고 종료일", r: (a) => (a.c.e == null ? "-" : dstr(a.c.e)) },
+    imp: { label: "노출수", desc: "광고 노출 횟수", r: (a) => UI.fmt(a.imp) },
+    clk: { label: "클릭수", desc: "광고 클릭 횟수", r: (a) => UI.fmt(a.clk) },
+    ctr: { label: "CTR", desc: "광고 클릭률", r: (a) => pct(a.clk, a.imp) },
+    cpc: { label: "평균 CPC", desc: "평균 클릭당 비용", r: (a) => (a.clk ? won(a.spend / a.clk) : "-") },
+    cpm: { label: "CPM", desc: "1,000회 노출당 비용", r: (a) => (a.imp ? won((a.spend / a.imp) * 1000) : "-") },
+    spend: { label: "광고비", desc: "광고 집행 비용", r: (a) => won(a.spend) },
+    conv: { label: "전환수", desc: "전체 전환 횟수", r: (a) => UI.fmt(a.conv) },
+    rev: { label: "전환가치", desc: "전환 금액", r: (a) => won(a.rev) },
+    cvr: { label: "전환율", desc: "클릭 대비 전환 비율", r: (a) => pct(a.conv, a.clk) },
+    cpa: { label: "CPA", desc: "전환당 광고비", r: (a) => (a.conv ? won(a.spend / a.conv) : "-") },
+    roas: { label: "ROAS", desc: "광고 수익률", r: (a) => (a.spend ? Math.round((a.rev / a.spend) * 100) + "%" : "-") },
+    vpc: { label: "전환당 가치", desc: "전환 1건당 평균 전환가치", r: (a) => (a.conv ? won(a.rev / a.conv) : "-") },
+    allConv: { label: "전체 전환수", desc: "주 전환 액션 외 전체 전환 횟수", r: (a) => UI.fmt(Math.round(a.conv * 1.3)) },
+    allRev: { label: "전체 전환가치", desc: "전체 전환 액션 기준 전환가치", r: (a) => won(a.rev * 1.15) },
+    bid: { label: "입찰 전략", desc: "광고 입찰 방식", r: (a) => BID[a.type] || "-" },
+    opt: { label: "최적화 점수", desc: "Google 최적화 점수", r: (a) => 62 + ((a.name.length * 7) % 33) + "%" },
+    shopUse: { label: "상품 광고 사용 여부", desc: "Merchant Center 상품을 쓰는 캠페인인지", r: (a) => (a.c.shopping ? C().pill("사용") : C().pill("미사용", "gray")) },
+    pmax: { label: "상품 기반 P-Max 여부", desc: "상품을 쓰는 실적 최대화 캠페인인지", r: (a) => (a.c.shopping && a.type === "실적 최대화" ? C().pill("해당") : C().pill("해당없음", "gray")) },
+  };
+  const AD_DEFAULT = {
+    basic: ["name", "type", "status", "start", "end"],
+    perf: ["name", "imp", "clk", "ctr", "cpc", "spend"],
+    conv: ["name", "conv", "clk", "rev", "cvr", "cpa", "roas"],
+    ops: ["name", "budget", "bid", "opt"],
+    shopping: ["name", "type", "shopUse", "pmax"],
+  };
+  const PR_COLS = {
+    info: { label: "상품정보", desc: "상품명·Google 상품 ID", fixed: true, left: true, r: (r) => `${r.name ? UI.esc(r.name) : '<span class="muted">삭제된 상품</span>'}<div class="muted small">${r.id}</div>` },
+    camp: { label: "캠페인명", desc: "상품이 노출된 캠페인", r: (r) => UI.esc(r.camp) },
+    imp: { label: "노출수", desc: "광고 노출 횟수", r: (r) => UI.fmt(r.imp) },
+    clk: { label: "클릭수", desc: "광고 클릭 횟수", r: (r) => UI.fmt(r.clk) },
+    ctr: { label: "CTR", desc: "광고 클릭률", r: (r) => pct(r.clk, r.imp) },
+    spend: { label: "광고비", desc: "광고 집행 비용", r: (r) => won(r.spend) },
+    conv: { label: "전환수", desc: "전체 전환 횟수", r: (r) => UI.fmt(r.conv) },
+    rev: { label: "전환가치", desc: "전환 금액", r: (r) => won(r.rev) },
+    roas: { label: "ROAS", desc: "광고 수익률", r: (r) => (r.spend ? Math.round((r.rev / r.spend) * 100) + "%" : "-") },
+    cpc: { label: "평균 CPC", desc: "평균 클릭당 비용", r: (r) => (r.clk ? won(r.spend / r.clk) : "-") },
+    cvr: { label: "전환율", desc: "클릭 대비 전환 비율", r: (r) => pct(r.conv, r.clk) },
+    cpa: { label: "CPA", desc: "전환 1건당 평균 광고비", r: (r) => (r.conv ? won(r.spend / r.conv) : "-") },
+    vpc: { label: "전환당 가치", desc: "전환 1건당 평균 전환가치", r: (r) => (r.conv ? won(r.rev / r.conv) : "-") },
+    allConv: { label: "전체 전환수", desc: "주 전환 액션 외 전체 전환 횟수", r: (r) => UI.fmt(Math.round(r.conv * 1.3)) },
+    allRev: { label: "전체 전환가치", desc: "전체 전환 액션 기준 전환가치", r: (r) => won(r.rev * 1.15) },
+    pid: { label: "상품 ID", desc: "Google 상품 ID", r: (r) => r.id },
+    gpc: { label: "Google 상품 카테고리", desc: "메이크샵이 전송한 Google 상품 카테고리", r: (r) => (r.p ? C().gpcLabel(Store.effGpc(r.p)) || "-" : "-") },
+  };
+  const PR_DEFAULT = ["info", "camp", "imp", "clk", "ctr", "conv", "spend", "rev", "roas"];
+  const colKey = () => (view.mode === "product" ? "product" : "ad:" + view.sub);
+  const catalog = () => (view.mode === "product" ? PR_COLS : AD_COLS);
+  const defaults = () => (view.mode === "product" ? PR_DEFAULT : AD_DEFAULT[view.sub]);
+  const curCols = () => (GStore.cols()[colKey()] || defaults()).filter((k) => catalog()[k]);
 
   const productMode = () => GStore.s.mc !== "none" && GStore.s.mcLink === "linked"; // 상품 기준 탭 노출 (POL-080)
   function range(period) {
@@ -82,11 +146,12 @@ const GAds = (function () {
     const pm = productMode();
     const shoppingOk = GStore.s.mc !== "none";
     const [f, t, prev] = range(view.period);
-    const filter = (c) => view.mode === "product" ? c.shopping : view.sub === "전체" || c.type === view.sub;
+    if (view.sub === "shopping" && !shoppingOk) view.sub = "basic"; // MC 미연결이면 쇼핑 광고 서브탭 사용 불가 (POL-083)
+    const filter = (c) => (view.mode === "product" ? c.shopping : true);
     const cur = Perf.rows("google", f, t, filter);
     const before = Perf.sum(Perf.rows("google", prev[0], prev[1], filter));
     const tot = Perf.sum(cur);
-    const kpis = [["비용", tot.spend, before.spend, "원"], ["노출수", tot.imp, before.imp, ""], ["클릭수", tot.clk, before.clk, ""], ["전환수", tot.conv, before.conv, ""], ["전환 가치", tot.rev, before.rev, "원"]];
+    const kpis = [["광고비", tot.spend, before.spend, "원"], ["노출수", tot.imp, before.imp, ""], ["클릭수", tot.clk, before.clk, ""], ["전환수", tot.conv, before.conv, ""], ["전환가치", tot.rev, before.rev, "원"]];
     const delta = (a, b) => (!b ? '<span class="muted">비교 데이터 없음</span>' : `<span class="${a >= b ? "up" : "down"}">${a >= b ? "▲" : "▼"} ${Math.abs(((a - b) / b) * 100).toFixed(1)}%</span>`);
     const roas = tot.spend ? Math.round((tot.rev / tot.spend) * 100) + "%" : "-";
     box.innerHTML = `
@@ -94,18 +159,21 @@ const GAds = (function () {
         <div class="seg">${[["ad", "광고 기준"], ["product", "상품 기준"]].filter((x) => x[0] === "ad" || pm).map((x) => `<button type="button" data-mode="${x[0]}" class="${view.mode === x[0] ? "is-active" : ""}">${x[1]}</button>`).join("")}</div>
         <div class="seg">${PERIODS.map((p) => `<button type="button" data-p="${p[0]}" class="${view.period === p[0] ? "is-active" : ""}">${p[1]}</button>`).join("")}</div>
       </div>
-      ${view.mode === "ad" ? `<div class="stabs stabs--sub">${SUBS.map((x) => { const dis = x === "쇼핑" && !shoppingOk; return `<button type="button" class="stab ${x === view.sub ? "is-active" : ""}" data-sub="${x}" ${dis ? 'disabled title="Merchant Center 연결이 필요합니다."' : ""}>${x}</button>`; }).join("")}</div>` : ""}
-      <div class="kpis">${kpis.map((k) => `<div class="kpi"><span class="kpi__label">${k[0]}</span><span class="kpi__val">${UI.fmt(k[1])}${k[3]}</span><span class="kpi__sub">${delta(k[1], k[2])}</span>${k[0] === "전환 가치" ? `<span class="kpi__roas">ROAS ${roas}</span>` : ""}</div>`).join("")}</div>
-      <div class="table-wrap" style="margin-top:18px">${view.mode === "ad" ? campTable(cur) : productTable(cur)}</div>`;
+      <div class="kpis">${kpis.map((k) => `<div class="kpi"><span class="kpi__label">${k[0]}</span><span class="kpi__val">${UI.fmt(k[1])}${k[3]}</span><span class="kpi__sub">${delta(k[1], k[2])}</span>${k[0] === "전환가치" ? `<span class="kpi__roas">ROAS ${roas}</span>` : ""}</div>`).join("")}</div>
+      <div class="perf-sub" style="margin-top:18px">${view.mode === "ad" ? `<div class="stabs stabs--sub">${SUBS.map((x) => { const dis = x[0] === "shopping" && !shoppingOk; return `<button type="button" class="stab ${x[0] === view.sub ? "is-active" : ""}" data-sub="${x[0]}" ${dis ? 'disabled title="Merchant Center 연결이 필요합니다."' : ""}>${x[1]}</button>`; }).join("")}</div>` : "<div></div>"}
+        <button type="button" class="btn btn--line btn--sm" data-act="cols">${UI.icon.gear} 항목 설정</button></div>
+      <div class="table-wrap" style="margin-top:10px">${view.mode === "ad" ? campTable(cur) : productTable(cur)}</div>`;
+    box.querySelector('[data-act="cols"]').addEventListener("click", () => openColumns(() => paintPerf(box)));
     box.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => { view.mode = b.dataset.mode; paintPerf(box); }));
     box.querySelectorAll("[data-p]").forEach((b) => b.addEventListener("click", () => { view.period = b.dataset.p; paintPerf(box); }));
     box.querySelectorAll("[data-sub]").forEach((b) => b.addEventListener("click", () => { view.sub = b.dataset.sub; paintPerf(box); }));
   }
+  function table(cols, rows, cat) {
+    return `<table class="table table--camp"><thead><tr>${cols.map((k) => `<th class="${cat[k].left ? "th-left" : ""}">${cat[k].label}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${cols.map((k) => `<td class="${cat[k].left ? "td-left" : ""}">${cat[k].r(r)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  }
   function campTable(list) {
     if (!list.length) return '<table class="table"><tbody><tr><td class="table__empty">조회 기간에 성과가 있는 캠페인이 없습니다.</td></tr></tbody></table>';
-    return `<table class="table table--camp"><thead><tr><th class="th-left">캠페인명</th><th>유형</th><th>노출수</th><th>클릭수</th><th>CTR</th><th>비용</th><th>전환수</th><th>전환 가치</th><th>ROAS</th></tr></thead><tbody>${list
-      .map((a) => `<tr><td class="td-left"><span class="camp-name">${UI.esc(a.name)}</span></td><td>${a.type}</td><td>${UI.fmt(a.imp)}</td><td>${UI.fmt(a.clk)}</td><td>${a.imp ? ((a.clk / a.imp) * 100).toFixed(2) + "%" : "-"}</td><td>${UI.fmt(a.spend)}</td><td>${UI.fmt(a.conv)}</td><td>${UI.fmt(a.rev)}</td><td>${a.spend ? Math.round((a.rev / a.spend) * 100) + "%" : "-"}</td></tr>`)
-      .join("")}</tbody></table>`;
+    return table(curCols(), list, AD_COLS);
   }
   /** 상품 기준: segments.product_item_id로 메이크샵 상품과 매칭, 없으면 '삭제된 상품' (POL-084) */
   function productTable(list) {
@@ -113,11 +181,51 @@ const GAds = (function () {
     const ps = GStore.products().filter((p) => GStore.status(p) === "활동중").slice(0, 8);
     const weights = ps.map((p, i) => 1 / (i + 2));
     const wsum = weights.reduce((a, b) => a + b, 0) + 0.2;
-    const rows = ps.map((p, i) => ({ name: p.name, id: `online:ko:KR:${p.no}`, k: weights[i] / wsum }));
-    rows.push({ name: null, id: "online:ko:KR:1000190", k: 0.2 / wsum });
-    return `<table class="table table--camp"><thead><tr><th class="th-left">상품정보</th><th>노출수</th><th>클릭수</th><th>비용</th><th>전환수</th><th>전환 가치</th><th>ROAS</th></tr></thead><tbody>${rows
-      .map((r) => { const sp = tot.spend * r.k; const rv = tot.rev * r.k; return `<tr><td class="td-left">${r.name ? UI.esc(r.name) : '<span class="muted">삭제된 상품</span>'}<div class="muted small">${r.id}</div></td><td>${UI.fmt(tot.imp * r.k)}</td><td>${UI.fmt(tot.clk * r.k)}</td><td>${UI.fmt(sp)}</td><td>${UI.fmt(tot.conv * r.k)}</td><td>${UI.fmt(rv)}</td><td>${sp ? Math.round((rv / sp) * 100) + "%" : "-"}</td></tr>`; })
-      .join("")}</tbody></table>`;
+    const camps = window.GMOCK.campaigns.filter((c) => c.shopping).map((c) => c.name);
+    const rows = ps.map((p, i) => ({ p, name: p.name, id: `online:ko:KR:${p.no}`, camp: camps[i % camps.length], k: weights[i] / wsum }));
+    rows.push({ p: null, name: null, id: "online:ko:KR:1000190", camp: camps[0], k: 0.2 / wsum });
+    rows.forEach((r) => ["imp", "clk", "conv", "rev", "spend"].forEach((x) => (r[x] = Math.round(tot[x] * r.k))));
+    return table(curCols(), rows, PR_COLS);
+  }
+
+  /* ---------------- 항목 설정 모달 (광고 기준 서브탭별·상품 기준 따로 저장, POL-085) ---------------- */
+  function openColumns(onSaved) {
+    const cat = catalog();
+    let sel = curCols().slice();
+    const scope = view.mode === "product" ? "상품 기준" : `광고 기준 · ${SUBS.find((x) => x[0] === view.sub)[1]}`;
+    const m = UI.modal({
+      title: "항목 설정",
+      size: "lg",
+      body: `<p class="sec__lead">${scope} 표에 보여줄 항목과 순서를 정합니다. 저장하면 이 화면에만 적용됩니다.</p><div class="colset" id="colset"></div>`,
+      footer: '<button type="button" class="btn btn--line btn--lg" data-act="reset" style="margin-right:auto">기본값으로 초기화</button><button type="button" class="btn btn--line btn--lg" data-act="c">취소</button><button type="button" class="btn btn--dark btn--lg" data-act="ok">저장</button>',
+    });
+    const box = m.el.querySelector("#colset");
+    function paint() {
+      const avail = Object.keys(cat).filter((k) => !sel.includes(k));
+      const selLi = sel.map((k, i) => {
+        const btns = cat[k].fixed ? "" : `<button type="button" class="btn btn--line btn--sm" data-top="${i}" ${i <= 1 ? "disabled" : ""} aria-label="최상단으로">⤒</button><button type="button" class="btn btn--line btn--sm" data-up="${i}" ${i <= 1 ? "disabled" : ""} aria-label="위로">▲</button><button type="button" class="btn btn--line btn--sm" data-dn="${i}" ${i === sel.length - 1 ? "disabled" : ""} aria-label="아래로">▼</button><button type="button" class="btn btn--line btn--sm" data-bot="${i}" ${i === sel.length - 1 ? "disabled" : ""} aria-label="최하단으로">⤓</button><button type="button" class="btn btn--line btn--sm" data-rm="${k}">제거</button>`;
+        return `<li><span><b>${cat[k].label}</b> ${cat[k].fixed ? '<span class="colset__fixed">고정</span>' : ""}<br><span class="muted">${cat[k].desc}</span></span><span class="btns">${btns}</span></li>`;
+      }).join("");
+      const availLi = avail.map((k) => `<li><span><b>${cat[k].label}</b><br><span class="muted">${cat[k].desc}</span></span><span class="btns"><button type="button" class="btn btn--line btn--sm" data-add="${k}">추가</button></span></li>`).join("");
+      box.innerHTML = `<div class="colset__box"><div class="colset__head">선택한 항목 (${sel.length})</div><ul class="colset__list">${selLi}</ul></div>
+        <div class="colset__box"><div class="colset__head">선택 가능한 항목 (${avail.length})</div>${avail.length ? `<ul class="colset__list">${availLi}</ul>` : '<div class="colset__empty">항목 없음</div>'}</div>`;
+      box.querySelectorAll("[data-add]").forEach((b) => b.addEventListener("click", () => { sel.push(b.dataset.add); paint(); }));
+      box.querySelectorAll("[data-rm]").forEach((b) => b.addEventListener("click", () => { sel = sel.filter((k) => k !== b.dataset.rm); paint(); }));
+      box.querySelectorAll("[data-up]").forEach((b) => b.addEventListener("click", () => { const i = +b.dataset.up; [sel[i - 1], sel[i]] = [sel[i], sel[i - 1]]; paint(); }));
+      box.querySelectorAll("[data-top]").forEach((b) => b.addEventListener("click", () => { const k = sel.splice(+b.dataset.top, 1)[0]; sel.splice(1, 0, k); paint(); }));
+      box.querySelectorAll("[data-bot]").forEach((b) => b.addEventListener("click", () => { const k = sel.splice(+b.dataset.bot, 1)[0]; sel.push(k); paint(); }));
+      box.querySelectorAll("[data-dn]").forEach((b) => b.addEventListener("click", () => { const i = +b.dataset.dn; [sel[i + 1], sel[i]] = [sel[i], sel[i + 1]]; paint(); }));
+    }
+    m.el.querySelector('[data-act="reset"]').addEventListener("click", () => { sel = defaults().slice(); paint(); UI.toast("기본값으로 초기화되었습니다. [저장]을 눌러야 적용됩니다.", "info"); });
+    m.el.querySelector('[data-act="c"]').addEventListener("click", () => m.close(true));
+    m.el.querySelector('[data-act="ok"]').addEventListener("click", () => {
+      GStore.cols()[colKey()] = sel.slice();
+      GStore.save();
+      m.close(true);
+      UI.toast("항목 설정이 저장되었습니다.", "success");
+      onSaved();
+    });
+    paint();
   }
 
   /* ---------------- 광고 운영 상태 모달 (권장사항·진단) ---------------- */

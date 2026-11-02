@@ -78,9 +78,9 @@ window.GMOCK = (function () {
   /* ---------------- 동기화 이력 ---------------- */
   const syncHistory = [
     { at: -0.1, type: "자동 동기화", result: "일부 실패", target: 18, ok: 15, fail: 3, failIds: [5, 13, 20] },
-    { at: -1, type: "정합성 점검", result: "성공", target: 6, ok: 6, fail: 0 },
+    { at: -1, type: "자동 동기화", result: "성공", target: 6, ok: 6, fail: 0 },
     { at: -1.2, type: "자동 동기화", result: "성공", target: 22, ok: 22, fail: 0 },
-    { at: -2, type: "정합성 점검", result: "성공", target: 3, ok: 3, fail: 0 },
+    { at: -2, type: "자동 동기화", result: "성공", target: 3, ok: 3, fail: 0 },
     { at: -3, type: "전체 동기화", result: "성공", target: 39, ok: 39, fail: 0 },
     { at: -12, type: "자동 동기화", result: "실패", target: 4, ok: 0, fail: 4, failIds: [11, 18, 26, 28], cause: "Google 계정 인증 만료" },
     { at: -45, type: "최초 동기화", result: "성공", target: 37, ok: 37, fail: 0 },

@@ -20,8 +20,9 @@ const GFeed = (function () {
       root.appendChild(n);
     }
     root.appendChild(operationSection());
+    root.appendChild(categorySection());
     const c = GStore.counts(GStore.products());
-    const reg = App.section("상품 피드 등록 현황", `<button type="button" class="btn btn--line btn--sm" data-ext="Merchant Center 바로가기" data-url="https://merchants.google.com/mc/products/diagnostics?a=${(s.mcAccount || G().merchantCandidates[0]).id}">Merchant Center 바로가기</button>`, C().statusBar(c, null, true) + (!s.firstMatchDone ? `<p class="note note--warn">${UI.icon.info}<span>상품 카테고리 매칭 전입니다. 연결관리 &gt; 상품 카테고리 매칭에서 [상품 피드 반영]을 누르면 매칭된 상품이 반영대기로 등록되어 자동 전송됩니다.</span></p>` : ""));
+    const reg = App.section("상품 피드 등록 현황", `<button type="button" class="btn btn--line btn--sm" data-ext="Merchant Center 바로가기" data-url="https://merchants.google.com/mc/products/diagnostics?a=${(s.mcAccount || G().merchantCandidates[0]).id}">Merchant Center 바로가기</button>`, C().statusBar(c, null, true) + (!s.firstMatchDone ? `<p class="note note--warn">${UI.icon.info}<span>상품 카테고리 매칭 전입니다. 카테고리 매칭에서 [상품 피드 반영]을 누르면 매칭된 상품이 반영대기로 등록되어 자동 전송됩니다.</span></p>` : ""));
     C().bindExt(reg);
     root.appendChild(reg);
     root.appendChild(programSection(c));
@@ -53,6 +54,22 @@ const GFeed = (function () {
       App.render();
       UI.toast("전체 동기화를 시작했습니다. 전송 대상 상품이 반영대기로 등록되었습니다.", "info");
     });
+    return el;
+  }
+
+  /* ---------------- 2. 카테고리 매칭 (연결관리와 같은 매칭 모달을 연다, POL-063·POL-065) ---------------- */
+  function categorySection() {
+    const s = GStore.s;
+    const leaves = Store.leafCategories();
+    const off = leaves.filter((c) => s.catUse[c.id] === false).length;
+    const matched = leaves.filter((c) => s.catUse[c.id] !== false && GStore.validGpc(Store.s.catMap[c.id])).length;
+    const unmatched = leaves.length - off - matched;
+    const done = unmatched === 0;
+    const body = `<dl class="kv">
+        <div class="kv__row"><dt>카테고리 설정</dt><dd>${done ? C().pill("설정완료", "solid-blue") : C().pill("미설정", "gray")} <span class="muted">최하위 카테고리 ${UI.fmt(leaves.length)}개 · 매칭 ${UI.fmt(matched)}개 · 미매칭 ${UI.fmt(unmatched)}개 · 사용안함 ${UI.fmt(off)}개</span></dd></div>
+      </dl>${unmatched ? `<p class="note note--warn">${UI.icon.info}<span>미매칭 카테고리의 상품은 노출제한(카테고리 미매칭)으로 전송되지 않습니다.</span></p>` : ""}`;
+    const el = App.section("카테고리 매칭", '<button type="button" class="btn btn--line btn--sm" data-act="match">상품 카테고리 매칭</button>', body);
+    el.querySelector('[data-act="match"]').addEventListener("click", () => C().openCategoryMatch(false));
     return el;
   }
 
@@ -160,7 +177,7 @@ const GFeed = (function () {
       </dl></div>
       <div class="pbasic__foot"><span class="muted small">상품 정보는 여기서 수정할 수 없습니다.</span><button type="button" class="btn btn--line btn--sm" data-act="edit">상품 상세 관리</button></div>
       <h4 class="mh">Google 피드 상태</h4>
-      <div class="graybox gstate">${C().stTag(st)} <span class="tag-gray">판정: ${GStore.judge(st)}</span>
+      <div class="graybox gstate">${C().stTag(st)}
         <ul><li>최근 연동일시 ${g.status ? GStore.s.lastAuto || "-" : "-"}</li>${r ? `<li>사유 <b>${UI.esc(r.title)}</b> — ${UI.esc(r.guide)}</li>` : ""}${r && r.detail ? `<li class="muted">Google 안내: ${UI.esc(r.detail)}</li>` : ""}</ul></div>
       <h4 class="mh">카테고리 매칭</h4>
       <table class="mtable"><thead><tr><th style="width:90px">사용여부</th><th>Google 상품 카테고리</th><th style="width:140px">성별</th><th style="width:150px">연령대</th></tr></thead>
@@ -263,30 +280,51 @@ const GFeed = (function () {
   }
 
   /* ---------------- 동기화 이력 (재시도 버튼 없음, POL-076) ---------------- */
+  const PERIODS = [["today", "오늘"], ["yesterday", "어제"], ["7", "최근 7일"], ["30", "최근 30일"], ["month", "이번 달"], ["custom", "직접 설정"]];
+  const dayStart = (n) => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime() + n * 86400000; };
+  function inPeriod(h, f) {
+    const t = h.at == null ? Date.now() : Date.now() + h.at * 86400000; // at: 오늘 기준 상대 일수, 이번 세션 이력은 지금
+    if (f.period === "today") return t >= dayStart(0);
+    if (f.period === "yesterday") return t >= dayStart(-1) && t < dayStart(0);
+    if (f.period === "month") { const d = new Date(); return t >= new Date(d.getFullYear(), d.getMonth(), 1).getTime(); }
+    if (f.period === "custom") return (!f.from || t >= new Date(f.from).getTime()) && (!f.to || t < new Date(f.to).getTime() + 86400000);
+    return t >= dayStart(-(+f.period - 1)); // 오늘 포함 최근 N일
+  }
   function openHistory() {
-    const f = { days: 30, result: "" };
+    const f = { period: "30", result: "", from: "", to: "" };
     const m = UI.modal({ title: "동기화 이력", size: "lg", body: '<div id="hist"></div>', footer: '<button type="button" class="btn btn--dark btn--lg" data-act="close">닫기</button>' });
     const box = m.el.querySelector("#hist");
     function paint() {
-      const list = GStore.s.history.filter((h) => (h.at == null || -h.at <= f.days) && (!f.result || h.result === f.result));
+      const list = GStore.s.history.filter((h) => inPeriod(h, f) && (!f.result || h.result === f.result));
       box.innerHTML = `
-        <div class="hist-filter"><select class="select select--sm" id="h-days">${[[7, "최근 7일"], [30, "최근 30일"], [90, "최근 90일"]].map((o) => `<option value="${o[0]}" ${o[0] === f.days ? "selected" : ""}>${o[1]}</option>`).join("")}</select>
-          <select class="select select--sm" id="h-res"><option value="">결과 전체</option>${["성공", "일부 실패", "실패", "진행 중"].map((r) => `<option ${r === f.result ? "selected" : ""}>${r}</option>`).join("")}</select></div>
-        <div class="mtable-wrap"><table class="mtable"><thead><tr><th>일시</th><th>유형</th><th>결과</th><th>대상</th><th>성공</th><th>실패</th><th>상세</th></tr></thead>
-        <tbody>${list.length ? list.map((h, i) => `<tr><td>${h.atStr}</td><td>${h.type}</td><td>${h.result}</td><td>${h.target}</td><td>${h.ok}</td><td>${h.fail}</td><td>${h.fail ? `<button type="button" class="btn btn--line btn--sm" data-h="${GStore.s.history.indexOf(h)}">상세</button>` : "-"}</td></tr>`).join("") : '<tr><td colspan="7" class="table__empty">조회된 이력이 없습니다.</td></tr>'}</tbody></table></div>`;
-      box.querySelector("#h-days").addEventListener("change", (e) => { f.days = +e.target.value; paint(); });
+        <div class="hist-filter">
+          <select class="select select--sm" id="h-res" aria-label="처리 결과"><option value="">결과 전체</option>${["성공", "일부 실패", "실패", "진행 중"].map((r) => `<option ${r === f.result ? "selected" : ""}>${r}</option>`).join("")}</select>
+          <div class="seg seg--sm"><span class="muted small" style="margin-right:6px">조회기간</span>${PERIODS.map((p) => `<button type="button" data-per="${p[0]}" class="${p[0] === f.period ? "is-active" : ""}">${p[1]}</button>`).join("")}</div>
+        </div>
+        ${f.period === "custom" ? `<div class="hist-filter hist-custom"><span></span><div class="row-inline"><input type="date" class="input input--sm" id="h-from" value="${f.from}" aria-label="시작일"/> ~ <input type="date" class="input input--sm" id="h-to" value="${f.to}" aria-label="종료일"/><button type="button" class="btn btn--line btn--sm" data-act="h-apply">적용</button></div></div>` : ""}
+        <div class="mtable-wrap"><table class="mtable"><thead><tr><th>시작 일시</th><th>완료 일시</th><th>동기화 유형</th><th>대상 상품 수</th><th>성공 상품 수</th><th>실패 상품 수</th><th>처리 결과</th><th>관리</th></tr></thead>
+        <tbody>${list.length ? list.map((h) => `<tr><td>${h.atStr}</td><td>${h.endStr || "-"}</td><td>${h.type}</td><td>${UI.fmt(h.target)}</td><td>${UI.fmt(h.ok)}</td><td>${UI.fmt(h.fail)}</td><td>${h.result}</td><td>${h.fail && h.result !== "진행 중" ? `<button type="button" class="btn btn--line btn--sm" data-h="${GStore.s.history.indexOf(h)}">상세</button>` : "-"}</td></tr>`).join("") : '<tr><td colspan="8" class="table__empty">조회된 이력이 없습니다.</td></tr>'}</tbody></table></div>`;
       box.querySelector("#h-res").addEventListener("change", (e) => { f.result = e.target.value; paint(); });
+      box.querySelectorAll("[data-per]").forEach((b) => b.addEventListener("click", () => { f.period = b.dataset.per; paint(); }));
+      const ap = box.querySelector('[data-act="h-apply"]');
+      if (ap) ap.addEventListener("click", () => {
+        const from = box.querySelector("#h-from").value;
+        const to = box.querySelector("#h-to").value;
+        if (from && to && to < from) return UI.alert("종료일은 시작일보다 이를 수 없습니다.");
+        f.from = from; f.to = to; paint();
+      });
       box.querySelectorAll("[data-h]").forEach((b) => b.addEventListener("click", () => openFail(GStore.s.history[+b.dataset.h])));
     }
     paint();
     m.el.querySelector('[data-act="close"]').addEventListener("click", () => m.close(true));
   }
+  /** 동기화 실패 상세: 오른쪽 드로어, 실패 상품별 카드(상품명·상품코드·실패 사유) */
   function openFail(h) {
     const ps = (h.failIds || []).map((id) => GStore.products().find((p) => p.id === id)).filter(Boolean);
-    const body = `<p class="sec__lead">${h.atStr} ${h.type} 실패 상품 ${h.fail}건입니다. 실패 상품은 반영대기로 남아 다음 전송에서 다시 보냅니다.</p>
-      <table class="mtable"><thead><tr><th>상품정보</th><th>실패 사유</th></tr></thead><tbody>${ps.map((p) => `<tr><td class="td-left">${UI.esc(p.name)}</td><td class="td-left">${UI.esc(h.cause || window.GMOCK.failReasons[p.id] || "Merchant API 일시 오류. 다음 전송에서 다시 보냅니다.")}</td></tr>`).join("")}</tbody></table>`;
-    const m = UI.modal({ title: "동기화 실패 상세", size: "md", body, footer: '<button type="button" class="btn btn--dark btn--lg" data-act="close">닫기</button>' });
-    m.el.querySelector('[data-act="close"]').addEventListener("click", () => m.close(true));
+    const body = `<p class="muted small fail-sum">${h.atStr} ${h.type} · 실패 ${UI.fmt(h.fail)}건</p>
+      <ul class="fail-cards">${ps.map((p) => `<li class="fail-card"><b>${UI.esc(p.name)}</b><span class="muted small">P${String(p.no).padStart(8, "0")}</span><span class="txt-red small">${UI.esc(h.cause || window.GMOCK.failReasons[p.id] || "Merchant API 일시 오류")}</span></li>`).join("")}</ul>
+      <p class="note">${UI.icon.info}<span>실패 상품은 반영대기로 남아 다음 전송에서 다시 보냅니다. 재시도 버튼은 없습니다.</span></p>`;
+    UI.modal({ title: "동기화 실패 상세", size: "md", cls: "modal--side", body });
   }
 
   return { render };
