@@ -5,10 +5,11 @@
    ========================================================================== */
 const GAds = (function () {
   const C = () => GCommon;
-  const PERIODS = [["today", "오늘"], ["yesterday", "어제"], ["7d", "최근 7일"], ["30d", "최근 30일"], ["month", "이번 달"]];
+  const SIZES = [20, 30, 50, 70, 100];
+  const PERIODS = [["today", "오늘"], ["yesterday", "어제"], ["7d", "7일"], ["30d", "1개월"], ["month", "이번 달"], ["custom", "직접설정"]];
   /** 광고 기준 서브탭: 보는 관점별로 기본 항목을 다르게 둔다 (POL-085). 캠페인 유형으로 나누지 않는다 */
   const SUBS = [["basic", "기본 정보"], ["perf", "광고 성과"], ["conv", "전환 성과"], ["ops", "캠페인 운영"], ["shopping", "쇼핑 광고"]];
-  const view = { mode: "ad", period: "7d", sub: "basic" };
+  const view = { mode: "ad", period: "7d", sub: "basic", from: null, to: null, q: "", page: 1, size: 20 };
 
   /* ---------------- 항목 카탈로그와 서브탭별 기본값 ---------------- */
   const BID = { "실적 최대화": "전환 가치 극대화", 쇼핑: "타깃 광고 투자수익(ROAS)", 검색: "클릭수 최대화", 디스플레이: "전환수 최대화", 동영상: "타깃 CPM" };
@@ -38,8 +39,8 @@ const GAds = (function () {
     allRev: { label: "전체 전환가치", desc: "전체 전환 액션 기준 전환가치", r: (a) => won(a.rev * 1.15) },
     bid: { label: "입찰 전략", desc: "광고 입찰 방식", r: (a) => BID[a.type] || "-" },
     opt: { label: "최적화 점수", desc: "Google 최적화 점수", r: (a) => 62 + ((a.name.length * 7) % 33) + "%" },
-    shopUse: { label: "상품 광고 사용 여부", desc: "Merchant Center 상품을 쓰는 캠페인인지", r: (a) => (a.c.shopping ? C().pill("사용") : C().pill("미사용", "gray")) },
-    pmax: { label: "상품 기반 P-Max 여부", desc: "상품을 쓰는 실적 최대화 캠페인인지", r: (a) => (a.c.shopping && a.type === "실적 최대화" ? C().pill("해당") : C().pill("해당없음", "gray")) },
+    shopUse: { label: "상품 광고 사용 여부", desc: "Merchant Center 상품을 쓰는 캠페인인지", needMc: true, r: (a) => (a.c.shopping ? C().pill("사용") : C().pill("미사용", "gray")) },
+    pmax: { label: "상품 기반 P-Max 여부", desc: "상품을 쓰는 실적 최대화 캠페인인지", needMc: true, r: (a) => (a.c.shopping && a.type === "실적 최대화" ? C().pill("해당") : C().pill("해당없음", "gray")) },
   };
   const AD_DEFAULT = {
     basic: ["name", "type", "status", "start", "end"],
@@ -50,7 +51,7 @@ const GAds = (function () {
   };
   const PR_COLS = {
     info: { label: "상품정보", desc: "상품명·Google 상품 ID", fixed: true, left: true, r: (r) => `${r.name ? UI.esc(r.name) : '<span class="muted">삭제된 상품</span>'}<div class="muted small">${r.id}</div>` },
-    camp: { label: "캠페인명", desc: "상품이 노출된 캠페인", r: (r) => UI.esc(r.camp) },
+    camp: { label: "캠페인명", desc: "상품이 노출된 캠페인", fixed: true, r: (r) => UI.esc(r.camp) },
     imp: { label: "노출수", desc: "광고 노출 횟수", r: (r) => UI.fmt(r.imp) },
     clk: { label: "클릭수", desc: "광고 클릭 횟수", r: (r) => UI.fmt(r.clk) },
     ctr: { label: "CTR", desc: "광고 클릭률", r: (r) => pct(r.clk, r.imp) },
@@ -71,7 +72,16 @@ const GAds = (function () {
   const colKey = () => (view.mode === "product" ? "product" : "ad:" + view.sub);
   const catalog = () => (view.mode === "product" ? PR_COLS : AD_COLS);
   const defaults = () => (view.mode === "product" ? PR_DEFAULT : AD_DEFAULT[view.sub]);
-  const curCols = () => (GStore.cols()[colKey()] || defaults()).filter((k) => catalog()[k]);
+  const mcOff = () => GStore.s.mc === "none";
+  /** 사용 불가 항목: Merchant Center 연결이 필요한 항목은 미연결이면 고를 수 없고 표에도 나오지 않는다 (POL-085) */
+  const unusable = (k) => !!catalog()[k].needMc && mcOff();
+  /** 고정 항목은 저장값과 관계없이 항상 맨 앞에 둔다 */
+  function withFixed(list) {
+    const cat = catalog();
+    const fixed = Object.keys(cat).filter((k) => cat[k].fixed);
+    return fixed.concat(list.filter((k) => cat[k] && !cat[k].fixed));
+  }
+  const curCols = () => withFixed(GStore.cols()[colKey()] || defaults()).filter((k) => !unusable(k));
 
   const productMode = () => GStore.s.mc !== "none" && GStore.s.mcLink === "linked"; // 상품 기준 탭 노출 (POL-080)
   function range(period) {
@@ -83,8 +93,18 @@ const GAds = (function () {
       case "7d": return [a(t, -7), a(t, -1), [a(t, -14), a(t, -8)]];
       case "30d": return [a(t, -30), a(t, -1), [a(t, -60), a(t, -31)]];
       case "month": { const f = new Date(t.getFullYear(), t.getMonth(), 1); const n = Math.round((t - f) / 86400000) + 1; return [f, t, [a(f, -n), a(f, -1)]]; }
+      case "custom": {
+        if (!view.from || !view.to) return range("yesterday");
+        const f = parse(view.from);
+        const e = parse(view.to);
+        const n = Math.round((e - f) / 86400000) + 1;
+        return [f, e, [a(f, -n), a(f, -1)]];
+      }
     }
   }
+
+  const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const parse = (x) => { const [y, m, d] = x.split("-").map(Number); return new Date(y, m - 1, d); };
 
   function render(root) {
     const s = GStore.s;
@@ -99,9 +119,12 @@ const GAds = (function () {
     root.appendChild(accountSection());
     root.appendChild(measureSection());
     if (!productMode() && view.mode === "product") view.mode = "ad"; // 조회 중 MC 연동이 해제되면 광고 기준으로 전환
-    const perf = App.section("광고 성과", "", '<div id="gads-perf"></div>');
+    const perf = App.section("광고 성과", `<select class="select select--sm" id="gads-size" aria-label="페이지당 노출 개수">${SIZES.map((n) => `<option value="${n}" ${n === view.size ? "selected" : ""}>${n}개씩 보기</option>`).join("")}</select><button type="button" class="btn btn--line btn--sm" data-act="cols">${UI.icon.gear} 항목</button>`, '<div id="gads-perf"></div>');
     root.appendChild(perf);
-    paintPerf(perf.querySelector("#gads-perf"));
+    const box = perf.querySelector("#gads-perf");
+    perf.querySelector("#gads-size").addEventListener("change", (e) => { view.size = +e.target.value; view.page = 1; paintPerf(box); });
+    perf.querySelector('[data-act="cols"]').addEventListener("click", () => openColumns(() => paintPerf(box)));
+    paintPerf(box);
   }
 
   /* ---------------- 계정 정보 ---------------- */
@@ -115,7 +138,7 @@ const GAds = (function () {
       ${stage === "MC 연결 감지" ? `<div class="kv__row"><dt></dt><dd class="kv__wide"><div class="infobox">${UI.icon.info}<div>이 Google Ads 계정에 이미 연결된 Merchant Center 계정이 있습니다(${window.GMOCK.merchantCandidates[0].id}).<br>메이크샵에 연결하면 쇼핑 광고와 상품 기준 성과를 확인할 수 있습니다.<div style="margin-top:10px"><button type="button" class="btn btn--primary btn--sm" data-act="link-mc">이 Merchant Center를 메이크샵에 연결</button></div></div></div></dd></div>` : ""}
       ${stage === "Google Ads만 연결" ? `<div class="kv__row"><dt></dt><dd class="kv__wide"><p class="note">${UI.icon.info}<span>Merchant Center가 연결되지 않아 쇼핑 광고 성과는 확인할 수 없습니다. 오류가 아닙니다.</span></p></dd></div>` : ""}
     </dl>`;
-    const el = App.section("계정 정보", '<button type="button" class="btn btn--line btn--sm" data-act="status">광고 운영 상태</button>', body);
+    const el = App.section("광고 계정 정보", '<button type="button" class="btn btn--line btn--sm" data-act="status">광고 운영 상태</button>', body);
     C().bindExt(el);
     el.querySelector('[data-act="status"]').addEventListener("click", openStatus);
     const lk = el.querySelector('[data-act="link-mc"]');
@@ -141,42 +164,84 @@ const GAds = (function () {
     return App.section("광고 측정", "", body);
   }
 
-  /* ---------------- 광고 성과 ---------------- */
+  /* ---------------- 광고 성과 (Meta 광고 관리 탭 캠페인 목록과 같은 틀: 조회기간·검색·성과 카드·표·페이지) ---------------- */
   function paintPerf(box) {
     const pm = productMode();
     const shoppingOk = GStore.s.mc !== "none";
-    const [f, t, prev] = range(view.period);
+    const t = Perf.today0();
+    const [f, to, prev] = range(view.period);
     if (view.sub === "shopping" && !shoppingOk) view.sub = "basic"; // MC 미연결이면 쇼핑 광고 서브탭 사용 불가 (POL-083)
     const filter = (c) => (view.mode === "product" ? c.shopping : true);
-    const cur = Perf.rows("google", f, t, filter);
+    const cur = Perf.rows("google", f, to, filter);
     const before = Perf.sum(Perf.rows("google", prev[0], prev[1], filter));
     const tot = Perf.sum(cur);
-    const kpis = [["광고비", tot.spend, before.spend, "원"], ["노출수", tot.imp, before.imp, ""], ["클릭수", tot.clk, before.clk, ""], ["전환수", tot.conv, before.conv, ""], ["전환가치", tot.rev, before.rev, "원"]];
-    const delta = (a, b) => (!b ? '<span class="muted">비교 데이터 없음</span>' : `<span class="${a >= b ? "up" : "down"}">${a >= b ? "▲" : "▼"} ${Math.abs(((a - b) / b) * 100).toFixed(1)}%</span>`);
-    const roas = tot.spend ? Math.round((tot.rev / tot.spend) * 100) + "%" : "-";
+    const q = view.q.trim().toLowerCase();
+    const list = (view.mode === "ad" ? cur : productRows(cur)).filter((r) => !q || (r.name || "").toLowerCase().includes(q)).sort((x, y) => y.spend - x.spend);
+    const pages = Math.max(1, Math.ceil(list.length / view.size));
+    if (view.page > pages) view.page = pages;
+    const rows = list.slice((view.page - 1) * view.size, view.page * view.size);
+    const pct = (a, b) => (b ? ((a - b) / b) * 100 : null);
+    const roas = tot.spend ? (tot.rev / tot.spend) * 100 : null;
+    const card = (label, val, diff, extra) => `
+      <div class="kpi"><div class="kpi__label">${label}</div><div class="kpi__val">${val}</div>
+      <div class="kpi__sub">${diff == null ? '<span class="muted">비교 데이터 없음</span>' : `<span class="${diff >= 0 ? "up" : "down"}">${diff >= 0 ? "↑" : "↓"} ${Math.abs(diff).toFixed(1)}%</span> <span class="muted">직전 동일 기간 대비</span>`}</div>${extra || ""}</div>`;
+    const custom = view.period === "custom";
+    const unit = view.mode === "ad" ? "캠페인" : "상품";
     box.innerHTML = `
-      <div class="perf-top">
-        <div class="seg">${[["ad", "광고 기준"], ["product", "상품 기준"]].filter((x) => x[0] === "ad" || pm).map((x) => `<button type="button" data-mode="${x[0]}" class="${view.mode === x[0] ? "is-active" : ""}">${x[1]}</button>`).join("")}</div>
-        <div class="seg">${PERIODS.map((p) => `<button type="button" data-p="${p[0]}" class="${view.period === p[0] ? "is-active" : ""}">${p[1]}</button>`).join("")}</div>
+      ${pm ? `<div class="perf-top"><div class="seg">${[["ad", "광고 기준"], ["product", "상품 기준"]].map((x) => `<button type="button" data-mode="${x[0]}" class="${view.mode === x[0] ? "is-active" : ""}">${x[1]}</button>`).join("")}</div></div>` : ""}
+      <div class="period-bar">
+        <div class="seg" role="group" aria-label="조회기간">${PERIODS.map((p) => `<button type="button" class="${view.period === p[0] ? "is-active" : ""}" data-p="${p[0]}">${p[1]}</button>`).join("")}</div>
+        <div class="dates"><input type="date" id="g-from" value="${ymd(f)}" max="${ymd(t)}" ${custom ? "" : "disabled"} aria-label="시작일"/><span>~</span><input type="date" id="g-to" value="${custom && !view.to ? "" : ymd(to)}" min="${ymd(f)}" max="${ymd(t)}" ${custom ? "" : "disabled"} aria-label="종료일"/></div>
+        <form class="search search--sm" id="g-search"><button type="submit" aria-label="검색">${UI.icon.search}</button><input type="search" placeholder="${unit}명으로 검색" value="${UI.esc(view.q)}" aria-label="${unit}명 검색"/></form>
       </div>
-      <div class="kpis">${kpis.map((k) => `<div class="kpi"><span class="kpi__label">${k[0]}</span><span class="kpi__val">${UI.fmt(k[1])}${k[3]}</span><span class="kpi__sub">${delta(k[1], k[2])}</span>${k[0] === "전환가치" ? `<span class="kpi__roas">ROAS ${roas}</span>` : ""}</div>`).join("")}</div>
-      <div class="perf-sub" style="margin-top:18px">${view.mode === "ad" ? `<div class="stabs stabs--sub">${SUBS.map((x) => { const dis = x[0] === "shopping" && !shoppingOk; return `<button type="button" class="stab ${x[0] === view.sub ? "is-active" : ""}" data-sub="${x[0]}" ${dis ? 'disabled title="Merchant Center 연결이 필요합니다."' : ""}>${x[1]}</button>`; }).join("")}</div>` : "<div></div>"}
-        <button type="button" class="btn btn--line btn--sm" data-act="cols">${UI.icon.gear} 항목 설정</button></div>
-      <div class="table-wrap" style="margin-top:10px">${view.mode === "ad" ? campTable(cur) : productTable(cur)}</div>`;
-    box.querySelector('[data-act="cols"]').addEventListener("click", () => openColumns(() => paintPerf(box)));
-    box.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => { view.mode = b.dataset.mode; paintPerf(box); }));
-    box.querySelectorAll("[data-p]").forEach((b) => b.addEventListener("click", () => { view.period = b.dataset.p; paintPerf(box); }));
+      <div class="kpis">
+        ${card("광고비", UI.fmt(tot.spend), pct(tot.spend, before.spend))}
+        ${card("노출수", UI.fmt(tot.imp), pct(tot.imp, before.imp))}
+        ${card("클릭수", UI.fmt(tot.clk), pct(tot.clk, before.clk))}
+        ${card("전환수", UI.fmt(tot.conv), pct(tot.conv, before.conv))}
+        ${card("전환가치", UI.fmt(tot.rev), pct(tot.rev, before.rev), `<div class="kpi__roas">ROAS <b class="${roas == null ? "" : roas >= 300 ? "up" : "down"}">${roas == null ? "-" : Math.round(roas) + "%"}</b></div>`)}
+      </div>
+      <p class="note note--right">${UI.icon.info}<span>성과 데이터는 Google Ads API 기준이며 반영까지 최대 1일 이상 소요될 수 있습니다.</span><a class="ext" data-ext="Google Ads 바로가기" data-url="https://ads.google.com/aw/campaigns">Google Ads 바로가기 ${UI.icon.ext}</a></p>
+      ${view.mode === "ad" ? `<div class="stabs stabs--sub">${SUBS.map((x) => { const dis = x[0] === "shopping" && !shoppingOk; return `<button type="button" class="stab ${x[0] === view.sub ? "is-active" : ""}" data-sub="${x[0]}" ${dis ? 'disabled title="Merchant Center 연결이 필요합니다."' : ""}>${x[1]}</button>`; }).join("")}</div>` : ""}
+      <div class="table-wrap">${table(curCols(), rows, catalog(), unit)}</div>
+      <div class="list-foot"><div class="list-foot__left muted small">조회기간 ${ymd(f)} ~ ${ymd(to)} · 총 ${list.length}개 ${unit} · 광고 비용 높은 순</div><div id="g-pager"></div><div></div></div>`;
+    box.querySelector("#g-pager").appendChild(UI.pagination(list.length, view.page, view.size, (p) => { view.page = p; paintPerf(box); }));
+    box.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => { view.mode = b.dataset.mode; view.q = ""; view.page = 1; paintPerf(box); }));
     box.querySelectorAll("[data-sub]").forEach((b) => b.addEventListener("click", () => { view.sub = b.dataset.sub; paintPerf(box); }));
+    box.querySelectorAll("[data-p]").forEach((b) =>
+      b.addEventListener("click", () => {
+        view.period = b.dataset.p;
+        if (view.period === "custom") { const [a, z] = range("yesterday"); view.from = view.from || ymd(a); view.to = view.to || ymd(z); }
+        view.page = 1;
+        paintPerf(box);
+      })
+    );
+    const fromEl = box.querySelector("#g-from");
+    const toEl = box.querySelector("#g-to");
+    fromEl.addEventListener("change", () => {
+      if (!fromEl.value) return;
+      if (fromEl.value > ymd(t)) { fromEl.value = view.from; return UI.alert("미래 날짜는 조회기간으로 선택할 수 없습니다."); }
+      view.from = fromEl.value;
+      if (view.to && view.to < view.from) { view.to = null; UI.toast("시작일이 종료일보다 이후로 변경되어 종료일이 초기화되었습니다. 종료일을 다시 선택해 주세요.", "warn"); }
+      if (view.from && view.to) { view.page = 1; paintPerf(box); } else { toEl.value = ""; toEl.min = view.from; }
+    });
+    toEl.addEventListener("change", () => {
+      if (!toEl.value) return;
+      if (toEl.value < view.from) { toEl.value = view.to || ""; return UI.alert("종료일은 시작일 이전 날짜로 선택할 수 없습니다."); }
+      if (toEl.value > ymd(t)) { toEl.value = view.to || ""; return UI.alert("미래 날짜는 조회기간으로 선택할 수 없습니다."); }
+      view.to = toEl.value;
+      view.page = 1;
+      paintPerf(box);
+    });
+    box.querySelector("#g-search").addEventListener("submit", (e) => { e.preventDefault(); view.q = e.target.querySelector("input").value; view.page = 1; paintPerf(box); });
+    box.querySelector("#g-search input").addEventListener("search", (e) => { if (!e.target.value) { view.q = ""; view.page = 1; paintPerf(box); } });
+    C().bindExt(box);
   }
-  function table(cols, rows, cat) {
-    return `<table class="table table--camp"><thead><tr>${cols.map((k) => `<th class="${cat[k].left ? "th-left" : ""}">${cat[k].label}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${cols.map((k) => `<td class="${cat[k].left ? "td-left" : ""}">${cat[k].r(r)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
-  }
-  function campTable(list) {
-    if (!list.length) return '<table class="table"><tbody><tr><td class="table__empty">조회 기간에 성과가 있는 캠페인이 없습니다.</td></tr></tbody></table>';
-    return table(curCols(), list, AD_COLS);
+  function table(cols, rows, cat, unit) {
+    return `<table class="table table--camp"><thead><tr>${cols.map((k) => `<th class="${cat[k].left ? "th-left" : ""}">${cat[k].label}</th>`).join("")}</tr></thead><tbody>${rows.length ? rows.map((r) => `<tr>${cols.map((k) => `<td class="${cat[k].left ? "td-left" : ""}">${cat[k].r(r)}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${cols.length}" class="table__empty">표시할 ${unit}이 없습니다.</td></tr>`}</tbody></table>`;
   }
   /** 상품 기준: segments.product_item_id로 메이크샵 상품과 매칭, 없으면 '삭제된 상품' (POL-084) */
-  function productTable(list) {
+  function productRows(list) {
     const tot = Perf.sum(list);
     const ps = GStore.products().filter((p) => GStore.status(p) === "활동중").slice(0, 8);
     const weights = ps.map((p, i) => 1 / (i + 2));
@@ -185,45 +250,74 @@ const GAds = (function () {
     const rows = ps.map((p, i) => ({ p, name: p.name, id: `online:ko:KR:${p.no}`, camp: camps[i % camps.length], k: weights[i] / wsum }));
     rows.push({ p: null, name: null, id: "online:ko:KR:1000190", camp: camps[0], k: 0.2 / wsum });
     rows.forEach((r) => ["imp", "clk", "conv", "rev", "spend"].forEach((x) => (r[x] = Math.round(tot[x] * r.k))));
-    return table(curCols(), rows, PR_COLS);
+    return rows;
   }
 
   /* ---------------- 항목 설정 모달 (광고 기준 서브탭별·상품 기준 따로 저장, POL-085) ---------------- */
   function openColumns(onSaved) {
+    /* Meta 3-5-2 항목 설정 모달과 같은 구조·동작(MKT-REQ-039 통일). 저장 단위만 서브탭·상품 기준별(POL-085). */
     const cat = catalog();
-    let sel = curCols().slice();
-    const scope = view.mode === "product" ? "상품 기준" : `광고 기준 · ${SUBS.find((x) => x[0] === view.sub)[1]}`;
-    const m = UI.modal({
-      title: "항목 설정",
-      size: "lg",
-      body: `<p class="sec__lead">${scope} 표에 보여줄 항목과 순서를 정합니다. 저장하면 이 화면에만 적용됩니다.</p><div class="colset" id="colset"></div>`,
-      footer: '<button type="button" class="btn btn--line btn--lg" data-act="reset" style="margin-right:auto">기본값으로 초기화</button><button type="button" class="btn btn--line btn--lg" data-act="c">취소</button><button type="button" class="btn btn--dark btn--lg" data-act="ok">저장</button>',
-    });
-    const box = m.el.querySelector("#colset");
-    function paint() {
-      const avail = Object.keys(cat).filter((k) => !sel.includes(k));
-      const selLi = sel.map((k, i) => {
-        const btns = cat[k].fixed ? "" : `<button type="button" class="btn btn--line btn--sm" data-top="${i}" ${i <= 1 ? "disabled" : ""} aria-label="최상단으로">⤒</button><button type="button" class="btn btn--line btn--sm" data-up="${i}" ${i <= 1 ? "disabled" : ""} aria-label="위로">▲</button><button type="button" class="btn btn--line btn--sm" data-dn="${i}" ${i === sel.length - 1 ? "disabled" : ""} aria-label="아래로">▼</button><button type="button" class="btn btn--line btn--sm" data-bot="${i}" ${i === sel.length - 1 ? "disabled" : ""} aria-label="최하단으로">⤓</button><button type="button" class="btn btn--line btn--sm" data-rm="${k}">제거</button>`;
-        return `<li><span><b>${cat[k].label}</b> ${cat[k].fixed ? '<span class="colset__fixed">고정</span>' : ""}<br><span class="muted">${cat[k].desc}</span></span><span class="btns">${btns}</span></li>`;
-      }).join("");
-      const availLi = avail.map((k) => `<li><span><b>${cat[k].label}</b><br><span class="muted">${cat[k].desc}</span></span><span class="btns"><button type="button" class="btn btn--line btn--sm" data-add="${k}">추가</button></span></li>`).join("");
-      box.innerHTML = `<div class="colset__box"><div class="colset__head">선택한 항목 (${sel.length})</div><ul class="colset__list">${selLi}</ul></div>
-        <div class="colset__box"><div class="colset__head">선택 가능한 항목 (${avail.length})</div>${avail.length ? `<ul class="colset__list">${availLi}</ul>` : '<div class="colset__empty">항목 없음</div>'}</div>`;
-      box.querySelectorAll("[data-add]").forEach((b) => b.addEventListener("click", () => { sel.push(b.dataset.add); paint(); }));
-      box.querySelectorAll("[data-rm]").forEach((b) => b.addEventListener("click", () => { sel = sel.filter((k) => k !== b.dataset.rm); paint(); }));
-      box.querySelectorAll("[data-up]").forEach((b) => b.addEventListener("click", () => { const i = +b.dataset.up; [sel[i - 1], sel[i]] = [sel[i], sel[i - 1]]; paint(); }));
-      box.querySelectorAll("[data-top]").forEach((b) => b.addEventListener("click", () => { const k = sel.splice(+b.dataset.top, 1)[0]; sel.splice(1, 0, k); paint(); }));
-      box.querySelectorAll("[data-bot]").forEach((b) => b.addEventListener("click", () => { const k = sel.splice(+b.dataset.bot, 1)[0]; sel.push(k); paint(); }));
-      box.querySelectorAll("[data-dn]").forEach((b) => b.addEventListener("click", () => { const i = +b.dataset.dn; [sel[i + 1], sel[i]] = [sel[i], sel[i + 1]]; paint(); }));
+    const st = { sel: curCols().slice(), pickL: null, pickR: null, qL: "", qR: "" };
+    const nFixed = Object.keys(cat).filter((k) => cat[k].fixed).length; // 고정 항목 수(광고 기준 1, 상품 기준 2)
+    const josa = (w) => ((w.charCodeAt(w.length - 1) - 0xac00) % 28 ? "은" : "는");
+    const body = `<div class="dual">
+      <div class="dual__box"><div class="dual__title">선택 가능한 타이틀 목록</div><label class="dual__search">${UI.icon.search}<input type="text" placeholder="검색어를 입력해 주세요." data-q="L"/></label><ul class="dual__list" data-list="L"></ul></div>
+      <div class="dual__mid"><button type="button" class="btn btn--dark btn--icon" data-mv="add" aria-label="추가">»</button><button type="button" class="btn btn--dark btn--icon" data-mv="del" aria-label="제외">«</button></div>
+      <div class="dual__box"><div class="dual__title">선택한 타이틀 목록</div><label class="dual__search">${UI.icon.search}<input type="text" placeholder="검색어를 입력해 주세요." data-q="R"/></label><ul class="dual__list" data-list="R"></ul></div>
+      <div class="dual__order"><button type="button" class="btn btn--gray btn--icon" data-o="top" aria-label="최상단 이동">⇈</button><button type="button" class="btn btn--gray btn--icon" data-o="up" aria-label="위로 이동">↑</button><button type="button" class="btn btn--gray btn--icon" data-o="down" aria-label="아래로 이동">↓</button><button type="button" class="btn btn--gray btn--icon" data-o="bottom" aria-label="최하단 이동">⇊</button></div>
+    </div>`;
+    const m = UI.modal({ title: "목록 타이틀 양식 관리", size: "lg", cls: "modal--cols", body, footer: '<button type="button" class="btn btn--line btn--lg" data-act="reset">초기화</button><button type="button" class="btn btn--dark btn--lg" data-act="save">저장</button>' });
+    const L = m.el.querySelector('[data-list="L"]');
+    const R = m.el.querySelector('[data-list="R"]');
+    function li(k, side) {
+      const c = cat[k];
+      const picked = side === "L" ? st.pickL === k : st.pickR === k;
+      if (side === "L" && unusable(k)) return `<li data-off="${k}" class="is-disabled" title="Merchant Center 연결 후 사용할 수 있습니다."><span>${c.label}</span><em>Merchant Center 연결 필요</em></li>`;
+      return `<li data-k="${k}" class="${picked ? "is-picked" : ""} ${c.fixed ? "is-fixed" : ""}"><span>${c.fixed ? "*" : ""}${c.label}</span><em>${c.desc}</em></li>`;
     }
-    m.el.querySelector('[data-act="reset"]').addEventListener("click", () => { sel = defaults().slice(); paint(); UI.toast("기본값으로 초기화되었습니다. [저장]을 눌러야 적용됩니다.", "info"); });
-    m.el.querySelector('[data-act="c"]').addEventListener("click", () => m.close(true));
-    m.el.querySelector('[data-act="ok"]').addEventListener("click", () => {
-      GStore.cols()[colKey()] = sel.slice();
+    function paint() {
+      const avail = Object.keys(cat).filter((k) => !st.sel.includes(k) && (!st.qL || cat[k].label.includes(st.qL)));
+      const chosen = st.sel.filter((k) => !st.qR || cat[k].label.includes(st.qR));
+      L.innerHTML = avail.length ? avail.map((k) => li(k, "L")).join("") : '<li class="dual__empty">항목이 없습니다.</li>';
+      R.innerHTML = chosen.map((k) => li(k, "R")).join("") || '<li class="dual__empty">항목이 없습니다.</li>';
+      L.querySelectorAll("[data-k]").forEach((x) => x.addEventListener("click", () => { st.pickL = x.dataset.k; paint(); }));
+      L.querySelectorAll("[data-k]").forEach((x) => x.addEventListener("dblclick", () => { st.pickL = x.dataset.k; move("add"); }));
+      R.querySelectorAll("[data-k]").forEach((x) => x.addEventListener("click", () => { st.pickR = x.dataset.k; paint(); }));
+      R.querySelectorAll("[data-k]").forEach((x) => x.addEventListener("dblclick", () => { st.pickR = x.dataset.k; move("del"); }));
+      const i = st.sel.indexOf(st.pickR);
+      const movable = st.pickR && !cat[st.pickR].fixed;
+      m.el.querySelector('[data-o="top"]').disabled = m.el.querySelector('[data-o="up"]').disabled = !movable || i <= nFixed;
+      m.el.querySelector('[data-o="down"]').disabled = m.el.querySelector('[data-o="bottom"]').disabled = !movable || i === st.sel.length - 1;
+      m.el.querySelector('[data-mv="add"]').disabled = !st.pickL;
+      m.el.querySelector('[data-mv="del"]').disabled = !st.pickR || cat[st.pickR].fixed;
+    }
+    function move(dir) {
+      if (dir === "add" && st.pickL) { st.sel.push(st.pickL); st.pickR = st.pickL; st.pickL = null; }
+      if (dir === "del" && st.pickR) {
+        if (cat[st.pickR].fixed) return UI.alert(`${cat[st.pickR].label}${josa(cat[st.pickR].label)} 필수 항목으로 제외할 수 없습니다.`);
+        st.sel = st.sel.filter((k) => k !== st.pickR); st.pickL = st.pickR; st.pickR = null;
+      }
+      paint();
+    }
+    m.el.querySelectorAll("[data-mv]").forEach((b) => b.addEventListener("click", () => move(b.dataset.mv)));
+    m.el.querySelectorAll("[data-o]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const i = st.sel.indexOf(st.pickR);
+        const arr = st.sel.filter((k) => k !== st.pickR);
+        const pos = { top: nFixed, up: Math.max(nFixed, i - 1), down: Math.min(arr.length, i + 1), bottom: arr.length }[b.dataset.o];
+        arr.splice(pos, 0, st.pickR);
+        st.sel = arr;
+        paint();
+      })
+    );
+    m.el.querySelectorAll("[data-q]").forEach((x) => x.addEventListener("input", () => { st["q" + x.dataset.q] = x.value.trim(); paint(); }));
+    m.el.querySelector('[data-act="reset"]').addEventListener("click", () => { st.sel = withFixed(defaults()).filter((k) => !unusable(k)); st.pickL = st.pickR = null; paint(); UI.toast("기본 항목 구성으로 초기화되었습니다. [저장]을 눌러야 적용됩니다.", "info"); });
+    m.el.querySelector('[data-act="save"]').addEventListener("click", () => {
+      GStore.cols()[colKey()] = st.sel.slice();
       GStore.save();
       m.close(true);
-      UI.toast("항목 설정이 저장되었습니다.", "success");
       onSaved();
+      UI.toast(`${view.mode === "product" ? "상품 성과 목록" : "캠페인 목록"} 항목 설정이 저장되었습니다.`, "success");
     });
     paint();
   }

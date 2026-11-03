@@ -114,14 +114,12 @@ const GCommon = (function () {
     if (auto) { s.autoMatchShown = true; GStore.save(); }
     const items = window.MOCK.gpcList.map((g) => ({ value: g.id, label: g.path }));
     const cats = Store.leafCategories();
-    const SIZE = 8;
-    // 모달 안 입력값 (페이지를 이동해도 유지, [상품 피드 반영] 전에는 저장하지 않음)
+    // 모달 안 입력값 ([상품 피드 반영] 전에는 저장하지 않음). 목록은 페이지 없이 스크롤로 전체를 보여준다(Meta 상품 카테고리 매칭과 같음)
     const draft = {};
     cats.forEach((c) => {
       const cur = Store.s.catMap[c.id] || "";
       draft[c.id] = { use: s.catUse[c.id] !== false, gpc: GStore.validGpc(cur) ? cur : "" };
     });
-    let page = 1;
     const body = `
       <div class="infobox">${UI.icon.info}<div>
         · 메이크샵 카테고리를 Google 상품 카테고리(GPC)에 연결합니다. 매칭한 카테고리의 상품만 Google로 전송합니다.<br>
@@ -130,11 +128,10 @@ const GCommon = (function () {
         · 사용여부를 끄면 해당 카테고리 상품은 사용안함으로 처리합니다.</div></div>
       <div class="mtable-wrap"><table class="mtable">
         <thead><tr><th style="width:90px">사용여부</th><th>쇼핑몰 카테고리</th><th style="width:110px">연동 상품 수</th><th style="width:380px">Google 카테고리</th></tr></thead>
-        <tbody id="gcm-body"></tbody></table></div>
-      <div id="gcm-pager" class="gcm-pager"></div>`;
+        <tbody id="gcm-body"></tbody></table></div>`;
     const unmatched = () => cats.some((c) => draft[c.id].use && !draft[c.id].gpc);
     const m = UI.modal({
-      title: "Google 상품 카테고리 매칭",
+      title: "상품 카테고리 매칭",
       size: "lg",
       body,
       footer: '<button type="button" class="btn btn--line btn--lg" data-act="later">다음에 반영</button><button type="button" class="btn btn--dark btn--lg" data-act="save">상품 피드 반영</button>',
@@ -146,7 +143,7 @@ const GCommon = (function () {
       },
     });
     function paint() {
-      const rows = cats.slice((page - 1) * SIZE, page * SIZE);
+      const rows = cats;
       const tb = m.el.querySelector("#gcm-body");
       tb.innerHTML = rows
         .map((c) => {
@@ -159,9 +156,6 @@ const GCommon = (function () {
         const dd = UI.dropdown(tr.querySelector(".gpc-dd"), { items, value: draft[id].gpc, placeholder: "카테고리를 선택해주세요", minListWidth: 420, disabled: !draft[id].use, onChange: (v) => (draft[id].gpc = v) });
         tr.querySelector(".gcm-use").addEventListener("change", (e) => { draft[id].use = e.target.checked; dd.setDisabled(!e.target.checked); });
       });
-      const pg = m.el.querySelector("#gcm-pager");
-      pg.innerHTML = "";
-      pg.appendChild(UI.pagination(cats.length, page, SIZE, (p) => { page = p; paint(); }));
     }
     paint();
     m.el.querySelector('[data-act="later"]').addEventListener("click", () => m.close());

@@ -6,8 +6,8 @@ const GFeed = (function () {
   const C = () => GCommon;
   const G = () => window.GMOCK;
   const TABS = ["전체", "활동중", "검토중", "미승인", "노출제한", "사용안함", "반영대기"];
-  const SIZES = [10, 20, 50, 100];
-  const view = { tab: "전체", q: "", page: 1, size: 10, sel: new Set() };
+  const SIZES = [20, 30, 50, 70, 100];
+  const view = { tab: "전체", q: "", page: 1, size: 20, sel: new Set() };
 
   function render(root, params) {
     const s = GStore.s;
@@ -26,7 +26,7 @@ const GFeed = (function () {
     C().bindExt(reg);
     root.appendChild(reg);
     root.appendChild(programSection(c));
-    const listSec = App.section("상품 피드", "", '<div id="gfeed-list"></div>', { cls: "sec--list" });
+    const listSec = App.section("상품 피드 목록", "", '<div id="gfeed-list"></div>', { cls: "sec--list" });
     root.appendChild(listSec);
     paintList(listSec.querySelector("#gfeed-list"));
   }
@@ -99,8 +99,8 @@ const GFeed = (function () {
       <div class="list-tools">
         <div class="stabs" role="tablist">${TABS.map((t) => `<button type="button" role="tab" class="stab ${t === view.tab ? "is-active" : ""}" data-tab="${t}">${t} <b>${c[t]}</b></button>`).join("")}</div>
         <div class="list-tools__right">
-          <form class="search" id="gfeed-search"><button type="submit" aria-label="검색">${UI.icon.search}</button><input type="search" placeholder="상품명으로 검색" value="${UI.esc(view.q)}" aria-label="상품명 검색" /></form>
-          <select class="select" id="gfeed-size" aria-label="페이지당 노출 개수">${SIZES.map((n) => `<option value="${n}" ${n === view.size ? "selected" : ""}>${n}개씩</option>`).join("")}</select>
+          <form class="search" id="gfeed-search"><button type="submit" aria-label="검색">${UI.icon.search}</button><input type="search" placeholder="검색어를 입력해 주세요." value="${UI.esc(view.q)}" aria-label="상품명 검색" /></form>
+          <select class="select" id="gfeed-size" aria-label="페이지당 노출 개수">${SIZES.map((n) => `<option value="${n}" ${n === view.size ? "selected" : ""}>${n}개씩 보기</option>`).join("")}</select>
         </div>
       </div>
       <div class="table-wrap"><table class="table">
@@ -126,10 +126,10 @@ const GFeed = (function () {
     });
   }
   function columnsFor(tab) {
-    if (tab === "전체") return ["chk", "info", "price", "sku", "status", "gpc", "manage"];
-    if (tab === "미승인" || tab === "노출제한") return ["chk", "info", "price", "sku", "gpc", "reason", "manage"];
-    if (tab === "사용안함") return ["chk", "info", "price", "sku", "manage"];
-    return ["chk", "info", "price", "sku", "gpc", "manage"];
+    if (tab === "전체") return ["chk", "info", "status", "sku", "price", "gpc", "manage"];
+    if (tab === "미승인" || tab === "노출제한") return ["chk", "info", "sku", "price", "gpc", "reason", "manage"];
+    if (tab === "사용안함") return ["chk", "info", "sku", "price", "manage"];
+    return ["chk", "info", "sku", "price", "gpc", "manage"];
   }
   function head(k) {
     return {

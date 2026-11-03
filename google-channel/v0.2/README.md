@@ -9,7 +9,7 @@ v0.1(Google 채널 단독 기획)은 상위 폴더 [`../`](../)에 그대로 있
 | 자료 | 설명 | GitHub Pages |
 |---|---|---|
 | 목업 | `index.html` — 통합 현황·통합 상품 피드·Meta·Google·TikTok 탭, 우측 하단 시나리오 패널로 연동 상태 전환 | [바로가기](https://donghoim.github.io/Makeshop/google-channel/v0.2/) |
-| HTML 화면정의서 | `screen-spec.html` — 화면 47개, 왼쪽 목차·검색, 목업 위 번호 마커와 오른쪽 DESCRIPTION | [바로가기](https://donghoim.github.io/Makeshop/google-channel/v0.2/screen-spec.html) |
+| HTML 화면정의서 | `screen-spec.html` — 화면 48개, 왼쪽 목차·검색, 목업 위 번호 마커와 오른쪽 DESCRIPTION | [바로가기](https://donghoim.github.io/Makeshop/google-channel/v0.2/screen-spec.html) |
 
 ## IA
 
