@@ -32,7 +32,7 @@ window.GMOCK = (function () {
     invalid_value: { group: "잘못된 속성값", description: "속성 [color]의 값이 올바르지 않습니다.", detail: "옵션 값에 허용되지 않는 문자가 포함되어 있습니다." },
     landing_page_error: { group: "방문 페이지 오류", description: "방문 페이지를 열 수 없습니다.", detail: "상품 URL이 정상적으로 열리는지 확인하세요." },
     image_issue: { group: "이미지 문제", description: "이미지에 홍보성 문구가 포함되어 있습니다.", detail: "텍스트·워터마크가 없는 상품 이미지로 변경하세요." },
-    policy_violation: { group: "Google 정책 위반", description: "Google 쇼핑 정책에 위반되는 상품입니다.", detail: "Google 쇼핑 광고 정책을 확인하세요." },
+    policy_violation: { group: "기타 상품 데이터 문제", description: "Google 쇼핑 정책에 위반되는 상품입니다.", detail: "Google 쇼핑 광고 정책을 확인하세요." },
     identifier_issue: { group: "상품 식별자 문제", description: "GTIN 값이 올바르지 않습니다.", detail: "바코드(GTIN) 값을 확인하거나 비워 두세요." },
     category_attribute: { group: "카테고리/속성 문제", description: "상품 카테고리와 속성이 맞지 않습니다.", detail: "Google 상품 카테고리를 다시 확인하세요." },
     duplicate: { group: "중복 또는 상품 식별 문제", description: "동일 상품이 중복 등록되었습니다.", detail: "같은 상품이 여러 번 등록되지 않았는지 확인하세요." },

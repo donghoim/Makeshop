@@ -326,7 +326,7 @@ const GStore = (function () {
       save();
       return n;
     },
-    /** [다시 동기화] — 전송 조건 충족 전체 상품 큐 등록 (POL-060) */
+    /** 전체 동기화 — 전송 조건 충족 전체 상품 큐 등록 (시스템 처리용, 운영자 버튼 없음) */
     fullSync() {
       products().forEach((p) => {
         const st = status(p);

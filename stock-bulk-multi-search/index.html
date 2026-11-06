@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>재고 일괄 관리 목업 · 메이크샵 관리자</title>
+<link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+<div class="demo"><b>재고 일괄 관리 목업</b><span>원본 요청 · 검토용 · 예시 데이터</span><span class="sp"></span>
+  <span>동작 기준</span><span class="seg" role="group" aria-label="동작 기준"><button type="button" data-mode="asis">현행</button><button type="button" data-mode="tobe" class="on">개선 후</button></span>
+  <button type="button" class="reset" data-act="reset">처음으로</button></div>
+<div class="gnb-top"><span class="logo">make#Free</span><span class="pill">Premium 전환</span><span class="pill dark">사용버전 ›</span><span class="sp"></span>
+  <span class="util"><span>담당자</span><span>번호 : 472342</span><span>공지사항</span><span>업그레이드</span><span>로그아웃</span></span></div>
+<nav class="gnb" aria-label="대메뉴"><span>설정</span><span class="on">상품</span><span>주문</span><span>회원</span><span>게시판</span><span>디자인</span><span>프로모션</span><span>부가서비스</span><span>통계</span><span>마케팅</span></nav>
+<div class="fav"><span>상품</span><span class="star">⭐ 설정</span></div>
+<div class="layout">
+  <nav class="lnb" aria-label="상품 메뉴">
+    <div class="ttl"><h1>상품</h1><span>매뉴얼</span></div>
+    <div class="grp"><div>상품 관리 <span>⌄</span></div></div>
+    <div class="grp"><div>분류 관리 <span>⌄</span></div></div>
+    <div class="grp"><div>진열 <span>⌄</span></div></div>
+    <div class="grp"><div>일괄 관리 <span>⌃</span></div>
+      <a>· 가격 일괄 수정</a><a>· 상품 적립금 일괄 수정</a><a>· 상품 이벤트/제한 일괄 변경</a><a>· 상품 세부 정보 관리</a><a>· 상품 분류 이동/복사</a><a>· 상품 이미지 일괄 변경</a><a>· 상품 예약 일괄 등록</a>
+      <a class="on">· 재고 일괄 관리</a><a>· 상품 아이콘 일괄 관리</a><a>· 상품 엑셀 일괄 등록</a><a>· 관리코드 일괄 관리</a></div>
+    <div class="grp"><div>부가 기능 <span>⌄</span></div></div>
+  </nav>
+  <main class="content" id="main"></main>
+  <aside class="quick" aria-hidden="true"><div class="q">Q</div><div>새창띄우기</div><div>개인결제창</div><div>링크도우미</div><div>디자인문의</div><div>IP 확인</div><div>문자보내기</div><div>푸시보내기</div><div>상품</div></aside>
+  <div class="side-gray" aria-hidden="true"></div>
+</div>
+<div id="pop"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<script src="src/data/mock-data.js"></script>
+<script src="src/js/app.js"></script>
+</body>
+</html>

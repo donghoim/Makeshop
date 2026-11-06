@@ -45,15 +45,8 @@ const GFeed = (function () {
       ["전송 실패 상품 수", UI.fmt(failN)],
     ];
     const body = `<div class="opgrid">${items.map((x) => `<div class="opgrid__item"><span class="opgrid__label">${x[0]}</span><span class="opgrid__val">${x[1]}</span></div>`).join("")}</div>`;
-    const busy = q > 0 && s.syncing;
-    const el = App.section("운영 현황", `<button type="button" class="btn btn--line btn--sm" data-act="hist">동기화 이력</button><button type="button" class="btn btn--line btn--sm" data-act="resync" ${busy ? "disabled title=\"큐에 전송 중인 상품이 있습니다.\"" : ""}>다시 동기화</button>`, body);
+    const el = App.section("운영 현황", `<button type="button" class="btn btn--line btn--sm" data-act="hist">동기화 이력</button>`, body);
     el.querySelector('[data-act="hist"]').addEventListener("click", openHistory);
-    el.querySelector('[data-act="resync"]').addEventListener("click", async () => {
-      if (!(await UI.confirm("전송 조건을 충족한 전체 상품을 다시 전송합니다.\n다시 동기화하시겠습니까?"))) return;
-      GStore.fullSync();
-      App.render();
-      UI.toast("전체 동기화를 시작했습니다. 전송 대상 상품이 반영대기로 등록되었습니다.", "info");
-    });
     return el;
   }
 
@@ -307,12 +300,20 @@ const GFeed = (function () {
       box.querySelector("#h-res").addEventListener("change", (e) => { f.result = e.target.value; paint(); });
       box.querySelectorAll("[data-per]").forEach((b) => b.addEventListener("click", () => { f.period = b.dataset.per; paint(); }));
       const ap = box.querySelector('[data-act="h-apply"]');
-      if (ap) ap.addEventListener("click", () => {
-        const from = box.querySelector("#h-from").value;
-        const to = box.querySelector("#h-to").value;
-        if (from && to && to < from) return UI.alert("종료일은 시작일보다 이를 수 없습니다.");
-        f.from = from; f.to = to; paint();
-      });
+      if (ap) {
+        /* 날짜 검증: 구글애즈 조회기간·Meta 광고 관리와 같은 문구 */
+        const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        const fromEl = box.querySelector("#h-from"), toEl = box.querySelector("#h-to");
+        fromEl.addEventListener("change", () => {
+          if (fromEl.value > today) { fromEl.value = f.from || ""; return UI.alert("미래 날짜는 조회기간으로 선택할 수 없습니다."); }
+          if (toEl.value && toEl.value < fromEl.value) { toEl.value = ""; UI.toast("시작일이 종료일보다 이후로 변경되어 종료일이 초기화되었습니다. 종료일을 다시 선택해 주세요.", "warn"); }
+        });
+        toEl.addEventListener("change", () => {
+          if (toEl.value > today) { toEl.value = f.to || ""; return UI.alert("미래 날짜는 조회기간으로 선택할 수 없습니다."); }
+          if (fromEl.value && toEl.value && toEl.value < fromEl.value) { toEl.value = f.to || ""; return UI.alert("종료일은 시작일 이전 날짜로 선택할 수 없습니다."); }
+        });
+        ap.addEventListener("click", () => { f.from = fromEl.value; f.to = toEl.value; paint(); });
+      }
       box.querySelectorAll("[data-h]").forEach((b) => b.addEventListener("click", () => openFail(GStore.s.history[+b.dataset.h])));
     }
     paint();

@@ -5,8 +5,9 @@
 | 구분 | 위치 | 내용 |
 |---|---|---|
 | 목업 | [`index.html`](./index.html) · [바로 보기](https://donghoim.github.io/Makeshop/cart-discount-area/) | 장바구니 결제 정보 영역의 할인 상세·최대 할인 적용, 쿠폰 선택 모달, 장바구니 타입별 화면 |
-| HTML 화면정의서 | [`screen-spec.html`](./screen-spec.html) · [바로 보기](https://donghoim.github.io/Makeshop/cart-discount-area/screen-spec.html) | 화면 15개, 실제 동작하는 목업 + 번호 마커 + DESCRIPTION |
-| 와이어프레임 | [`03_Wireframe/`](./03_Wireframe) | SVG 4장(결제 정보 할인 영역, 통합 장바구니 공급사별 쿠폰, 쿠폰 선택 모달, 할인 0건·정기배송 탭) |
+| HTML 화면정의서 | [`screen-spec.html`](./screen-spec.html) · [바로 보기](https://donghoim.github.io/Makeshop/cart-discount-area/screen-spec.html) | 화면 19개, 실제 동작하는 목업 + 번호 마커 + DESCRIPTION |
+| 와이어프레임 | [`03_Wireframe/`](./03_Wireframe) | SVG 5장(결제 정보 할인 영역, 통합 장바구니 공급사별 쿠폰, 쿠폰 선택 모달, 할인 0건·정기배송 탭, 쿠폰 기본 설정 최대 할인 툴팁) |
+| 테스트 케이스 | [`qa/`](./qa) | 품질관리팀 표준 템플릿 기준 TC 122건(P0~P2) |
 | 기획 문서 | [`08_Spec/`](./08_Spec) | 사양 정의서, 요구사항 정의서, 정책서, 와이어프레임 초안, CS 운영·응대 가이드 |
 
 ## 주요 기획 내용

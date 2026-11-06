@@ -224,7 +224,7 @@ const App = (function () {
         <label>전송 큐 자동 처리 ${sel("queueAuto", g.queueAuto !== false, [[true, "사용 (반영 5초 후 자동 전송)"], [false, "일시정지 (반영대기 유지)"]])}</label>
         <h4>권한·기존 메뉴</h4>
         <label>마케팅 채널 관리 메뉴 권한 ${sel("noPerm", g.noPerm, [[false, "있음"], [true, "없음(메뉴 비활성화)"]])}</label>
-        <div class="drawer__btns"><button type="button" class="btn btn--line btn--sm" data-act="legacy-google">기존 구글 상품 피드 URL 접속</button><button type="button" class="btn btn--line btn--sm" data-act="legacy-meta">기존 Meta 메뉴 URL 접속</button></div>
+        <div class="drawer__btns"><button type="button" class="btn btn--line btn--sm" data-act="legacy-meta">기존 Meta 메뉴 URL 접속</button></div>
         <h4>데이터</h4>
         <div class="drawer__btns"><button type="button" class="btn btn--line btn--sm" data-act="clear">저장 데이터 전체 초기화</button></div>
       </div>`;
@@ -265,7 +265,6 @@ const App = (function () {
           render();
         }
         if (a === "g-sync") { const n = GStore.syncGoogle(); UI.toast(n ? `검토중 ${n}건의 Google 판정 결과가 반영되었습니다.` : "검토중 상품이 없습니다.", "info"); render(); }
-        if (a === "legacy-google") { UI.drawer(drawerEl, false); location.hash = "#/legacy/google-feed"; }
         if (a === "legacy-meta") { UI.drawer(drawerEl, false); location.hash = "#/legacy/meta"; }
         if (a === "clear") {
           try { localStorage.clear(); } catch (e) {}

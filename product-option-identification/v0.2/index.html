@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>옵션코드 목업 · 메이크샵 관리자</title>
+<link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+<div class="demo"><b>옵션코드 목업 v0.2</b><span>원본 요청 · 검토용 · 예시 데이터는 새로고침하면 초기화됩니다</span><span class="sp"></span><button type="button" data-act="reset">처음으로</button></div>
+<header class="topbar">
+  <span class="fav">등록된 스마트 폴더가 없습니다. 메뉴 우측의 ★를 클릭하여 자주 사용하는 메뉴를 등록해주세요. <span class="star">⭐ 설정</span></span>
+  <span class="sp"></span><span class="acct">네오테스트17 ▾ &nbsp;&nbsp; 고객센터 ▾</span><input class="q" aria-label="메뉴 검색">
+</header>
+<div class="layout">
+  <nav class="lnb" aria-label="상품 메뉴">
+    <div class="ttl"><h1>상품</h1><span>매뉴얼</span></div>
+    <div class="grp"><div>상품 관리 <span>⌃</span></div>
+      <a href="#list" data-nav="list">전체 상품 관리</a>
+      <a href="#reg" data-nav="reg">상품 등록</a>
+      <a href="#del" data-nav="del">삭제 상품 조회</a>
+    </div>
+    <div class="grp"><div>일괄 관리 <span>⌃</span></div>
+      <a href="#stock" data-nav="stock">재고 일괄 관리</a>
+    </div>
+    <div class="grp"><div>부가 기능 <span>⌃</span></div>
+      <a href="#restock" data-nav="restock">재입고 알림 관리</a>
+    </div>
+  </nav>
+  <main class="content" id="main"></main>
+  <aside class="quick" aria-hidden="true"><div>Q</div><div>새창띄우기</div><div>개인결제창</div><div>링크도우미</div><div>디자인문의</div><div>IP 확인</div></aside>
+</div>
+<div id="pop"></div>
+<div id="toast" class="toast" hidden></div>
+<script src="src/data/mock-data.js"></script>
+<script src="src/js/model.js"></script>
+<script src="src/js/app.js"></script>
+</body>
+</html>

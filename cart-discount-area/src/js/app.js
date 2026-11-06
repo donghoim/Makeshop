@@ -15,7 +15,8 @@
       items: ids.map(function (id) { var it = clone(D.ITEMS[id]); it.checked = true; return it; }),
       coupons: preset.coupons === 'all' ? D.COUPONS.slice() : [],
       loggedIn: opts.loggedIn !== false, toggle: true, manualSel: { P: {}, C: {} },
-      shipBasis: opts.shipBasis || 'before', fold: { goods: false, disc: false }, modal: null, toast: null
+      shipBasis: opts.shipBasis || 'before', fold: { goods: false, disc: false }, modal: null, toast: null,
+      maxAuto: opts.maxAuto || 'off', orderView: null
     };
   }
 
@@ -138,6 +139,47 @@
     return h;
   }
 
+  /* 주문하기 → 주문서 초기 적용 쿠폰(목업). 쿠폰 기본 설정 > 최대 할인 자동 적용 값으로 판정, 장바구니 토글 상태는 판정에 쓰지 않음(POL-052) */
+  function selList(r) {
+    var out = [];
+    r.lines.forEach(function (l) {
+      var s = r.sel.P[l.id]; if (!s) return;
+      [s.single].concat(s.dups).filter(Boolean).forEach(function (id) { out.push({ target: l.src.name, c: E.byId(id) }); });
+    });
+    Object.keys(r.sel.C).forEach(function (k) {
+      var s = r.sel.C[k]; if (!s || !r.units[k]) return;
+      var label = k === 'ALL' ? '장바구니 전체' : (D.SHIPPING[k] ? D.SHIPPING[k].label : k) + ' 묶음';
+      [s.single].concat(s.dups).filter(Boolean).forEach(function (id) { out.push({ target: label, c: E.byId(id) }); });
+    });
+    return out;
+  }
+  function orderResult(st, r) {
+    var cart = selList(r), order, mode;
+    if (st.maxAuto === 'off') { order = cart; mode = cart.length ? 'carry' : 'none'; }
+    else {
+      var ro = E.compute({ cartType: st.cartType, items: st.items, coupons: st.coupons, loggedIn: st.loggedIn, toggle: true, manualSel: { P: {}, C: {} }, shipBasis: st.shipBasis });
+      order = selList(ro); mode = 'auto';
+    }
+    var key = function (l) { return l.map(function (x) { return x.target + x.c.id; }).sort().join('|'); };
+    return { mode: mode, cart: cart, order: order, same: key(cart) === key(order) };
+  }
+  function renderOrder(st) {
+    var o = st.orderView; if (!o) return '';
+    function rows(list) { return list.length ? list.map(function (x) { return '<tr><th>' + esc(x.target) + '</th><td>' + esc(x.c.name) + ' · ' + couponValue(x.c) + '</td></tr>'; }).join('') : '<tr><td colspan="2">적용 쿠폰 없음</td></tr>'; }
+    var why = {
+      carry: ['최대 할인 자동 적용이 사용안함이므로 장바구니에 적용된 쿠폰(자동 적용·직접 선택)을 주문서에서 이어서 적용합니다.', '주문서는 쿠폰을 새로 자동 선택하지 않습니다.', '주문서에서 쿠폰 사용 조건을 다시 확인하며, 조건을 충족하지 못한 쿠폰은 주문서 기존 방식대로 해제·안내합니다. 다른 쿠폰을 대신 선택하지 않습니다.'],
+      none: ['최대 할인 자동 적용이 사용안함이고 장바구니에 적용된 쿠폰이 없으므로, 쿠폰 없이 주문서를 엽니다.', '주문서는 쿠폰을 새로 자동 선택하지 않습니다. 고객은 주문서에서 직접 고를 수 있습니다.'],
+      auto: ['최대 할인 자동 적용이 사용함이므로 장바구니 적용 쿠폰과 관계없이 주문서 최대 할인 자동 적용 기준으로 다시 선택합니다.', '목업은 주문서 결과를 장바구니 최대 할인 조합으로 대신 보여 줍니다. 실제 주문서는 기존 자동 적용 제외 조건을 따릅니다.']
+    }[o.mode];
+    return '<div class="c-dim c-ord" data-act="o-dim"><div class="c-modal" role="dialog" aria-modal="true" aria-label="주문서 진입 결과" data-mk="order-result">' +
+      '<div class="c-modal-head"><h4>주문서 진입 결과 (목업)</h4><button class="c-x" data-act="o-close" aria-label="닫기">×</button></div>' +
+      '<div class="c-ord-set" data-mk="order-setting">쿠폰 기본 설정 &gt; 최대 할인 자동 적용: <b>' + (st.maxAuto === 'on' ? '사용함' : '사용안함') + '</b> · 실제 주문서 화면은 현행과 같으며, 이 레이어는 목업 확인용입니다.</div>' +
+      '<h5>장바구니 적용 쿠폰</h5><table>' + rows(o.cart) + '</table>' +
+      '<h5>주문서 초기 적용 쿠폰' + (o.same ? '' : ' <span class="diff">장바구니와 다름</span>') + '</h5><table data-mk="order-coupons">' + rows(o.order) + '</table>' +
+      '<ul class="why">' + why.map(function (w) { return '<li>' + w + '</li>'; }).join('') + '</ul>' +
+      '<button class="c-apply" data-act="o-close">확인</button></div></div>';
+  }
+
   function mount(root, opts) {
     opts = opts || {};
     var st = buildState(opts), r;
@@ -158,7 +200,7 @@
         '<div class="c-tabs" role="tablist" data-mk="tabs"><button role="tab" data-act="tab" data-tab="normal" class="' + (st.tab === 'normal' ? 'on' : '') + '">일반구매<em>(' + normalCount + ')</em></button><button role="tab" data-act="tab" data-tab="subs" class="' + (st.tab === 'subs' ? 'on' : '') + '">정기배송<em>(0)</em></button></div>' +
         '<div class="c-body"><div class="c-list">' + (st.tab === 'subs' ? '<div class="c-listhead"><span></span><span></span></div><div class="c-empty">장바구니에 담긴 상품이 없습니다.</div>' + renderBottom(st, r) : renderList(st, r)) + '</div>' +
         '<aside class="c-pay">' + renderPay(st, r) + '</aside></div></div>' +
-        renderModal(st, r) + (st.toast ? '<div class="c-toast" role="status">' + esc(st.toast) + '</div>' : '');
+        renderModal(st, r) + renderOrder(st) + (st.toast ? '<div class="c-toast" role="status">' + esc(st.toast) + '</div>' : '');
       if (opts.onRender) opts.onRender(st, r);
     }
 
@@ -183,7 +225,7 @@
     root.addEventListener('click', function (ev) {
       var t = ev.target.closest('[data-act]'); if (!t || !root.contains(t)) return;
       var act = t.getAttribute('data-act'), id = t.getAttribute('data-id');
-      if (act === 'm-dim' && ev.target !== t) return;
+      if ((act === 'm-dim' || act === 'o-dim') && ev.target !== t) return;
       switch (act) {
         case 'tab': st.tab = t.getAttribute('data-tab'); render(); break;
         case 'qty': st.items.forEach(function (i) { if (i.id === id) i.qty = Math.max(1, i.qty + +t.getAttribute('data-d')); }); render(); break;
@@ -202,7 +244,8 @@
           break;
         case 'optchange': toast('목업: 옵션 변경은 현행과 같습니다.'); break;
         case 'estimate': toast('목업: 견적서 출력은 현행과 같습니다.'); break;
-        case 'order': toast('목업: 주문서로 이동합니다.'); break;
+        case 'order': if (!st.items.some(function (i) { return i.checked; })) { toast('목업: 선택한 상품이 없을 때 주문하기 처리는 현행과 같습니다.'); break; } st.orderView = orderResult(st, r); render(); break;
+        case 'o-close': case 'o-dim': st.orderView = null; render(); break;
       }
     });
     root.addEventListener('change', function (ev) {
@@ -212,13 +255,14 @@
       else if (act === 'm-single') { st.modal.single = t.value || null; var c = t.value ? E.byId(t.value) : null; if (c && !c.dupAllowed) st.modal.dups = []; render(); }
       else if (act === 'm-dup') { var d = st.modal.dups; if (t.checked) d.push(t.value); else d.splice(d.indexOf(t.value), 1); render(); }
     });
-    root.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && st.modal) { st.modal = null; render(); } });
+    root.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && (st.modal || st.orderView)) { st.modal = null; st.orderView = null; render(); } });
 
     render();
     return {
       state: st, result: function () { return r; }, render: render,
       set: function (patch) { Object.keys(patch).forEach(function (k) { st[k] = patch[k]; }); render(); },
       openModal: openModal, applyModal: applyModal,
+      order: function () { st.orderView = orderResult(st, r); render(); },
       selectInModal: function (single, dups) { st.modal.single = single; if (dups) st.modal.dups = dups; render(); }
     };
   }
