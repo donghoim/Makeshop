@@ -287,21 +287,18 @@ const AdsPage = (function () {
   /* ---------------- 5. 전환 추적 설정 ---------------- */
   function conversionSection() {
     const s = Store.s;
-    const draft = { capi: s.ads.capi, naver: s.ads.naver, kakao: s.ads.kakao };
+    const draft = { naver: s.ads.naver, kakao: s.ads.kakao };
     const row = (k, label, info, enabled, hint) => `
       <div class="conv-row"><div class="conv-row__label">${label} ${UI.qmark(info)}</div>
       <div class="seg seg--wide ${enabled ? "" : "is-disabled"}" data-k="${k}"><button type="button" data-v="on" ${enabled ? "" : "disabled"}>사용</button><button type="button" data-v="off" ${enabled ? "" : "disabled"}>사용안함</button></div>
       ${hint ? `<span class="row-hint">${hint}</span>` : ""}</div>`;
     const body = `
-      ${row("capi", "Meta 전환 API(CAPI) 연동", "capi", true, "")}
       ${row("naver", "네이버페이 구매 전환", "naver", s.prereq.naver, s.prereq.naver ? "" : "네이버 연동 설정에서 주문형 네이버페이 사용 및 공통 인증키 입력 후 사용할 수 있습니다.")}
       ${row("kakao", "카카오톡 체크아웃 구매 전환", "kakao", s.prereq.kakao, s.prereq.kakao ? "" : "카카오 연동 설정에서 톡 체크아웃 연동 후 사용할 수 있습니다.")}
-      <p class="note" id="capi-note" hidden>${UI.icon.info}<span>Meta 전환 API(CAPI) 연동이 '사용안함'이면 네이버페이·카카오톡 체크아웃 구매 전환을 '사용'으로 설정해도 외부 결제 Purchase 이벤트는 전송되지 않습니다.</span></p>
       <div class="conv-foot"><button type="button" class="btn btn--primary btn--lg" data-act="save">확인</button></div>`;
     const el = App.section("전환 추적 설정", "", body);
     function paint() {
       el.querySelectorAll(".seg[data-k]").forEach((g) => g.querySelectorAll("button").forEach((b) => b.classList.toggle("is-active", draft[g.dataset.k] === b.dataset.v)));
-      el.querySelector("#capi-note").hidden = !(draft.capi === "off" && (draft.naver === "on" || draft.kakao === "on"));
     }
     el.querySelectorAll(".seg[data-k] button").forEach((b) => b.addEventListener("click", () => { draft[b.parentElement.dataset.k] = b.dataset.v; paint(); }));
     el.querySelector('[data-act="save"]').addEventListener("click", async () => {

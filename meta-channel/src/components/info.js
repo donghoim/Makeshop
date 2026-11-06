@@ -4,11 +4,12 @@
    ========================================================================== */
 const INFO = (function () {
   const more = (state) => ` <a class="lnk" data-goto-feed="${state}">자세히보기</a>`;
+  const manual = ` <a class="lnk" data-manual>자세히보기</a>`;
   const stateList = `
     <li><b>활동중 :</b> Meta 승인이 완료되어 정상적으로 노출 중인 상태입니다.</li>
     <li><b>검토중 :</b> Meta에서 상품을 검수하고 있는 상태입니다.</li>
     <li><b>미승인 :</b> Meta 정책 위반 등으로 승인이 거부된 상태입니다.${more("미승인")}</li>
-    <li><b>노출제한 :</b> 카테고리 미매칭 또는 상품 품질 조건에 해당하여 메이크샵에서 전송을 제한한 상태입니다.${more("노출제한")}</li>
+    <li><b>노출제한 :</b> 상품 품질 조건에 해당하여 메이크샵에서 전송을 제한한 상태입니다.${more("노출제한")}</li>
     <li><b>사용안함 :</b> 사용여부 해제로 피드에서 제외된 상태입니다.</li>
     <li><b>반영대기 :</b> Meta 상품 피드에 현재 반영 대기 중인 상태입니다.${more("반영대기")}</li>`;
   const data = {
@@ -29,10 +30,14 @@ const INFO = (function () {
         <li>사용안함으로 설정한 상품은 카테고리 매칭 여부와 관계없이 피드에서 제외되며, Meta에 노출되지 않습니다.</li>
         <li>사용안함으로 설정한 상품은 '사용안함' 상태로 표시됩니다.</li></ul>`,
     },
-    reason: {
+    // 사유 툴팁: 현재 탭(미승인·노출제한) 상태 설명만 노출. 자세히보기 = 매뉴얼 링크(URL 미정, 추후 공유)
+    reasonDenied: {
       title: "사유",
-      html: `<ul><li><b>미승인</b> : Meta API를 통해 전달받은 미승인 사유를 기준으로 안내 문구를 노출합니다.</li>
-        <li><b>노출제한</b> : 메이크샵 상품 검증 결과에 따라 노출제한 사유를 안내합니다.</li></ul>`,
+      html: `<ul><li><b>미승인 :</b> Meta 정책 위반 등으로 승인이 거부된 상태입니다.${manual}</li></ul>`,
+    },
+    reasonRestricted: {
+      title: "사유",
+      html: `<ul><li><b>노출제한 :</b> 상품 품질 조건에 해당하여 메이크샵에서 전송을 제한한 상태입니다.${manual}</li></ul>`,
     },
     adStatus: {
       title: "계정 상태",
@@ -96,6 +101,12 @@ const INFO = (function () {
     document.querySelectorAll(".modal-overlay").forEach((m) => m.remove());
     document.body.classList.remove("is-modal-open");
     location.hash = "#/meta/feed?tab=" + encodeURIComponent(a.dataset.gotoFeed);
+  });
+  // 사유 툴팁 '자세히보기' → 매뉴얼 링크 미정(추후 공유)
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest("[data-manual]");
+    if (!a) return;
+    UI.toast("매뉴얼 링크는 추후 공유 예정입니다.", "info");
   });
   return { data, bind };
 })();

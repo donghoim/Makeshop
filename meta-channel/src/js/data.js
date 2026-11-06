@@ -76,7 +76,8 @@ window.MOCK = (function () {
   ];
 
   /* ---------------- 상품 ---------------- */
-  // r: 노출제한 판정용 원천 데이터 플래그 (display/sale/soldout/price0/priceText/noImage/noDesc/memberOnly/loginPrice/privatePay)
+  // r: 노출제한 판정용 원천 데이터 플래그 (display/sale/soldout/price0/priceText/noImage/imageSpec/noDesc/memberOnly/loginPrice/privatePay)
+  // soldOutOpts: 품절인 옵션 조합 수(상품 전체 품절 아님). 품절 조합도 availability만 바꿔 전송하므로 연동 상품 수에 포함(POL-100)
   // meta: Meta 처리 결과 (활동중|검토중|미승인|null), reject: 미승인 사유 코드
   function P(id, name, cat, price, opts, extra) {
     return Object.assign(
@@ -98,7 +99,7 @@ window.MOCK = (function () {
     P(11, "베이직 코튼 블라우스 화이트", "c05", 39000, 3, { r: { noImage: true } }),
     P(12, "헤비 코튼 오버핏 맨투맨", "c06", 49000, 8, { meta: "활동중" }),
     P(13, "레터링 기모 맨투맨", "c06", 45000, 6, { meta: "미승인", reject: "IMAGE_NOT_ACCESSIBLE" }),
-    P(14, "와이드 핀턱 슬랙스", "c07", 59000, 10, { meta: "활동중" }),
+    P(14, "와이드 핀턱 슬랙스", "c07", 59000, 10, { meta: "활동중", soldOutOpts: 3 }),
     P(15, "밴딩 테이퍼드 슬랙스", "c07", 52000, 8, { meta: "검토중" }),
     P(16, "[개인결제] 김OO 고객님 슬랙스 수선비", "c07", 15000, 0, {}),
     P(17, "소프트 레더 숄더백", "c08", 129000, 3, { meta: "활동중" }),
@@ -131,6 +132,7 @@ window.MOCK = (function () {
     P(44, "카고 와이드 슬랙스", "c07", 64000, 8, { meta: "활동중" }),
     P(45, "가죽 미니 크로스 숄더백", "c08", 89000, 3, { meta: "활동중" }),
     P(46, "에어 메쉬 러닝 스니커즈", "c10", 89000, 10, { meta: "미승인", reject: "DUPLICATE_ITEM" }),
+    P(47, "린넨 와이드 셔츠 원피스", "c04", 72000, 4, { r: { imageSpec: true } }),
   ];
 
   /* ---------------- 상품 피드 사유 문구 ---------------- */
@@ -144,6 +146,7 @@ window.MOCK = (function () {
     { key: "noCategory", label: "기본 분류 미지정", text: "상품 분류가 지정되지 않았습니다. 기본 분류를 설정해 주세요." },
     { key: "privatePay", label: "상품명에 '개인결' 포함", text: "개인결제 상품은 피드에 연동되지 않습니다." },
     { key: "noImage", label: "상품이미지 없음", text: "상품 이미지가 없습니다. 이미지를 등록해주세요." },
+    { key: "imageSpec", label: "상품 이미지 규격 미충족(JPEG·PNG 아님 또는 8MB 이상)", text: "상품 이미지가 Meta 기준에 맞지 않습니다." },
     { key: "noDesc", label: "상품 상세설명 없음", text: "상품 상세설명이 없습니다. 상세설명을 입력해 주세요." },
     { key: "memberOnly", label: "특정 회원만 접근(도매회원 포함)", text: "특정 회원 등급만 접근할 수 있는 상품입니다. 전체 공개 상품만 피드에 연동됩니다." },
     { key: "loginPrice", label: "로그인 후 가격 노출", text: "로그인 후에만 가격이 노출되는 상품입니다. 비로그인 상태에서도 가격이 노출되도록 설정해 주세요." },

@@ -91,7 +91,9 @@ const App = (function () {
     ok.addEventListener('click',()=>{
       if (!checks.every(x=>x.checked)) return;
       Store.s.consentHistory = [...history, {version:"2026-10-27", at:new Date().toISOString(), operator:"prototype-admin", items:[true,true,true]}];
-      Store.save(); m.close(true); openWizard(!Store.s.connected);
+      Store.save(); m.close(true);
+      if (migration) { Store.completeMigration(); go("connect"); UI.toast("Meta 비즈니스 연동이 완료되었습니다.", "success"); setTimeout(() => ConnectPage.openCategoryMatch(true), 200); return; }
+      openWizard(!Store.s.connected);
     });
   }
   function consentBox(id, title, text, open) {
@@ -105,8 +107,7 @@ const App = (function () {
     FbeOAuth.open({
       onComplete: (sel) => {
         if (initial) {
-          if (Store.migrationPending()) Store.completeMigration(sel);
-          else Store.connect(sel);
+          Store.connect(sel);
           go("connect");
           UI.toast("Meta 비즈니스 연동이 완료되었습니다.", "success");
           setTimeout(() => ConnectPage.openCategoryMatch(true), 200);
@@ -117,7 +118,6 @@ const App = (function () {
         }
       },
       onCancel: () => {
-        if (Store.migrationPending()) { go("connect"); UI.toast("재연동을 완료하지 않았습니다. 기존 연결과 정보는 유지됩니다.", "warn"); return; }
         UI.toast(initial ? "Meta 연동이 완료되지 않았습니다. 연동 정보는 저장되지 않으며 연동 가이드 화면을 유지합니다." : "재설정을 취소하여 기존 연결 정보를 유지합니다.", "warn");
       },
     });
@@ -159,7 +159,7 @@ const App = (function () {
   async function enterMigration() {
     if (entering || !Store.migrationPending()) return;
     entering = true;
-    const confirmed = await UI.alert("페이스북 연동 기능이 Meta 비즈니스로 업그레이드되었습니다. 약관에 동의한 후 연동을 진행해 주세요.");
+    const confirmed = await UI.alert("페이스북 연동 기능이 Meta 비즈니스로 업그레이드되었습니다. 기존 연동 정보는 약관 동의 후 바로 이용하실 수 있습니다.");
     if (confirmed && Store.migrationPending()) {
       lastSurface = "meta";
       go("connect");
@@ -215,14 +215,15 @@ const App = (function () {
         <p class="drawer__hint">QA·리뷰용 상태 전환 도구입니다. 실제 서비스 화면에는 존재하지 않습니다.</p>
         <h4>연동 상태 프리셋</h4>
         <div class="drawer__btns"><button type="button" class="btn btn--line btn--sm" data-act="reset-new">미연동(최초 진입)</button><button type="button" class="btn btn--line btn--sm" data-act="reset-conn">연동 완료(운영 중)</button></div>
-        <div class="drawer__btns"><button type="button" class="btn btn--line btn--sm" data-act="reset-legacy">기존 상점(재연동 전)</button></div>
+        <div class="drawer__btns"><button type="button" class="btn btn--line btn--sm" data-act="reset-legacy">기존 상점(승계 전)</button></div>
         <h4>연결 관리</h4>
+        <label>Facebook 로그인 계정 ${sel("fbLogin", s.fbLogin, [["email", "이메일(이메일 표시)"], ["phone", "휴대폰번호(이름 표시)"]])}</label>
         <label>Instagram 연결 ${sel("ig", s.ig, [[true, "연결됨"], [false, "미연결(위저드 스킵)"]])}</label>
         <label>자산 조회 결과 ${sel("assetError", s.assetError, [["none", "정상"], ["page", "페이지 조회 실패(확인불가)"], ["pixel", "픽셀 조회 실패(확인불가)"]])}</label>
         <label>도메인 인증 ${sel("domainVerified", s.domainVerified, [[false, "미인증(안내 노출)"], [true, "인증 완료(안내 미노출)"]])}</label>
         <label>연결 해제 결과 ${sel("unlinkResult", s.unlinkResult, [["success", "성공"], ["network", "실패 - 통신·서버 오류"], ["auth", "실패 - 인증·권한 오류"]])}</label>
         <h4>상품 피드</h4>
-        <div class="drawer__btns"><button type="button" class="btn btn--line btn--sm" data-act="sync">Meta 심사 결과 동기화 (검토중→결과)</button><button type="button" class="btn btn--line btn--sm" data-act="queue">전송 큐 지금 처리 (반영대기→검토중)</button><button type="button" class="btn btn--line btn--sm" data-act="catalog">카탈로그 변경(재설정) 시뮬레이션</button></div>
+        <div class="drawer__btns"><button type="button" class="btn btn--line btn--sm" data-act="sync">Meta 심사 결과 동기화 (검토중→결과)</button><button type="button" class="btn btn--line btn--sm" data-act="queue">전송 큐 지금 처리 (반영대기→검토중)</button><button type="button" class="btn btn--line btn--sm" data-act="catalog">카탈로그 변경(재설정) 시뮬레이션</button><button type="button" class="btn btn--line btn--sm" data-act="addcat">쇼핑몰 최하위 분류 추가</button></div>
         <label>전송 큐 자동 처리 ${sel("queueAuto", s.queueAuto !== false, [[true, "사용 (반영 5초 후 자동 전송)"], [false, "일시정지 (반영대기 유지)"]])}</label>
         <h4>광고 관리</h4>
         <label>광고 계정 상태 ${sel("adStatus", s.ads.status, ["활성", "차단", "비활성", "미결제", "펜딩"].map((x) => [x, x]))}</label>
@@ -270,6 +271,11 @@ const App = (function () {
           if (!Store.s.connected) return UI.toast("연동 완료 상태에서만 사용할 수 있습니다.", "warn");
           Store.changeCatalog();
           UI.toast("카탈로그가 변경되어 기존 상품 피드 상태를 초기화하고 전송 대상 상품을 반영대기로 다시 등록했습니다.", "info");
+          render();
+        }
+        if (a === "addcat") {
+          Store.addLeafCategory();
+          UI.toast("쇼핑몰에 최하위 분류 1개가 추가되었습니다. 카테고리 설정의 대상 수가 늘어납니다.", "info");
           render();
         }
         if (a === "clear") {

@@ -91,7 +91,7 @@ const FeedPage = (function () {
         </div>
       </div>
       <div class="table-wrap"><table class="table">
-        <thead><tr>${cols.map((k) => `<th class="col-${k}">${head(k)}</th>`).join("")}</tr></thead>
+        <thead><tr>${cols.map((k) => `<th class="col-${k}">${head(k, view.tab)}</th>`).join("")}</tr></thead>
         <tbody>${pageRows.length ? pageRows.map((p) => `<tr>${cols.map((k) => `<td class="col-${k}">${cell(k, p)}</td>`).join("")}</tr>`).join("") : `<tr><td colspan="${cols.length}" class="table__empty">표시할 상품이 없습니다.</td></tr>`}</tbody>
       </table></div>
       <div class="list-foot"><div class="list-foot__left"><button type="button" class="btn btn--line" data-act="bulk">선택 수정</button>${view.tab === "반영대기" ? '<span class="muted small">반영대기 상품은 전송 큐에서 순서대로 Meta에 자동 전송됩니다. 직접 전송하는 기능은 없습니다.</span>' : ""}</div><div id="feed-pager"></div><div class="list-foot__right muted small">총 ${UI.fmt(rows.length)}건 · 선택 ${view.sel.size}건</div></div>`;
@@ -131,7 +131,7 @@ const FeedPage = (function () {
     if (tab === "사용안함") return ["chk", "info", "linked", "price", "manage"];
     return ["chk", "info", "linked", "price", "gpc", "manage"];
   }
-  function head(k) {
+  function head(k, tab) {
     return {
       chk: '<input type="checkbox" id="chk-all" aria-label="현재 페이지 전체 선택" />',
       info: "상품정보",
@@ -139,7 +139,7 @@ const FeedPage = (function () {
       linked: "연동 상품 수",
       price: "가격",
       gpc: "페이스북 카테고리",
-      reason: `사유 ${UI.qmark("reason")}`,
+      reason: `사유 ${UI.qmark(tab === "미승인" ? "reasonDenied" : "reasonRestricted")}`,
       manage: "관리",
     }[k];
   }

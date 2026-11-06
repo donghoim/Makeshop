@@ -23,12 +23,14 @@ const Store = (function () {
     return {
       connected: false,
       legacy: false, migrationComplete: false, legacyConnection: null, consentHistory: [],
+      fbLogin: "email",       // 'email' | 'phone' — 휴대폰번호 로그인 계정은 이메일 대신 이름 표시
       ig: true,               // Instagram 연결 여부 (FBE 위저드에서 스킵 시 false)
       assetError: "none",     // 'none' | 'page' | 'pixel' — 자산 조회 실패(확인불가) 시뮬레이션
       domainVerified: false,
       unlinkResult: "success", // 'success' | 'network' | 'auth' — 연결 해제 결과 시뮬레이션
       categorySaved: false,
       catMap: {},
+      extraCats: [],          // 시나리오: 연동 후 쇼핑몰에 새로 추가한 최하위 분류
       lastUpdate: null,
       products: clone(M.products).map((p) => Object.assign(p, { meta: null, reject: null, dirty: false })),
       ads: { status: "활성", billing: "선불", capi: "off", naver: "off", kakao: "off" },
@@ -68,7 +70,8 @@ const Store = (function () {
   const listeners = [];
 
   /* ---------------- 판정 ---------------- */
-  const cat = (id) => M.categories.find((c) => c.id === id) || null;
+  const allCats = () => M.categories.concat(state.extraCats || []);
+  const cat = (id) => allCats().find((c) => c.id === id) || null;
   const catPath = (id) => (cat(id) ? cat(id).path.join(" > ") : null);
   const gpc = (id) => M.gpcList.find((g) => g.id === id) || null;
   const isApparel = (gpcId) => !!gpcId && (gpc(gpcId) || { path: "" }).path.startsWith(M.APPAREL);
@@ -85,6 +88,7 @@ const Store = (function () {
     if (!p.cat) return "noCategory";
     if (p.name.includes("개인결")) return "privatePay";
     if (r.noImage) return "noImage";
+    if (r.imageSpec) return "imageSpec";
     if (r.noDesc) return "noDesc";
     if (r.memberOnly) return "memberOnly";
     if (r.loginPrice) return "loginPrice";
@@ -103,7 +107,7 @@ const Store = (function () {
     if (st === "미승인") return M.rejectReasons[p.reject] || M.rejectReasons.COMMERCE_POLICY_VIOLATION;
     return "";
   }
-  /** 연동 상품 수: Meta Catalog 에 실제 등록된 item(옵션 조합) 수. 미반영·제외 상품은 0 */
+  /** 연동 상품 수: Meta Catalog 에 실제 등록된 item(옵션 조합) 수. 품절인 옵션 조합(soldOutOpts)도 포함(POL-100). 미반영·제외 상품은 0 */
   function linkedCount(p) {
     return META_STATES.includes(status(p)) ? Math.max(1, p.options) : 0;
   }
@@ -136,7 +140,22 @@ const Store = (function () {
     save,
     scheduleQueue,
     cat, catPath, gpc, isApparel, effGpc, restriction, status, reason, linkedCount, counts,
-    leafCategories: () => M.categories,
+    leafCategories: () => allCats(),
+    /** 카테고리 설정 상태 (POL-097) — 매칭 수 = [상품 피드 반영]으로 GPC를 저장한 최하위 분류 수, Google 기본 선택값은 미포함 */
+    categoryStatus() {
+      const cats = allCats();
+      const matched = cats.filter((c) => state.catMap[c.id]).length;
+      const total = cats.length;
+      const label = matched === 0 ? "미설정" : matched === total ? "설정완료" : "일부설정";
+      return { label, matched, total };
+    },
+    /** 시나리오: 쇼핑몰 분류 관리에서 최하위 분류 추가 (POL-098 — 대상 수 증가, 미매칭으로 집계) */
+    addLeafCategory() {
+      state.extraCats = state.extraCats || [];
+      const n = state.extraCats.length + 1;
+      state.extraCats.push({ id: "cx" + n, path: ["시즌", "신규 분류 " + n], googleGpc: null });
+      save();
+    },
 
     reset(preset) {
       clearTimeout(qTimer);
@@ -150,11 +169,12 @@ const Store = (function () {
     },
 
     migrationPending() { return !!state.legacy && !state.migrationComplete; },
-    completeMigration(sel) {
+    /** 약관 동의 시 이관 정보 자동 승계 — Meta 팝업 없음. 기존 연동에 Instagram 정보가 없어 미연결 */
+    completeMigration() {
       state.connected = true;
       state.migrationComplete = true;
       state.categorySaved = false;
-      api.reconfigure(sel);
+      state.ig = false;
       save(); scheduleQueue();
     },
     /** FBE 연동 완료 (최초) */

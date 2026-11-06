@@ -40,7 +40,7 @@ const ConnectPage = (function () {
     const fail = (key) => s.assetError === key;
     const failCell = `<span class="pill pill--red">확인불가</span><span class="row-hint">자산 조회에 실패했습니다(권한 부족·토큰 만료 등). [설정]에서 재연동해 주세요.</span>`;
     const rows = [
-      ["페이스북 계정", `${UI.esc(a.fbEmail)} <span class="pill pill--blue">연결됨</span>`, null],
+      ["페이스북 계정", `${UI.esc(s.fbLogin === "phone" ? a.fbName : a.fbEmail)} <span class="pill pill--blue">연결됨</span>`, null],
       ["비즈니스 관리자", UI.esc(a.businessManagerName), ["비즈니스 관리자 바로가기", `https://business.facebook.com/settings/info?business_id=${bid}`]],
       ["페이지", fail("page") ? failCell : UI.esc(a.pageName), fail("page") ? null : ["페이지 바로가기", `https://www.facebook.com/${a.pageId}`]],
       ["픽셀 정보", fail("pixel") ? failCell : `픽셀 ID : ${a.pixelId}`, fail("pixel") ? null : ["이벤트 관리자 바로가기", `https://business.facebook.com/events_manager2/list/pixel/${a.pixelId}/overview?business_id=${bid}`]],
@@ -69,12 +69,13 @@ const ConnectPage = (function () {
   /* ---------------- 3. 상품 피드 요약 ---------------- */
   function feedSection() {
     const s = Store.s;
-    const matched = Object.keys(s.catMap).length;
-    const active = s.categorySaved && matched > 0;
+    const cs = Store.categoryStatus();
+    const active = s.categorySaved && cs.matched > 0;
+    const pill = { 설정완료: "pill--solid-blue", 일부설정: "pill--blue", 미설정: "pill--gray" }[cs.label];
     const c = active ? Store.counts(s.products) : { 전체: 0, 활동중: 0, 검토중: 0, 미승인: 0, 노출제한: 0, 사용안함: 0, 반영대기: 0 };
     const body = `
       <dl class="kv">
-        <div class="kv__row"><dt>카테고리 설정</dt><dd>${active ? `<span class="pill pill--solid-blue">설정완료</span><span class="muted">매칭 ${matched} / ${Store.leafCategories().length}개 카테고리</span>` : "미설정"} <button type="button" class="btn btn--line btn--sm" data-act="match">상품 카테고리 매칭</button></dd></div>
+        <div class="kv__row"><dt>카테고리 설정</dt><dd><span class="pill ${pill}">${cs.label}</span><span class="muted">매칭 ${cs.matched} / ${cs.total}개 카테고리</span> <button type="button" class="btn btn--line btn--sm" data-act="match">상품 카테고리 매칭</button></dd></div>
         <div class="kv__row kv__row--top"><dt>카탈로그 연동 상품 ${UI.qmark("catalog")}</dt><dd class="kv__wide">${statusBar(c, active ? s.lastUpdate : null)}</dd></div>
       </dl>`;
     const el = App.section("상품 피드", "", body);
