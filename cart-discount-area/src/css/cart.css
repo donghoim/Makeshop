@@ -135,6 +135,18 @@
 .cart-root.is-mobile .c-paybox { padding:20px 16px; }
 .cart-root.is-mobile .c-order-wrap { position:sticky; bottom:0; background:#fff; padding:8px 0; }
 
+/* 베이직심플·모던심플(PC) 결제 정보: 상품 목록 아래 전체 폭, 총 상품 금액(왼쪽)·총 할인 금액(오른쪽) 2칸
+   총 할인 금액 영역이 없으면(할인 0건·할인 없는 비회원·토글 OFF로 할인이 모두 빠짐) 총 상품 금액을 오른쪽 칸에 고정 */
+.cart-root.skin-basic:not(.is-mobile) .c-body { grid-template-columns:1fr; gap:32px; }
+.cart-root.skin-basic:not(.is-mobile) .c-pay { position:static; }
+.cart-root.skin-basic:not(.is-mobile) .c-sumgrid { display:flex; gap:100px; }
+.cart-root.skin-basic:not(.is-mobile) .c-sumgrid > div { flex:1; padding:0 10px; }
+.cart-root.skin-basic:not(.is-mobile) .c-sumgrid > [data-mk="disc"] { margin-top:0; }
+.cart-root.skin-basic:not(.is-mobile) .c-sumgrid.no-disc > [data-mk="goods"] { flex:none; width:300px; margin-left:auto; }
+.cart-root.skin-basic:not(.is-mobile) .c-final { justify-content:flex-end; gap:80px; padding-right:10px; }
+.cart-root.skin-basic:not(.is-mobile) .c-order-wrap { display:flex; justify-content:flex-end; }
+.cart-root.skin-basic:not(.is-mobile) .c-order { width:320px; }
+
 /* 주문서 진입 결과 레이어(목업 전용, POL-052~056) */
 .c-ord .c-modal { width:480px; }
 .c-ord-set { background:var(--soft); border-radius:6px; padding:10px 12px; font-size:12px; color:var(--sub); margin-bottom:12px; }

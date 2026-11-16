@@ -30,11 +30,16 @@ window.MOCK = {
   appDc: { name: "앱 구매 할인", amount: 500 },
   /* 보유 적립금(POL-044부터 POL-052까지): 상품 구매액 30%까지 사용 */
   reserve: { owned: 15000, limitRate: 0.3 },
-  /* 결제수단별 프로모션(POL-053부터 POL-058까지) */
+  /* 결제수단별 프로모션(POL-053부터 POL-058까지, POL-061부터 POL-064까지)
+     versions: 적용 버전(pc | mobile | app), firstPay: 첫결제 프로모션(회원 전용) */
   payments: [
     { id: "p1", name: "무통장 입금 시 5% 할인", rate: 0.05 },
     { id: "p2", name: "네이버페이 결제 시 2,000원 할인", amount: 2000 },
     { id: "p3", name: "카드 결제 시 3% 할인", rate: 0.03, memberOnly: true },
     { id: "p4", name: "휴대폰 결제 시 적립금 1% 적립", rate: 0.01, rewardOnly: true },
+    { id: "p5", name: "신용카드 첫결제 시 1,000원 할인", amount: 1000, memberOnly: true, firstPay: true },
+    { id: "p6", name: "카카오페이 결제 시 1,500원 할인(앱 전용)", amount: 1500, versions: ["app"] },
   ],
+  /* 1,000원 미만 사례: 보유 적립금 53,500원, 사용 한도 없음 */
+  lowBaseReserve: 53500,
 };

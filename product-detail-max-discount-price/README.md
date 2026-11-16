@@ -5,9 +5,9 @@
 | 구분 | 위치 | 내용 |
 |---|---|---|
 | 목업 | [`index.html`](./index.html) · [바로 보기](https://donghoim.github.io/Makeshop/product-detail-max-discount-price/) | 상품 상세 최대할인가 영역, 할인 목록 레이어, 관리자 설정 |
-| HTML 화면정의서 | [`screen-spec.html`](./screen-spec.html) · [바로 보기](https://donghoim.github.io/Makeshop/product-detail-max-discount-price/screen-spec.html) | 화면 24개, 번호 마커와 DESCRIPTION |
-| 기획 문서 | [`08_Spec/`](./08_Spec) | 사양 정의서(FR 13·POL 60·AC 29), 요구사항 정의서, 정책서, 와이어프레임 초안, CS 운영·응대 가이드 |
-| 테스트 케이스 | [`qa/`](./qa) | 품질관리팀 표준 템플릿 기준 TC 71건(P0~P2) |
+| HTML 화면정의서 | [`screen-spec.html`](./screen-spec.html) · [바로 보기](https://donghoim.github.io/Makeshop/product-detail-max-discount-price/screen-spec.html) | 화면 28개, 번호 마커와 DESCRIPTION |
+| 기획 문서 | [`08_Spec/`](./08_Spec) | 사양 정의서(FR 13·POL 64·AC 33), 요구사항 정의서, 정책서, 와이어프레임 초안, CS 운영·응대 가이드 |
+| 테스트 케이스 | [`qa/`](./qa) | 품질관리팀 표준 템플릿 기준 TC 67건(P0~P2) |
 
 ## 실행 방법
 

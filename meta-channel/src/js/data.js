@@ -1,6 +1,6 @@
 /* ==========================================================================
    Mock 데이터 (Backend/DB 없음 — Prototype 전용)
-   - 04_Screen-Spec 의 예시값은 실제 커머스 데이터로 치환했다.
+   - 05_화면정의 의 예시값은 실제 커머스 데이터로 치환했다.
    - src/data/*.json 은 동일 스키마의 참고용 사본이다.
    ========================================================================== */
 window.MOCK = (function () {
@@ -8,6 +8,7 @@ window.MOCK = (function () {
   const account = {
     fbAccountLabel: "김민지 (admin@noblystudio.kr)",
     fbEmail: "admin@noblystudio.kr",
+    fbName: "김민지",
     businessManagerName: "노블리 스튜디오",
     businessId: "1029384756102938",
     pageName: "노블리 스튜디오",
@@ -24,7 +25,6 @@ window.MOCK = (function () {
     name: "노블리 스튜디오 광고계정",
     id: "act_123456789012345",
     monthSpend: 4827300,
-    prepaidCredit: 1250000,
   };
 
   /* ---------------- GPC (Google Product Category) — 메이크샵 DB 적재 분류표 일부 ---------------- */

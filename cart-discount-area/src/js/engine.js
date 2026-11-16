@@ -21,6 +21,7 @@
 
   function issuerMatch(c, supplier, cartType) {
     if (c.issuer === 'HQSUP') return cartType.indexOf('int2') === 0 ? true : supplier === 'HQ';
+    if (c.issuer !== 'HQ' && cartType.indexOf('int2') !== 0) return false; /* 공급사 발행 쿠폰은 통합 장바구니2에서만 */
     return c.issuer === supplier;
   }
 
@@ -177,7 +178,8 @@
     /* 배송비: 공급사 묶음별, 할인 전(기본) 또는 최종 주문금액 기준 */
     var ship = 0, groupShip = {};
     var suppliers = {};
-    lines.forEach(function (l) { (suppliers[l.supplier] = suppliers[l.supplier] || []).push(l); });
+    var hqShip = D.CART_TYPES[cartType].hqShip; /* 통합 장바구니1: 모든 상품에 본사 배송비 정책 */
+    lines.forEach(function (l) { var sk = hqShip ? 'HQ' : l.supplier; (suppliers[sk] = suppliers[sk] || []).push(l); });
     Object.keys(suppliers).forEach(function (sp) {
       var rule = D.SHIPPING[sp];
       var basis = suppliers[sp].reduce(function (s2, l) { return s2 + (state.shipBasis === 'after' ? l.afterPC : l.goods); }, 0);

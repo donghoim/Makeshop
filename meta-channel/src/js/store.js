@@ -1,5 +1,5 @@
 /* ==========================================================================
-   상태 저장소 + 상품 피드 판정 로직 (05_Policy 5장 기준)
+   상태 저장소 + 상품 피드 판정 로직 (06_정책 5장 기준)
    - 상태는 localStorage 에 저장되어 새로고침 후에도 유지된다(시나리오 패널에서 초기화).
    - 상태 판정 우선순위: 사용안함 → 노출제한 → 반영대기 → Meta 상태(활동중/검토중/미승인)
    - 반영대기: 전송 조건을 충족해 전송 큐에 등록된 상태. 큐가 자동으로 Meta 전송(검토중)하며 운영자 수동 전송은 없다.
@@ -33,7 +33,7 @@ const Store = (function () {
       extraCats: [],          // 시나리오: 연동 후 쇼핑몰에 새로 추가한 최하위 분류
       lastUpdate: null,
       products: clone(M.products).map((p) => Object.assign(p, { meta: null, reject: null, dirty: false })),
-      ads: { status: "활성", billing: "선불", capi: "off", naver: "off", kakao: "off" },
+      ads: { status: "활성", capi: "on", naver: "off", kakao: "off" },
       queueAuto: true,        // 전송 큐 자동 처리 (시나리오 패널에서 일시정지 가능)
       prereq: { naver: true, kakao: false },
       columns: DEFAULT_COLUMNS.slice(),

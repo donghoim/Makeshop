@@ -35,7 +35,7 @@
 
   var CART_TYPES = {
     single: { label: '개별 장바구니', unit: 'all', groups: false },
-    int1: { label: '통합 장바구니1', unit: 'supplier', groups: true },
+    int1: { label: '통합 장바구니1', unit: 'all', groups: false, mixed: true, hqShip: true }, /* 본사·공급사 상품을 한 목록에, 배송비는 본사 정책, 장바구니 쿠폰 전체 1개 */
     int2all: { label: '통합 장바구니2(통합쿠폰)', unit: 'all', groups: true },
     int2each: { label: '통합 장바구니2(개별쿠폰)', unit: 'supplier', groups: true }
   };

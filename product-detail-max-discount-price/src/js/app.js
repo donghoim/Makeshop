@@ -18,6 +18,7 @@
     return {
       member: true, app: false, open: false, mobile: false,
       removed: {}, removeAll: false, couponFail: false, replaceText: false, reserveBlocked: false, zero: false,
+      payCond: false, firstPaid: false, lowBase: false,
       owned: Object.fromEntries(M.coupons.map((c) => [c.id, c.owned])),
       sel: new Set(), reserveUser: true, pay: null,
     };
@@ -28,8 +29,12 @@
     if (S.couponFail) return [];
     return M.coupons.filter((c) => c.area === area); // 예시 쿠폰은 모두 다운로드 쿠폰(비회원·미보유 회원에게 받기로 노출, POL-027)
   }
+  function device() { return S.app ? "app" : S.mobile ? "mobile" : "pc"; }
   function paymentsVisible() {
-    return M.payments.filter((p) => !p.rewardOnly && (S.member || !p.memberOnly)); // POL-054, POL-055
+    if (S.payCond) return []; // POL-062: 상점 결제 조건 설정(현금결제 할인/적립·카드 결제 수수료) 사용 중
+    return M.payments.filter((p) => !p.rewardOnly && (S.member || !p.memberOnly) // POL-054, POL-055
+      && (!p.versions || p.versions.includes(device())) // POL-063
+      && (!p.firstPay || (S.member && !S.firstPaid))); // POL-064
   }
   function visible(key) {
     if (S.removeAll || S.removed[key]) return false; // POL-010, POL-012
@@ -47,7 +52,7 @@
   function reserveBlockedByCoupon() {
     return ["product", "order"].some((a) => visible(a === "product" ? "productCoupon" : "orderCoupon") && couponsIn(a).some((c) => c.noReserve && isOn(c)));
   }
-  function reserveOwned() { return S.zero ? 200000 : M.reserve.owned; }
+  function reserveOwned() { return S.zero ? 200000 : S.lowBase ? M.lowBaseReserve : M.reserve.owned; }
   function reserveUsable() { return S.member && !S.reserveBlocked && reserveOwned() > 0; } // POL-051
 
   /* ---------- 기본 선택 (POL-033, POL-046, POL-056) ---------- */
@@ -62,9 +67,9 @@
     S.reserveUser = true;
     S.pay = null;
     const r = calc();
-    const sorted = r.payList.slice().sort((x, y) => y.amt - x.amt);
+    const sorted = (r.payAll || []).slice().sort((x, y) => y.amt - x.amt);
     S.payOrder = sorted.map((p) => p.id); // 정렬은 진입 시 차감액 기준으로 고정(POL-056)
-    if (sorted.length) S.pay = sorted[0].id;
+    if (sorted.length) S.pay = sorted[0].id; // 1,000원 미만으로 숨어 있어도 선택 상태는 유지하고, 다시 보이면 그대로 노출(POL-056, POL-061)
   }
   function cAmt(c, base) { return c.rate ? Math.round(base * c.rate) : c.amount; }
 
@@ -89,15 +94,17 @@
     if (visible("grade")) out.lines.grade = take("grade", Math.round(base3 * M.gradeDc.rate)); // POL-041
     if (visible("app")) out.lines.app = take("app", M.appDc.amount); // POL-043
     if (visible("reserve")) {
-      const limit = S.zero ? reserveOwned() : floor100(base3 * M.reserve.limitRate);
+      const limit = S.zero || S.lowBase ? reserveOwned() : floor100(base3 * M.reserve.limitRate);
       const use = S.member ? floor100(Math.min(reserveOwned(), limit)) : 0; // POL-045
       out.reserveUse = use;
       out.reserveOn = reserveUsable() && !reserveBlockedByCoupon() && S.reserveUser;
       if (out.reserveOn) take("reserve", use);
     }
     if (visible("payment")) {
-      const pbase = cur; // OPEN-002: 주문서 기준 금액(목업은 보유 적립금 차감 후 금액)
-      out.payList = paymentsVisible().map((p) => ({ id: p.id, name: p.name, amt: p.rate ? Math.round(pbase * p.rate) : Math.min(p.amount, pbase) }));
+      const pbase = cur; // POL-058: 앞선 할인·보유 적립금 차감 후 금액
+      out.payBase = pbase;
+      out.payAll = paymentsVisible().map((p) => ({ id: p.id, name: p.name, amt: p.rate ? Math.round(pbase * p.rate) : Math.min(p.amount, pbase) }));
+      out.payList = pbase < 1000 ? [] : out.payAll; // POL-061: 기준 금액 1,000원 미만이면 미노출(고객 선택 상태는 유지, POL-056)
       const sp = out.payList.find((p) => p.id === S.pay);
       if (sp) take("payment", sp.amt);
     }
@@ -124,7 +131,7 @@
         <div class="mb-sum"><div class="amt" id="mb-amt">${won(r.final)}<small>최대할인가</small></div>
         ${S.removeAll ? "" : `<button class="mb-toggle${S.open ? " on" : ""}" id="mb-toggle" data-act="toggle" aria-expanded="${S.open}">${S.open ? "닫기" : "자세히보기"}<i></i></button>`}</div>`;
       if (S.open && !S.removeAll) {
-        h += `<div class="mb-detail" id="mb-detail">${AREAS.filter(([k]) => visible(k)).map(([k, t]) => `<div class="mb-area" data-area="${k}"><h4>${t}</h4>${areaBody(k, r)}</div>`).join("")}`;
+        h += `<div class="mb-detail" id="mb-detail">${AREAS.filter(([k]) => visible(k) && (k !== "payment" || r.payList.length)).map(([k, t]) => `<div class="mb-area" data-area="${k}"><h4>${t}</h4>${areaBody(k, r)}</div>`).join("")}`;
         h += `<div class="mb-note">최종 결제 금액에 따라 최대할인가는 달라질 수 있습니다.</div></div>`;
       }
       h += `</section>`;
@@ -215,6 +222,7 @@
       ${ck("app", "파워앱 접속", S.app)}${ck("mobile", "모바일 화면", S.mobile)}
       <h6>개별디자인에서 영역 지우기</h6>${AREAS.map(([k, t]) => ck("rm-" + k, t, S.removed[k])).join("")}${ck("removeAll", "상세 내역 전체", S.removeAll)}
       <h6>설정·상태</h6>${ck("reserveBlocked", "적립금 사용 조건 미충족", S.reserveBlocked)}${ck("couponFail", "쿠폰 조회 실패", S.couponFail)}${ck("zero", "0원 사례(적립금 20만 원, 한도 없음)", S.zero)}${ck("replaceText", "가격 대체 문구 상품", S.replaceText)}
+      <h6>결제수단별 프로모션</h6>${ck("payCond", "상점 결제 조건 설정 사용(카드 결제 수수료 등)", S.payCond)}${ck("firstPaid", "신용카드 결제 이력 있음(첫결제 대상 아님)", S.firstPaid)}${ck("lowBase", "기준 금액 1,000원 미만(적립금 53,500원, 한도 없음)", S.lowBase)}
       <button class="reset" data-demo-reset>처음 상태로</button></div>`;
   }
   document.addEventListener("change", (e) => {

@@ -227,7 +227,6 @@ const App = (function () {
         <label>전송 큐 자동 처리 ${sel("queueAuto", s.queueAuto !== false, [[true, "사용 (반영 5초 후 자동 전송)"], [false, "일시정지 (반영대기 유지)"]])}</label>
         <h4>광고 관리</h4>
         <label>광고 계정 상태 ${sel("adStatus", s.ads.status, ["활성", "차단", "비활성", "미결제", "펜딩"].map((x) => [x, x]))}</label>
-        <label>결제 방식 ${sel("billing", s.ads.billing, [["선불", "선불"], ["후불", "후불"]])}</label>
         <label>주문형 네이버페이+공통 인증키 ${sel("prNaver", s.prereq.naver, [[true, "설정됨"], [false, "미설정"]])}</label>
         <label>카카오 톡 체크아웃 연동 ${sel("prKakao", s.prereq.kakao, [[true, "연동됨"], [false, "미연동"]])}</label>
         <h4>데이터</h4>
@@ -239,7 +238,6 @@ const App = (function () {
         const v = x.value === "true" ? true : x.value === "false" ? false : x.value;
         const k = x.dataset.k;
         if (k === "adStatus") s.ads.status = v;
-        else if (k === "billing") s.ads.billing = v;
         else if (k === "prNaver") { s.prereq.naver = v; if (!v) s.ads.naver = "off"; }
         else if (k === "prKakao") { s.prereq.kakao = v; if (!v) s.ads.kakao = "off"; }
         else s[k] = v;

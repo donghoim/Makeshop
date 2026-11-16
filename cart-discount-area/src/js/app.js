@@ -9,14 +9,15 @@
   function buildState(opts) {
     var preset = D.PRESETS[opts.preset || 'base'];
     var cartType = opts.cartType || 'single';
-    var ids = D.CART_TYPES[cartType].groups ? preset.intItems : preset.items;
+    var ct0 = D.CART_TYPES[cartType]; var ids = (ct0.groups || ct0.mixed) ? preset.intItems : preset.items;
     return {
       cartType: cartType, preset: opts.preset || 'base', tab: opts.tab || 'normal',
-      items: ids.map(function (id) { var it = clone(D.ITEMS[id]); it.checked = true; return it; }),
+      items: ids.map(function (id) { var it = clone(D.ITEMS[id]); it.checked = !opts.uncheckAll; return it; }),
       coupons: preset.coupons === 'all' ? D.COUPONS.slice() : [],
       loggedIn: opts.loggedIn !== false, toggle: true, manualSel: { P: {}, C: {} },
       shipBasis: opts.shipBasis || 'before', fold: { goods: false, disc: false }, modal: null, toast: null,
-      maxAuto: opts.maxAuto || 'off', orderView: null
+      maxAuto: opts.maxAuto || 'off', orderView: null,
+      skin: opts.skin || 'rw' /* rw=반응형, basic=베이직심플·모던심플(PC) 결제 정보 2칸 배치 */
     };
   }
 
@@ -86,6 +87,8 @@
     var on = st.toggle && !disabled;
     var h = '<div class="c-paybox" data-mk="paybox"><div class="c-payhead"><h3>결제 정보</h3>' +
       '<button class="c-toggle" role="switch" aria-checked="' + on + '" data-act="toggle" data-mk="toggle"' + (disabled ? ' disabled' : '') + '>최대 할인 적용 <span class="sw"></span></button></div>';
+    /* 베이직심플·모던심플(PC): 총 상품 금액(왼쪽)·총 할인 금액(오른쪽) 2칸. 총 할인 금액 영역이 없으면 총 상품 금액을 오른쪽 칸에 고정 */
+    h += '<div class="c-sumgrid' + (r.showDisc ? '' : ' no-disc') + '" data-mk="sumgrid">';
     h += '<div data-mk="goods"><div class="c-row main"><span>총 상품 금액<button class="c-fold' + (st.fold.goods ? ' closed' : '') + '" data-act="fold" data-k="goods" data-mk="fold" aria-label="총 상품 금액 하위 항목 ' + (st.fold.goods ? '펼치기' : '접기') + '">︿</button></span><span>' + won(r.totalGoods) + '원</span></div>';
     if (!st.fold.goods) h += sub('상품 금액', won(r.goodsSum) + '원') + sub('배송비', won(r.ship) + '원');
     h += '</div>';
@@ -101,6 +104,7 @@
       }
       h += '</div>';
     }
+    h += '</div>';
     h += '<div class="c-final" data-mk="final"><span>최종 결제 금액</span><span class="amt">' + won(r.final) + '<span class="won">원</span></span></div></div>';
     h += '<div class="c-order-wrap"><button class="c-order" data-act="order" data-mk="order-btn">주문하기</button></div>';
     return h;
@@ -190,6 +194,7 @@
     if (g.ResizeObserver) new ResizeObserver(measure).observe(root);
 
     function render() {
+      root.classList.toggle('skin-basic', st.skin === 'basic');
       measure();
       r = E.compute(st);
       if (!st.toggle) { st.manualSel = r.sel; }

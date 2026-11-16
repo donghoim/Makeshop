@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>장바구니 할인 화면정의서</title>
-<link rel="stylesheet" href="../10_Prototype/src/css/cart.css">
+<link rel="stylesheet" href="./src/css/cart.css">
 <style>
   :root { --b:#e3e5e8; --tx:#1b1d21; --mu:#6b7280; --pin:#e5484d; --hi:#1d3f8f; }
   * { box-sizing:border-box; }
@@ -45,7 +45,7 @@
 <div class="sp">
   <nav>
     <h1>장바구니 할인 화면정의서</h1>
-    <div class="meta">샵단 &gt; 장바구니, 관리자 쿠폰 기본 설정 · 반응형 스킨 기준 · 2026-11-04</div>
+    <div class="meta">샵단 &gt; 장바구니, 관리자 쿠폰 기본 설정 · 반응형 스킨 기준(베이직심플·모던심플 PC 배치는 SCR-CART-020부터 022까지) · 2026-11-10</div>
     <input id="q" placeholder="화면 검색" aria-label="화면 검색">
     <div id="toc"></div>
   </nav>
@@ -56,15 +56,17 @@
   </main>
   <aside class="desc"><h2>DESCRIPTION</h2><div id="desc"></div></aside>
 </div>
-<script src="../10_Prototype/src/data/scenarios.js"></script>
-<script src="../10_Prototype/src/js/engine.js"></script>
-<script src="../10_Prototype/src/js/app.js"></script>
-<script src="../10_Prototype/src/js/admin-coupon-setting.js"></script>
+<script src="./src/data/scenarios.js"></script>
+<script src="./src/js/engine.js"></script>
+<script src="./src/js/app.js"></script>
+<script src="./src/js/admin-coupon-setting.js"></script>
 <script>
-var SKIN_TABLE = '<table><tr><th>스킨</th><th>개별·통합2(통합쿠폰)</th><th>통합1·통합2(개별쿠폰)</th></tr>' +
+var SKIN_TABLE = '<table><tr><th>스킨</th><th>개별·통합1·통합2(통합쿠폰)</th><th>통합2(개별쿠폰)</th></tr>' +
   '<tr><td>반응형</td><td>상품 목록 하단, 견적서 출력 오른쪽</td><td>공급사 묶음 합계 아래</td></tr>' +
   '<tr><td>basic_simple · modern_simple</td><td>결제 정보 박스 안, 총 상품 금액 하위 항목 아래</td><td>공급사 묶음 합계 행</td></tr>' +
   '<tr><td>모바일 4.0</td><td>결제 정보 박스 안, 헤더 아래 전체 폭</td><td>공급사 묶음 하단</td></tr></table>';
+
+var LAYOUT = { t: '총 상품 금액·총 할인 금액 배치', b: ['베이직심플·모던심플(PC)은 결제 정보를 상품 목록 아래 전체 폭에 두고, 총 상품 금액(왼쪽)과 총 할인 금액(오른쪽)을 2칸으로 배치합니다.', '총 할인 금액 영역을 노출하지 않으면 총 상품 금액을 오른쪽 칸에 고정하고 왼쪽 칸은 비워 둡니다. 할인 0건, 할인이 없는 비회원, 토글 OFF로 할인이 모두 빠진 경우가 모두 같습니다.', '토글을 다시 켜는 등 할인이 생기면 2칸 배치로 돌아갑니다.', '반응형·모바일 4.0은 위아래로 쌓는 구조라 이 배치를 적용하지 않습니다.'], r: 'POL-027, POL-028, POL-029, POL-030' };
 
 var COMMON = {
   tabs: { t: '일반구매 / 정기배송 탭', b: ['할인 영역, 최대 할인 적용 토글, 쿠폰 버튼은 일반구매 탭에만 노출합니다.', '정기배송 탭은 현행 결제 정보를 그대로 유지합니다.'], r: 'POL-001, POL-002, POL-003' },
@@ -74,8 +76,8 @@ var COMMON = {
   notice: { t: '주문서 단계 항목', b: ['주문 할인, 보유 적립금, 적립금 즉시 할인은 금액 대신 "주문서에서 확인 가능"으로 노출합니다.', '상품 쿠폰·장바구니 쿠폰 할인이 모두 0원이면 3개 항목 모두 노출하지 않습니다.', '합계에는 포함하지 않습니다.'], r: 'POL-027, POL-028, POL-029, POL-030' },
   final: { t: '최종 결제 금액', b: ['총 상품 금액 − 총 할인 금액입니다. 0원 미만이면 0원으로 노출합니다.', '할인 후 금액만 노출하고 정가 취소선은 노출하지 않습니다. 적립 예정 금액은 노출하지 않습니다.', '수량·체크·옵션·쿠폰·토글이 바뀌면 새로고침 없이 즉시 다시 계산합니다.'], r: 'POL-004, POL-005, POL-006, POL-007, POL-011, POL-031, POL-032' },
   pcoupon: { t: '상품쿠폰 버튼', b: ['장바구니 타입과 관계없이 상품마다 노출합니다.', '누르면 해당 상품의 상품 쿠폰 선택 모달을 엽니다. 적용할 쿠폰이 없어도 노출합니다.'], r: 'POL-040, POL-041, POL-042, POL-043' },
-  ccouponAll: { t: '장바구니 쿠폰 버튼 (전체 1개)', b: ['개별 장바구니, 통합 장바구니2(통합쿠폰)에서 장바구니 전체에 1개 노출합니다.', '누르면 장바구니 쿠폰 선택 모달을 엽니다. 배송비 쿠폰은 노출하지 않습니다.', '스킨별 버튼 위치:' ], extra: SKIN_TABLE, r: 'POL-020, POL-021, POL-040, POL-041, POL-042, POL-043' },
-  ccouponGroup: { t: '장바구니 쿠폰 버튼 (공급사 묶음별)', b: ['통합 장바구니1, 통합 장바구니2(개별쿠폰)에서 공급사 묶음마다 1개 노출합니다.', '전체 버튼과 함께 노출하지 않습니다.', '누르면 해당 공급사 묶음 기준 장바구니 쿠폰 모달을 엽니다. 할인은 묶음별로 계산하고 결제 정보에는 합계 1줄로 표시합니다.'], extra: SKIN_TABLE, r: 'POL-020, POL-021, POL-040, POL-041, POL-042, POL-043' },
+  ccouponAll: { t: '장바구니 쿠폰 버튼 (전체 1개)', b: ['개별 장바구니, 통합 장바구니1, 통합 장바구니2(통합쿠폰)에서 장바구니 전체에 1개 노출합니다.', '누르면 장바구니 쿠폰 선택 모달을 엽니다. 배송비 쿠폰은 노출하지 않습니다.', '스킨별 버튼 위치:' ], extra: SKIN_TABLE, r: 'POL-020, POL-021, POL-040, POL-041, POL-042, POL-043' },
+  ccouponGroup: { t: '장바구니 쿠폰 버튼 (공급사 묶음별)', b: ['통합 장바구니2(개별쿠폰)에서 공급사 묶음마다 1개 노출합니다.', '전체 버튼과 함께 노출하지 않습니다.', '누르면 해당 공급사 묶음 기준 장바구니 쿠폰 모달을 엽니다. 할인은 묶음별로 계산하고 결제 정보에는 합계 1줄로 표시합니다.'], extra: SKIN_TABLE, r: 'POL-020, POL-021, POL-040, POL-041, POL-042, POL-043' },
   groupSum: { t: '공급사 묶음 합계', b: ['현행 묶음 합계(상품 금액 + 배송비)를 유지하며, 수량·체크 변경 시 함께 다시 계산합니다.'], r: 'POL-011' },
   order: { t: '주문하기', b: ['주문서로 이동합니다. 주문서의 첫 적용 쿠폰은 관리자 쿠폰 기본 설정 > 최대 할인 자동 적용 값으로 정합니다. 장바구니 최대 할인 적용 토글 상태는 판정에 쓰지 않습니다.', '사용안함: 주문하기 시점 장바구니에 적용된 쿠폰(자동 적용·직접 선택)을 주문서에서 이어서 적용합니다. 주문서는 새로 자동 선택하지 않습니다.', '사용함: 장바구니 적용 쿠폰과 관계없이 주문서 최대 할인 자동 적용 기준으로 다시 선택합니다.', '장바구니 화면에는 이 처리에 대한 별도 안내 문구를 추가하지 않습니다. 결과는 SCR-CART-016부터 018까지에서 확인합니다.'], r: 'FR-014, INT-010, POL-052, POL-053, POL-054, POL-055, POL-056' }
 };
@@ -89,15 +91,15 @@ var SCREENS = [
     pins: [['toggle', { t: '토글 자동 OFF', b: ['토글 ON에서 쿠폰을 직접 선택하면 토글을 OFF로 바꿉니다.', '자동 적용 결과를 해제하고 직접 선택한 쿠폰만 적용합니다.', '토글을 다시 켜면 직접 선택한 쿠폰을 해제하고 최대 할인 조합을 다시 적용합니다.'], r: 'POL-033, POL-034, POL-035, POL-036, POL-037, POL-038' }], ['disc-pc', { t: '상품 쿠폰', b: ['직접 선택한 중복 불가 쿠폰(5,000원)만 단독 적용합니다.'], r: 'POL-018, POL-019, POL-033, POL-034, POL-035, POL-036, POL-037, POL-038' }]] },
   { g: '쿠폰 선택 모달', id: 'SCR-CART-004', name: '상품쿠폰 적용 모달', st: '상품쿠폰 버튼 클릭', opts: { cartType: 'single', preset: 'base' }, setup: function (c) { c.openModal('P', 'hq2'); },
     pins: [['m-reg', { t: '쿠폰 등록', b: ['쿠폰 번호를 입력해 등록합니다. 처리는 주문서 쿠폰 등록과 같습니다.'], r: 'POL-044, POL-045, POL-046' }],
-      ['m-single', { t: '적용 쿠폰 선택', b: ['해당 상품에 쓸 수 있는 상품 쿠폰과 "쿠폰 적용 안함" 중 1개만 선택합니다.', '모달을 열면 현재 적용된 쿠폰이 선택되어 있습니다.', '다른 상품에 적용 중인 쿠폰은 선택할 수 없습니다.'], r: 'POL-022, POL-023, POL-024, POL-025, POL-026, POL-044, POL-045, POL-046' }],
+      ['m-single', { t: '적용 쿠폰 선택', b: ['해당 상품에 쓸 수 있는 상품 할인 쿠폰과 "쿠폰 적용 안함" 중 1개만 선택합니다. 적립 쿠폰은 노출하지 않습니다.', '모달을 열면 현재 적용된 쿠폰이 선택되어 있습니다.', '다른 상품에 적용 중인 쿠폰은 선택할 수 없습니다.'], r: 'POL-022, POL-023, POL-024, POL-025, POL-026, POL-044, POL-045, POL-046, POL-059' }],
       ['m-dup', { t: '적용 중복 쿠폰 선택', b: ['상품 중복 쿠폰을 여러 개 선택할 수 있습니다.', '중복 사용 불가 쿠폰을 선택하면 중복 쿠폰은 선택할 수 없습니다.'], r: 'POL-044, POL-045, POL-046' }],
-      ['m-na', { t: '적용 불가 쿠폰', b: ['보유했지만 사용 조건을 충족하지 못한 쿠폰과 조건을 보여 주며 선택할 수 없습니다.'], r: 'POL-044, POL-045, POL-046' }],
+      ['m-na', { t: '적용 불가 쿠폰', b: ['보유했지만 사용 조건을 충족하지 못한 할인 쿠폰과 조건을 보여 주며 선택할 수 없습니다.', '적립 쿠폰은 이 영역에도 노출하지 않습니다.'], r: 'POL-044, POL-045, POL-046, POL-059' }],
       ['m-apply', { t: '쿠폰적용', b: ['선택을 적용하고 모달을 닫은 뒤 결제 정보를 다시 계산합니다.', '토글이 ON이었다면 OFF로 바뀝니다.', '× 또는 바깥 영역, Esc는 변경 없이 닫습니다.'], r: 'POL-033, POL-034, POL-035, POL-036, POL-037, POL-038, POL-044, POL-045, POL-046' }]] },
   { g: '쿠폰 선택 모달', id: 'SCR-CART-005', name: '중복 불가 쿠폰 선택 중', st: '모달에서 중복 사용 불가 쿠폰을 고른 상태', opts: { cartType: 'single', preset: 'base' }, setup: function (c) { c.openModal('P', 'hq2'); c.selectInModal('P2', []); },
     pins: [['m-dup', { t: '중복 쿠폰 비활성화', b: ['중복 사용 불가 쿠폰을 선택하면 중복 쿠폰 선택을 해제하고 비활성화합니다.', '적용하면 선택한 쿠폰만 단독으로 적용합니다.'], r: 'POL-033, POL-034, POL-035, POL-036, POL-037, POL-038, POL-044, POL-045, POL-046' }]] },
   { g: '쿠폰 선택 모달', id: 'SCR-CART-006', name: '장바구니 쿠폰 적용 모달', st: '장바구니 쿠폰 버튼 클릭', opts: { cartType: 'single', preset: 'base' }, setup: function (c) { c.openModal('C', 'ALL'); },
-    pins: [['m-single', { t: '장바구니 쿠폰 목록', b: ['버튼의 적용 단위(장바구니 전체 또는 공급사 묶음)에 쓸 수 있는 장바구니 쿠폰만 노출합니다.', '할인은 상품 할인·상품 쿠폰 적용 후 금액 합계에 1회 적용합니다.'], r: 'POL-020, POL-021, POL-044, POL-045, POL-046' }],
-      ['m-na', { t: '적용 불가 쿠폰', b: ['최소 구매 금액 등 사용 조건을 충족하지 못한 쿠폰입니다.'], r: 'POL-022, POL-023, POL-024, POL-025, POL-026, POL-044, POL-045, POL-046' }]] },
+    pins: [['m-single', { t: '장바구니 쿠폰 목록', b: ['버튼의 적용 단위(장바구니 전체 또는 공급사 묶음)에 쓸 수 있는 장바구니 할인 쿠폰만 노출합니다. 적립 쿠폰은 노출하지 않습니다.', '할인은 상품 할인·상품 쿠폰 적용 후 금액 합계에 1회 적용합니다.'], r: 'POL-020, POL-021, POL-044, POL-045, POL-046, POL-059' }],
+      ['m-na', { t: '적용 불가 쿠폰', b: ['최소 구매 금액 등 사용 조건을 충족하지 못한 할인 쿠폰입니다.', '적립 쿠폰은 이 영역에도 노출하지 않습니다.'], r: 'POL-022, POL-023, POL-024, POL-025, POL-026, POL-044, POL-045, POL-046, POL-059' }]] },
   { g: '할인 상태', id: 'SCR-CART-007', name: '상품 할인만 (쿠폰 0건)', st: '보유 쿠폰 없음', opts: { cartType: 'single', preset: 'productOnly' },
     pins: [['disc', { t: '총 할인 금액', b: ['상품 할인만 노출합니다.', '쿠폰 할인이 없으므로 주문서 단계 항목 3개를 노출하지 않습니다.'], r: 'POL-027, POL-028, POL-029, POL-030' }], ['pcoupon-btn', { t: '쿠폰 버튼', b: ['적용할 쿠폰이 없어도 버튼을 노출합니다. 누르면 쿠폰이 없는 모달을 엽니다.'], r: 'POL-040, POL-041, POL-042, POL-043' }]] },
   { g: '할인 상태', id: 'SCR-CART-008', name: '할인 0건', st: '적용 가능한 할인 없음', opts: { cartType: 'single', preset: 'noDiscount' },
@@ -106,16 +108,26 @@ var SCREENS = [
     pins: [['goods', { t: '접기/펼치기', b: ['총 상품 금액·총 할인 금액의 하위 항목을 각각 접고 펼칩니다.', '페이지 안에서만 상태를 유지하고 다시 들어오면 펼친 상태입니다.'], r: 'POL-004, POL-005, POL-006, POL-007' }]] },
   { g: '할인 상태', id: 'SCR-CART-010', name: '담긴 상품 없음', st: '빈 장바구니', opts: { cartType: 'single', preset: 'empty' },
     pins: [['empty', { t: '빈 장바구니', b: ['현행 안내 문구를 유지합니다.'], r: 'POL-001, POL-002, POL-003' }], ['paybox', { t: '결제 정보', b: ['금액은 0원, 총 할인 금액 영역 미노출, 토글 비활성화입니다.'], r: 'POL-027, POL-028, POL-029, POL-030, POL-039' }]] },
-  { g: '장바구니 타입', id: 'SCR-CART-011', name: '통합 장바구니1 · 통합2(개별쿠폰)', st: '공급사 묶음별 장바구니 쿠폰', opts: { cartType: 'int1', preset: 'base' },
+  { g: '장바구니 타입', id: 'SCR-CART-011', name: '통합 장바구니2(개별쿠폰)', st: '공급사 묶음별 장바구니 쿠폰', opts: { cartType: 'int2each', preset: 'base' },
     pins: [['group-sum', COMMON.groupSum], ['ccoupon-group', COMMON.ccouponGroup], ['disc-cc', { t: '장바구니 쿠폰 합계', b: ['공급사 묶음별로 계산한 장바구니 쿠폰 할인의 합계를 1줄로 노출합니다.'], r: 'POL-020, POL-021' }]] },
   { g: '장바구니 타입', id: 'SCR-CART-012', name: '통합 장바구니2(통합쿠폰)', st: '전체 1개 장바구니 쿠폰', opts: { cartType: 'int2all', preset: 'base' },
     pins: [['ccoupon-all', COMMON.ccouponAll], ['disc-cc', { t: '장바구니 쿠폰', b: ['장바구니 전체 합계에 1회 적용합니다. 본사+공급사 쿠폰은 공급사 구분 없이 적용합니다.'], r: 'POL-020, POL-021, POL-022, POL-023, POL-024, POL-025, POL-026' }]] },
+  { g: '장바구니 타입', id: 'SCR-CART-023', name: '통합 장바구니1', st: '본사·공급사 상품을 함께 담은 상태', opts: { cartType: 'int1', preset: 'base' },
+    pins: [['ccoupon-all', COMMON.ccouponAll], ['disc-cc', { t: '장바구니 쿠폰', b: ['본사·공급사 상품 모두 본사 배송 정책을 따르므로 개별 장바구니와 같이 장바구니 쿠폰 버튼을 전체에 1개 노출합니다.', '공급사 묶음별 버튼은 노출하지 않습니다. 쿠폰 적용 대상 상품은 발행 주체 기준을 따릅니다.'], r: 'POL-020, POL-021, POL-025, POL-041' }]] },
+  { g: '할인 상태', id: 'SCR-CART-024', name: '체크 상품 0건', st: '상품은 담겨 있고 모두 체크 해제', opts: { cartType: 'single', preset: 'base', uncheckAll: true },
+    pins: [['goods', { t: '총 상품 금액 0원 노출', b: ['체크한 상품이 없으면 총 상품 금액·상품 금액·배송비를 0원으로 노출합니다. 빈 장바구니와 같은 금액 영역을 유지하며 숨기지 않습니다.', '총 할인 금액 영역은 노출하지 않고, 최종 결제 금액은 0원입니다.'], r: 'POL-008, POL-030, POL-058' }], ['toggle', { t: '토글 비활성화', b: ['적용 가능한 할인이 없어 OFF 모양으로 비활성화합니다. 상품을 다시 체크하면 활성화합니다.'], r: 'POL-039' }]] },
   { g: '기타', id: 'SCR-CART-013', name: '정기배송 탭', st: '현행 유지', opts: { cartType: 'single', preset: 'base', tab: 'subs' },
     pins: [['tabs', COMMON.tabs], ['paybox', { t: '정기배송 결제 정보', b: ['총 상품 금액, 배송비, 총 결제 금액, 정기배송 신청 버튼을 현행대로 유지합니다.', '할인 영역·토글·쿠폰 버튼을 노출하지 않습니다.'], r: 'POL-001, POL-002, POL-003' }], ['subs-note', { t: '자동결제 금액 안내', b: ['현행 안내 문구를 유지합니다.'], r: 'POL-001, POL-002, POL-003' }]] },
   { g: '기타', id: 'SCR-CART-014', name: '모바일 (반응형)', st: '390px', width: 390, opts: { cartType: 'single', preset: 'base' },
     pins: [['toggle', COMMON.toggle], ['disc', COMMON.disc], ['final', COMMON.final], ['order-btn', { t: '주문하기', b: ['모바일에서는 결제 정보가 상품 목록 아래로 내려가며, 결제 정보 구성과 동작은 PC와 같습니다.', '주문하기 버튼 위치·고정 여부는 현행 반응형 스킨을 따릅니다.'], r: 'POL-004, POL-005, POL-006, POL-007' }]] },
   { g: '기타', id: 'SCR-CART-015', name: '비회원', st: '로그인하지 않은 상태', opts: { cartType: 'single', preset: 'base', loggedIn: false },
     pins: [['disc', { t: '상품 할인만 적용', b: ['비회원은 보유 쿠폰이 없어 쿠폰 할인이 없습니다. 쿠폰 처리는 현행 주문서와 같습니다.'], r: 'POL-022, POL-023, POL-024, POL-025, POL-026' }]] },
+  { g: '스킨 · 베이직심플·모던심플(PC)', id: 'SCR-CART-020', name: '할인 있음 (2칸 배치)', st: '총 할인 금액 노출', opts: { cartType: 'single', preset: 'base', skin: 'basic' },
+    pins: [['goods', LAYOUT], ['disc', COMMON.disc], ['final', COMMON.final]] },
+  { g: '스킨 · 베이직심플·모던심플(PC)', id: 'SCR-CART-021', name: '할인 없음 (총 상품 금액 오른쪽 고정)', st: '할인 0건 · 할인 없는 비회원', opts: { cartType: 'single', preset: 'noDiscount', skin: 'basic' },
+    pins: [['toggle', { t: '토글 비활성화', b: ['적용 가능한 할인이 없어 OFF 모양으로 비활성화합니다.'], r: 'POL-039' }], ['goods', { t: '총 상품 금액 오른쪽 고정', b: ['총 할인 금액 영역을 노출하지 않으므로 총 상품 금액을 오른쪽 칸에 둡니다. 왼쪽 칸은 비워 둡니다.', '할인이 없는 비회원도 같습니다.'], r: 'POL-027, POL-028, POL-029, POL-030' }]] },
+  { g: '스킨 · 베이직심플·모던심플(PC)', id: 'SCR-CART-022', name: '토글 OFF (쿠폰 할인만 있던 장바구니)', st: '상품 할인 없이 쿠폰만 적용되던 상태에서 토글을 끈 상태', opts: { cartType: 'single', preset: 'noDiscount', skin: 'basic' }, setup: function (c) { c.set({ coupons: CART_DATA.COUPONS.slice(), toggle: false, manualSel: { P: {}, C: {} } }); },
+    pins: [['toggle', { t: '토글 OFF', b: ['쿠폰을 모두 해제해 할인이 0원이 됩니다. 토글은 비활성화하지 않고 다시 켤 수 있습니다.'], r: 'POL-035, POL-039' }], ['goods', { t: '총 상품 금액 오른쪽 이동', b: ['총 할인 금액 영역이 사라지면 총 상품 금액이 오른쪽 칸으로 이동합니다(SCR-CART-021과 같은 위치).', '토글을 다시 켜면 쿠폰이 적용되어 2칸 배치로 돌아갑니다.'], r: 'POL-027, POL-028, POL-029, POL-030, POL-038' }]] },
   { g: '주문서 진입 쿠폰 처리', id: 'SCR-CART-016', name: '사용안함 · 장바구니 쿠폰 이어서 적용', st: '장바구니에서 중복 불가 쿠폰을 직접 적용 후 주문하기', opts: { cartType: 'single', preset: 'base', maxAuto: 'off' }, setup: function (c) { c.set({ toggle: false, manualSel: { P: { hq2: { single: 'P2', dups: [] } }, C: {} } }); c.order(); },
     pins: [['order-setting', { t: '판정 기준', b: ['관리자 쿠폰 기본 설정 > 최대 할인 자동 적용 값으로 판정합니다. 장바구니 토글 ON·OFF는 판정에 쓰지 않습니다.', '이 레이어는 목업 확인용입니다. 실제 주문서 화면 구성은 현행과 같습니다.'], r: 'POL-052' }],
       ['order-coupons', { t: '사용안함: 이어서 적용', b: ['주문하기 시점 장바구니에 적용된 쿠폰을 같은 적용 대상으로 주문서에 이어서 적용합니다. 토글이 자동 적용한 쿠폰과 고객이 직접 고른 쿠폰 모두 같습니다.', '주문서는 쿠폰을 새로 자동 선택하지 않습니다.', '할인 금액은 전달하지 않고 주문서에서 다시 계산합니다.', '주문서 사용 조건(유효기간, 사용 완료, 결제수단 지정, 회원 추가 혜택, 적립금 동시사용)을 충족하지 못한 쿠폰은 주문서 기존 방식대로 해제·안내하고, 다른 쿠폰을 대신 선택하지 않습니다.'], r: 'FR-014, INT-010, POL-053, POL-054' }]] },

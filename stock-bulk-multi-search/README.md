@@ -7,7 +7,7 @@
 | 목업 | [`index.html`](./index.html) · [바로 보기](https://donghoim.github.io/Makeshop/stock-bulk-multi-search/) | 재고 일괄 관리 검색 영역, 복수 검색 결과·오류 안내 |
 | HTML 화면정의서 | [`screen-spec.html`](./screen-spec.html) · [바로 보기](https://donghoim.github.io/Makeshop/stock-bulk-multi-search/screen-spec.html) | 화면 8개, 번호 마커와 DESCRIPTION |
 | 기획 문서 | [`08_Spec/`](./08_Spec) | 사양 정의서(FR 4·POL 16·AC 24), 요구사항 정의서, 정책서, 와이어프레임 초안, CS 운영·응대 가이드 |
-| 테스트 케이스 | [`qa/`](./qa) | 품질관리팀 표준 템플릿 기준 TC 29건(P0~P2) |
+| 테스트 케이스 | [`qa/`](./qa) | 품질관리팀 표준 템플릿 기준 TC 28건(P0~P2) |
 
 ## 실행 방법
 

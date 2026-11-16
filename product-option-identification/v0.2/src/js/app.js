@@ -1,20 +1,49 @@
-// 옵션코드 목업 화면: 전체 상품 관리·삭제 상품 조회·상품 등록/수정·옵션 팝업 3종·재고 일괄 관리·재입고 알림 관리
+// 옵션코드 목업 화면: 전체 상품 관리·삭제 상품 조회·상품 등록/수정·옵션 팝업 3종·재고 일괄 관리(옵션별 재고 수정 팝업)
 (function () {
   'use strict';
   const M = window.OptModel;
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const won = (n) => Number(n || 0).toLocaleString('ko-KR');
-  const HELP = '상품 저장이 완료되면 옵션코드가 자동으로 부여됩니다. 발급된 코드는 수정할 수 없으며, 운영자가 입력하는 관리코드와 다릅니다.';
+  const HELP = '상품 저장이 완료되면 옵션코드가 자동으로 부여됩니다. 코드는 수정할 수 없으며, 운영자가 입력하는 관리코드와 다릅니다. 옵션값 이름을 바꾸거나 지우면 해당 옵션은 새 옵션코드가 부여됩니다.';
+  const HYB_HELP = '상품 저장이 완료되면 옵션코드가 자동으로 부여됩니다. 코드는 수정할 수 없으며, 운영자가 입력하는 관리코드와 다릅니다. 하이브리드 옵션은 옵션값 이름을 바꿔도 옵션코드를 유지합니다.'; // 하이브리드는 이름을 바꿔도 코드 유지(POL-020)
+  const EX = 'M1100006925-000000005';
   const help = (tip) => '<span class="help" tabindex="0" data-tip="' + esc(tip || HELP) + '">?</span>';
   const qhelp = '<span class="help" tabindex="0" data-tip="기존 화면의 도움말입니다.">?</span>';
+  // 옵션 팝업의 기존 문구(demoshop01 실제 화면 원문, 2026-11-16 확인)
+  const STATUS = ['판매', '품절', '노출안함', '일시품절', '배송지연'];
+  const qh = (t) => '<span class="help" tabindex="0" data-tip="' + esc(t) + '">?</span>';
+  const TIP = {
+    price: '옵션가격은 +, - 모두 사용가능 합니다. Ex) 100, -100, 100\n중복부과 : 주문수량과 동일하게 옵션가격이 부과됩니다. (도매/기간 할인 적용됩니다.)\n단일부과 : 주문수량과 상관없이 옵션가격이 1회만 부과됩니다. (도매 할인만 적용됩니다.)\n조합옵션은 "중복부과"만 됩니다.',
+    stock: '현재 상품의 재고수량을 보여줍니다.\n+ : 현재 상품의 재고 수량에 변경할 재고 수량을 더하기 합니다.\n- : 현재 상품의 재고 수량에 변경할 재고 수량을 빼기 합니다.\n= : 현재 상품의 재고 수량을 변경할 재고 수량으로 치환합니다.',
+    status: '현재 상품의 상태를 나타냅니다.\n판매: 노출 O / 주문 O\n품절: 노출 O / 주문 X\n노출안함: 노출 X / 주문 X\n일시품절: 노출 O / 주문 X\n배송지연: 노출 O / 주문 O',
+    stop: '해당 수량이 되면 자동으로 옵션의 상태가 품절로 바뀝니다. 재고 수량을 기준으로 합니다.\n판매중지수량 미사용 시 마이너스 재고 수량이 되며, 자동 품절처리 되지 않습니다. 옵션 값별로 자동 품절되도록 하고자 하신다면 사용함으로 설정하시어 직접 수량 입력해 사용바랍니다.',
+    order: '현재 상품의 주문수량을 보여줍니다. (주문시도 주문 포함)\n옵션 설정 이후 누적된 수량입니다.',
+    safe: '현재고 수량을 기준으로 합니다. 주문은 계속 이루어집니다.',
+    mcode: '업체에서 수동으로 코드를 관리 할 수 있습니다. 자동으로 생성되는 기본코드와 다릅니다.',
+    memo: '참고사항 등을 입력 할 수 있습니다. 쇼핑몰 구축 > 상품 화면 부가 설정 > 상품 옵션 비고 노출 설정을 통해 비고 값을 옵션에 노출시킬 수 있습니다.'
+  };
+  const NEWNOTE = '<li class="newnote">옵션값 이름을 바꾸거나 지우면 해당 옵션은 새 옵션코드가 부여됩니다.</li>';
+  const NOTE_BYTES = '<li>옵션명은 50바이트, 옵션값은 각각 200바이트까지 입력 가능합니다. (한글 1자 2바이트, 영문 1자 1바이트)</li>';
+  const NOTE_COMMA = '<li>옵션값과 옵션가격의 구분자는 콤마(,)입니다. (옵션값의 콤마(,) 개수와 옵션가격의 콤마(,) 개수는 일치해야 합니다.)</li>';
+  const NOTE_TAIL = '<li>특수한글 (웻, 뷁, 눝, 댧 등)로 옵션명 또는 옵션값 입력할 경우, 인식되지 않아 정상적으로 주문진행이 되지 않습니다.</li>' +
+    '<li>마이너스 옵션으로 상품가격이 마이너스가 되는 경우 쿠폰 사용 등 할인, 적립금액 계산이 정상적으로 되지 않을 수 있습니다.</li>' +
+    '<li>정기배송 신청이 되어 있는 상품의 옵션 변경 및 재조합 할 경우 정기배송 신청서의 해당 상품은 품절 상태로 변경됩니다.</li>';
+  const BASE_NOTES = '<ul class="pnote"><li>전체 옵션 개수는 30개까지 설정 가능하며, 조합은 10개까지 가능합니다.</li>' +
+    '<li>설정된 순서대로 옵션이 노출됩니다. (첫 번째 필드의 화살표를 클릭 후 드래그 하면 순서가 변경됩니다.)</li>' + NOTE_BYTES + NOTE_COMMA + NEWNOTE +
+    '<li>조합된 옵션 사용 여부는 "옵션 재조합"으로 조합을 다시 하거나 조합된 옵션상에서 설정하시기 바랍니다.</li>' +
+    '<li>옵션명 참고사항 : 총 글자 수가 한글 기준 127자 (영문 기준 255byte) 초과 시 주문상세 팝업창과 주문서 다운로드 엑셀 파일에서<br>잘려 보이게 됩니다.</li>' +
+    '<li><label><input type="checkbox"> 최소 주문한도 설정을 상품단위로 적용합니다.</label></li>' +
+    '<li><label><input type="checkbox"> 최대 주문한도 설정을 상품단위로 적용합니다.</label><div class="pnote-sub">- 기본 ‘옵션단위’로 적용되는 주문한도 설정을 상품단위로 변경할 수 있습니다.<br>예시) A상품(55,빨강) , A상품(66,노랑) 구매 한 경우,<br>최소/최대 주문한도 3개 이상/이하 설정 시,<br>- 옵션단위: 각 각의 옵션 적용 상품에 대해 3개 이상/이하 주문해야 함<br>(A상품(55,빨강) 3개, A상품(66,노랑) 3개)<br>- 상품단위: 각 각의 옵션 적용 상품의 총 합을 3개 이상/이하 주문해야 함<br>(A상품(55,빨강) 1개, A상품(66,노랑) 2개)<br>- 상품단위 적용 기능은 멀티옵션 설정한 경우, 유효합니다.</div></li>' +
+    NOTE_TAIL + '</ul>';
+  const INDIV_NOTES = '<ul class="pnote">' + NOTE_BYTES + NOTE_COMMA + NEWNOTE + NOTE_TAIL + '</ul>';
+  const statusSel = (attrs, cur) => '<select ' + attrs + ' data-k="status">' + STATUS.map((x) => '<option' + (cur === x ? ' selected' : '') + '>' + x + '</option>').join('') + '</select>';
 
-  let db, alerts, nextUid, view = 'list', savedRef = null, draft = null, pop = null, toastTimer;
-  const search = { list: { key: '상품명', val: '' }, del: { key: '상품명', val: '' }, stock: { key: '상품명', val: '', done: false }, restock: { key: '상품명', val: '' } };
+  let db, nextUid, view = 'list', savedRef = null, draft = null, pop = null, toastTimer;
+  const search = { list: { key: '상품명', val: '' }, del: { key: '상품명', val: '' }, stock: { key: '상품명', val: '', done: false } };
 
   function init() {
     db = M.clone(window.OPT_MOCK.products);
-    alerts = M.clone(window.OPT_MOCK.alerts);
     nextUid = window.OPT_MOCK.nextUid;
     Object.keys(search).forEach((k) => Object.assign(search[k], { key: '상품명', val: '', done: false }));
   }
@@ -50,7 +79,7 @@
   function route() {
     const h = curHash().replace('#', '') || 'list';
     const [v, uid] = h.split('/');
-    view = ['list', 'del', 'reg', 'edit', 'stock', 'restock'].includes(v) ? v : 'list';
+    view = ['list', 'del', 'reg', 'edit', 'stock'].includes(v) ? v : 'list';
     if (view === 'edit') { savedRef = product(uid); if (!savedRef) { nav('list'); return; } draft = M.clone(savedRef); }
     else if (view === 'reg') { savedRef = null; draft = M.emptyProduct(); }
     pop = null;
@@ -59,7 +88,7 @@
   }
   function render() {
     document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('on', a.dataset.nav === (view === 'edit' ? 'list' : view)));
-    const html = { list: () => renderList(false), del: () => renderList(true), reg: renderProduct, edit: renderProduct, stock: renderStock, restock: renderRestock }[view]();
+    const html = { list: () => renderList(false), del: () => renderList(true), reg: renderProduct, edit: renderProduct, stock: renderStock }[view]();
     $('main').innerHTML = html;
     renderPop();
   }
@@ -73,7 +102,7 @@
   function matches(p, key, val) {
     const q = val.trim();
     if (!q) return true;
-    if (key === '옵션코드') return M.codesOf(p).some((c) => c.code === q);
+    if (key === '옵션코드') return M.codesOf(p).some((c) => c.code.includes(q)); // 부분 일치, 결과는 상품 단위
     if (key === '상품번호') return p.uid === q;
     return p.name.includes(q);
   }
@@ -84,7 +113,7 @@
       '<span class="stab">상품리스트 검색</span><table class="ftable searchbox"><tbody>' +
       '<tr><th>상품 상태</th><td><label><input type="radio" name="pst" checked>전체</label><label><input type="radio" name="pst">진열</label><label><input type="radio" name="pst">미진열</label></td></tr>' +
       '<tr><th>분류선택</th><td><select><option>대분류를 선택해 주세요.</option></select> <select><option>중분류를 선택해 주세요.</option></select> <select><option>소분류를 선택해 주세요.</option></select></td></tr>' +
-      '<tr><th>상품 검색</th><td>' + keySelect('skey', LIST_KEYS, s.key) + ' <input id="sval" style="width:260px" value="' + esc(s.val) + '" placeholder="' + (s.key === '옵션코드' ? '예: 1100006925-0005' : '') + '"></td></tr>' +
+      '<tr><th>상품 검색</th><td>' + keySelect('skey', LIST_KEYS, s.key) + ' <input id="sval" style="width:260px" value="' + esc(s.val) + '" placeholder="' + (s.key === '옵션코드' ? '예: ' + EX : '') + '"></td></tr>' +
       '</tbody></table><div class="center"><button class="bbtn lg" data-act="search" data-s="' + (del ? 'del' : 'list') + '">검 색</button></div>' +
       '<div class="result-head"><span>총 <b>' + rows.length + '</b>개 상품</span>' + (s.val ? '<button class="sbtn" data-act="search-clear" data-s="' + (del ? 'del' : 'list') + '">검색 초기화</button>' : '') + '</div>' +
       '<table class="ltable"><thead><tr><th style="width:30px"><input type="checkbox"></th><th style="width:56px">이미지</th><th>상품명</th><th style="width:150px">옵션</th><th style="width:80px">판매가</th><th style="width:60px">재고</th><th style="width:100px">등록일</th><th style="width:96px">관리</th></tr></thead><tbody>' +
@@ -169,6 +198,7 @@
   function openBase() {
     syncFields();
     pop = { type: 'base', mode: draft.optionUse === 'Y' ? draft.mode : 'combo', base: M.clone(draft.base), orig: M.clone(draft.base), err: '' };
+    if (!pop.base.composed) pop.base.composed = pop.base.rows.map((r) => r.key); // 마지막 재조합 결과(행 직접 삭제 허용 기준)
     render();
   }
   function renderBase() {
@@ -181,27 +211,27 @@
       '<td><input type="checkbox" data-o="' + i + '" data-k="oneclick"' + (o.oneclick ? ' checked' : '') + '></td><td><button class="ibtn minus" data-act="b-del" data-i="' + i + '">−</button></td></tr>').join('');
     const combined = w.mode === 'combo' && b.rows.length;
     const rows = M.sortByCode(b.rows);
-    const st = (r) => '<select data-r="' + r.id + '" data-k="status">' + ['판매', '품절', '숨김'].map((x) => '<option' + (r.status === x ? ' selected' : '') + '>' + x + '</option>').join('') + '</select>';
+    const st = (r) => statusSel('data-r="' + r.id + '"', r.status);
     return '<div class="win"><button class="win-x" data-act="pop-close" aria-label="닫기">✕</button><div class="ptop">상품옵션 등록/수정</div><div class="pbody">' +
-      '<div class="sec">옵션 설정<span class="r"><button class="sbtn" data-act="noop">다중 상품 옵션 불러오기</button> <button class="sbtn" data-act="noop">다른 상품 옵션 정보가져오기</button></span></div>' +
-      '<table class="ptable"><thead><tr><th style="width:28px"></th><th>필수</th><th>조합</th><th>옵션명</th><th>옵션값</th><th>옵션가격 ' + qhelp + '</th><th>재고관리 코드</th><th>사용</th><th>원클릭</th><th><button class="ibtn" data-act="b-add" aria-label="옵션 항목 추가">+</button></th></tr></thead><tbody>' +
+      '<div class="sec">옵션 설정<span class="r"><button class="sbtn" data-act="noop">다중 상품 옵션 불러오기</button> <button class="sbtn" data-act="noop">다른 상품 옵션 정보 가져오기</button></span></div>' +
+      '<table class="ptable"><thead><tr><th style="width:28px"></th><th>필수</th><th>조합</th><th>옵션명</th><th>옵션값</th><th>옵션가격 ' + qh(TIP.price) + '</th><th>재고관리 코드</th><th>사용</th><th>원클릭</th><th><button class="ibtn" data-act="b-add" aria-label="옵션 항목 추가">+</button></th></tr></thead><tbody>' +
       (optRows || '<tr><td colspan="10" class="empty">항목이 없습니다. 옵션 항목을 추가해 주세요.</td></tr>') + '</tbody></table>' +
-      '<div class="rowtools"><span><select style="width:190px"><option>저장옵션 선택</option></select> <button class="sbtn" data-act="noop">옵션적용</button> <button class="sbtn" data-act="noop">저장옵션관리</button></span><span><input style="width:130px"> <button class="sbtn" data-act="noop">현재옵션저장</button> <button class="sbtn" data-act="b-add">옵션 항목 추가</button></span></div>' +
-      '<ul class="pnote"><li>전체 옵션 개수는 30개까지 설정 가능하며, 조합은 10개까지 가능합니다.</li><li>설정된 순서대로 옵션이 노출됩니다.</li><li>옵션값과 옵션가격의 구분자는 콤마(,)입니다. (옵션값의 콤마(,) 개수와 옵션가격의 콤마(,) 개수는 일치해야 합니다.)</li><li>조합된 옵션 사용 여부는 "옵션 재조합"으로 조합을 다시 하거나 조합된 옵션상에서 설정하시기 바랍니다.</li></ul>' +
+      '<div class="rowtools"><span><select style="width:190px"><option>저장옵션 선택</option></select> <button class="sbtn" data-act="noop">옵션 적용</button> <button class="sbtn" data-act="noop">저장옵션 관리</button></span><span><input style="width:130px"> <button class="sbtn" data-act="noop">현재옵션저장</button> <button class="sbtn" data-act="b-add">옵션 항목 추가</button></span></div>' +
+      BASE_NOTES +
       '<div class="center">' + (combined ? '<button class="bbtn" data-act="b-combine">옵션 재조합</button>' : '<button class="bbtn" data-act="b-combine">선택된 옵션 조합하기</button><button class="bbtn" data-act="b-nocombo">조합 없이 옵션 적용</button>') + '</div>' +
       (w.mode === 'nocombo' && b.opts.length ? '<div class="msg-ok">조합 없이 옵션이 적용되었습니다. 미조합 옵션은 상품 단위로 재고를 관리합니다. 옵션코드는 상품 수정 화면 상단 요약에서 확인할 수 있습니다.</div>' : '') +
       (combined ? '<hr class="sep"><div class="optset"><div><b>옵션 출력 방식 선택</b> <label><input type="radio" name="otype">일체형(옵션 항목이 하나의 선택박스에 출력)</label> <label><input type="radio" name="otype" checked>분리형(옵션항목이 다수의 선택박스에 출력)</label></div>' +
         '<div><b>옵션 재고 관리 선택</b> <label><input type="radio" name="ostk">재고 사용 안함</label> <label><input type="radio" name="ostk" checked>재고 사용</label></div><div><b>옵션별 주문한도 설정</b> <label><input type="radio" name="olim" checked>미사용</label> <label><input type="radio" name="olim">사용</label></div></div>' +
         '<div class="sec" style="margin-top:4px">옵션 조합 확인 및 관리<span class="r"><button class="sbtn" data-act="noop">조합 옵션 기본 설정</button></span></div>' +
         '<div class="bulkbar">일괄처리: 선택항목의 <select id="bulk-k"><option value="price">옵션가격</option><option value="stock">재고</option><option value="status">상태</option></select><input id="bulk-v" style="width:180px"><button class="sbtn" data-act="b-bulk">적용</button></div>' +
-        '<div class="listwrap"><table class="ptable" style="border-top:0"><thead><tr><th style="width:30px"><input type="checkbox" data-act="chk-all"></th>' + b.heads.map((h) => '<th>' + esc(h) + '</th>').join('') +
-        '<th>옵션가격</th><th>재고 ' + qhelp + '</th><th>상태 ' + qhelp + '</th><th class="blue">판매중지수량 ' + qhelp + '</th><th>주문 ' + qhelp + '</th><th class="blue">확인요청수량 ' + qhelp + '</th><th class="code-col">옵션코드 ' + help() + '</th><th>관리코드 ' + qhelp + '</th><th>비고 ' + qhelp + '</th></tr></thead><tbody>' +
-        rows.map((r) => '<tr' + (!r.code && p.assigned ? ' class="new-row"' : '') + '><td><input type="checkbox" class="rowchk" data-id="' + r.id + '"></td>' + r.labels.map((l) => '<td class="l">' + esc(l) + '</td>').join('') +
+        '<div class="listwrap"><table class="ptable" style="border-top:0"><thead><tr><th style="width:30px"><input type="checkbox" data-act="chk-all"></th><th class="code-col">옵션코드 ' + help() + '</th>' + b.heads.map((h) => '<th>' + esc(h) + '</th>').join('') +
+        '<th>옵션가격</th><th>재고 ' + qh(TIP.stock) + '</th><th>상태 ' + qh(TIP.status) + '</th><th class="blue">판매중지수량 ' + qh(TIP.stop) + '</th><th>주문 ' + qh(TIP.order) + '</th><th class="blue">확인요청수량 ' + qh(TIP.safe) + '</th><th>관리코드 ' + qh(TIP.mcode) + '</th><th>비고 ' + qh(TIP.memo) + '</th></tr></thead><tbody>' +
+        rows.map((r) => '<tr' + (!r.code && p.assigned ? ' class="new-row"' : '') + '><td><input type="checkbox" class="rowchk" data-id="' + r.id + '"></td><td class="code-col">' + codeCell(r.code, p) + '</td>' + r.labels.map((l) => '<td class="l">' + esc(l) + '</td>').join('') +
           '<td><input type="number" class="w80" data-r="' + r.id + '" data-k="price" value="' + esc(r.price) + '"></td><td><input type="number" class="w60" data-r="' + r.id + '" data-k="stock" value="' + esc(r.stock) + '"></td><td>' + st(r) + '</td>' +
-          '<td><select><option>사용</option></select> 0</td><td>0</td><td><select><option>사용</option></select> 0</td><td class="code-col">' + codeCell(r.code, p) + '</td>' +
+          '<td><select><option>사용</option></select> 0</td><td>0</td><td><select><option>사용</option></select> 0</td>' +
           '<td><input class="w110" data-r="' + r.id + '" data-k="mcode" value="' + esc(r.mcode) + '"></td><td><input class="w110" data-r="' + r.id + '" data-k="memo" value="' + esc(r.memo) + '"></td></tr>').join('') +
         '</tbody></table></div><div class="rowtools"><span><button class="sbtn red" data-act="b-delrows">선택옵션삭제</button> <button class="sbtn" data-act="b-addrow">옵션추가</button> <button class="sbtn" data-act="noop">항목숨기기</button></span></div>' +
-        '<ul class="pnote"><li>설정된 순서대로 옵션이 노출됩니다.</li><li>옵션항목 추가/수정/삭제를 원하는경우, <span style="color:#e60012">[통합옵션 매뉴얼 필독]</span></li></ul>' : '') +
+        '<ul class="pnote"><li>설정된 순서대로 옵션이 노출됩니다.</li><li>옵션항목 추가/수정/삭제를 원하는경우, <span style="color:#e60012">[통합옵션 매뉴얼 필독]</span></li><li>옵션별 주문한도 설정은 조합된 옵션에만 사용이 가능하며, 조합 + 미조합이 혼합된 경우는 수량제한이 적용되지 않으니 유의하시기 바랍니다.</li></ul>' : '') +
       (w.err ? '<p class="err">' + esc(w.err) + '</p>' : '') +
       '<div class="center"><button class="bbtn" data-act="b-save">저 장</button><button class="bbtn" data-act="noop">미리보기</button><button class="bbtn" data-act="pop-close">닫 기</button></div></div></div>';
   }
@@ -214,6 +244,7 @@
   function saveBase() {
     const w = pop;
     try { checkOpts(w.base.opts, w.orig.opts, w.mode === 'combo' ? w.base.rows : []); } catch (err) { w.err = err.message; return render(); }
+    if (w.mode === 'combo' && M.needsRecombine(w.base)) { w.err = '옵션값이 바뀌었습니다. [옵션 재조합]을 눌러 주세요.'; return render(); }
     if (w.mode === 'combo' && !w.base.rows.length) { w.err = '[선택된 옵션 조합하기]로 옵션을 조합해 주세요.'; return render(); }
     if (w.mode === 'nocombo' && !w.base.opts.some((o) => o.vals.length)) { w.err = '옵션명과 옵션값을 입력해 주세요.'; return render(); }
     draft.optionUse = 'Y'; draft.mode = w.mode; draft.base = w.base;
@@ -232,12 +263,14 @@
     const h = pop.h, p = draft, stk = h.stockUse === 'Y';
     const groups = h.groups.map((g, gi) => '<tr><td style="text-align:center"><div class="mv"><button data-act="h-up" data-g="' + gi + '"' + (gi === 0 ? ' disabled' : '') + ' aria-label="위로">▲</button><button data-act="h-down" data-g="' + gi + '"' + (gi === h.groups.length - 1 ? ' disabled' : '') + ' aria-label="아래로">▼</button></div></td>' +
       '<td style="text-align:center"><input type="checkbox" class="gsel" data-g="' + gi + '"></td><td><div class="gname"><button class="rbtn" data-act="h-addval" data-g="' + gi + '" aria-label="옵션값 추가">+</button><span>옵션명</span><input data-g="' + gi + '" data-k="name" value="' + esc(g.name) + '"><span>구매조건 설정 &nbsp;최소 <input style="width:50px"> 이상, 최대 <input style="width:50px"> 이하</span></div>' +
-      '<table class="vtable"><thead><tr><th rowspan="2"></th><th rowspan="2">옵션값</th><th rowspan="2">옵션 이미지</th><th colspan="2">구매제한</th><th rowspan="2">옵션가격</th>' + (stk ? '<th rowspan="2">재고</th><th rowspan="2">상태</th><th rowspan="2">판매중지 수량</th><th rowspan="2">주문</th><th rowspan="2">확인요청 수량</th>' : '') + '<th rowspan="2" class="code-col">옵션코드 ' + help() + '</th><th rowspan="2" style="width:22%">비고</th></tr><tr><th>최소</th><th>최대</th></tr></thead><tbody>' +
+      '<table class="vtable"><thead><tr><th rowspan="2"></th><th rowspan="2" class="code-col">옵션코드 ' + help(HYB_HELP) + '</th><th rowspan="2">옵션값</th><th rowspan="2">옵션 이미지</th><th colspan="2">구매제한</th><th rowspan="2">옵션가격</th>' + (stk ? '<th rowspan="2">재고</th>' : '') + '<th rowspan="2">상태</th>' + (stk ? '<th rowspan="2">판매중지 수량</th><th rowspan="2">주문</th><th rowspan="2">확인요청 수량</th>' : '') + '<th rowspan="2" style="width:22%">비고</th></tr><tr><th>최소</th><th>최대</th></tr></thead><tbody>' +
       g.values.map((v, vi) => '<tr' + (!v.code && p.assigned ? ' class="new-row"' : '') + '><td><button class="rbtn minus" data-act="h-delval" data-g="' + gi + '" data-v="' + vi + '" aria-label="옵션값 삭제">−</button></td>' +
-        '<td><input style="width:110px" data-g="' + gi + '" data-v="' + vi + '" data-k="text" value="' + esc(v.text) + '"></td><td><span class="noimg" style="width:24px;height:22px;display:inline-grid;place-items:center;background:#eee;color:#aaa;font-size:8px">no img</span> <input style="width:90px"> <button class="hsm">찾아보기</button></td>' +
+        '<td class="code-col">' + codeCell(v.code, p) + '</td><td><input style="width:110px" data-g="' + gi + '" data-v="' + vi + '" data-k="text" value="' + esc(v.text) + '"></td><td><span class="noimg" style="width:24px;height:22px;display:inline-grid;place-items:center;background:#eee;color:#aaa;font-size:8px">no img</span> <input style="width:90px"> <button class="hsm">찾아보기</button></td>' +
         '<td><input style="width:44px" value="' + esc(v.min) + '"></td><td><input style="width:44px" value="' + esc(v.max) + '"></td><td><input type="number" style="width:70px" data-g="' + gi + '" data-v="' + vi + '" data-k="price" value="' + esc(v.price) + '"></td>' +
-        (stk ? '<td><input type="number" style="width:56px" data-g="' + gi + '" data-v="' + vi + '" data-k="stock" value="' + esc(v.stock) + '"></td><td><select data-g="' + gi + '" data-v="' + vi + '" data-k="status">' + ['판매', '품절', '숨김'].map((x) => '<option' + (v.status === x ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></td><td><select><option>사용</option></select> 0</td><td>0</td><td><select><option>사용</option></select> 0</td>' : '') +
-        '<td class="code-col">' + codeCell(v.code, p) + '</td><td><input style="width:100%" data-g="' + gi + '" data-v="' + vi + '" data-k="memo" value="' + esc(v.memo) + '"></td></tr>').join('') +
+        (stk ? '<td><input type="number" style="width:56px" data-g="' + gi + '" data-v="' + vi + '" data-k="stock" value="' + esc(v.stock) + '"></td>' : '') +
+        '<td>' + statusSel('data-g="' + gi + '" data-v="' + vi + '"', v.status) + '</td>' +
+        (stk ? '<td><select><option>사용</option></select> 0</td><td>0</td><td><select><option>사용</option></select> 0</td>' : '') +
+        '<td><input style="width:100%" data-g="' + gi + '" data-v="' + vi + '" data-k="memo" value="' + esc(v.memo) + '"></td></tr>').join('') +
       '</tbody></table></td></tr>').join('');
     return '<div class="win hybrid"><button class="win-x" data-act="pop-close" aria-label="닫기">✕</button><div class="htop">make#</div><div class="hbody"><h2>상품옵션 등록/수정</h2>' +
       '<div class="hsec">옵션 조건 설정<span class="r"><button class="hsm" data-act="noop">다른 상품 옵션 정보 가져오기</button></span></div>' +
@@ -268,6 +301,7 @@
   function openIndiv() {
     syncFields();
     pop = { type: 'indiv', ind: M.clone(draft.indiv), orig: M.clone(draft.indiv), err: '' };
+    if (!pop.ind.composed) pop.ind.composed = pop.ind.rows.map((r) => r.name + '\u0001' + r.value); // 마지막 구성 결과
     render();
   }
   function renderIndiv() {
@@ -277,19 +311,19 @@
       '<td><button class="ibtn minus" data-act="i-del" data-i="' + i + '">−</button></td></tr>').join('');
     const rows = M.sortByCode(ind.rows);
     return '<div class="win"><button class="win-x" data-act="pop-close" aria-label="닫기">✕</button><div class="ptop">개별옵션 등록/수정</div><div class="pbody">' +
-      '<div class="sec">개별 옵션 설정 <small>(개별 옵션 개수는 10개 까지 가능)</small><span class="r"><button class="sbtn" data-act="noop">다른 상품 옵션 정보가져오기</button></span></div>' +
-      '<table class="ptable"><thead><tr><th>개별 옵션명</th><th>옵션값</th><th>옵션가격 ' + qhelp + '</th><th>사용</th><th><button class="ibtn" data-act="i-add" aria-label="개별 옵션 항목 추가">+</button></th></tr></thead><tbody>' +
+      '<div class="sec">개별 옵션 설정 <small>(개별 옵션 개수는 10개 까지 가능)</small><span class="r"><button class="sbtn" data-act="noop">다른 상품 옵션 정보 가져오기</button></span></div>' +
+      '<table class="ptable"><thead><tr><th>개별 옵션명</th><th>옵션값</th><th>옵션가격 ' + qh(TIP.price) + '</th><th>사용</th><th><button class="ibtn" data-act="i-add" aria-label="개별 옵션 항목 추가">+</button></th></tr></thead><tbody>' +
       (optRows || '<tr><td colspan="5" class="empty">항목이 없습니다. 옵션 항목을 추가해 주세요.</td></tr>') + '</tbody></table>' +
-      '<div class="rowtools"><span><select style="width:190px"><option>저장옵션 선택</option></select> <button class="sbtn" data-act="noop">옵션적용</button> <button class="sbtn" data-act="noop">저장옵션관리</button></span><span><input style="width:130px"> <button class="sbtn" data-act="noop">현재옵션저장</button> <button class="sbtn" data-act="i-add">개별 옵션 항목 추가</button></span></div>' +
-      '<ul class="pnote"><li>옵션명은 50바이트, 옵션값은 각각 200바이트까지 입력 가능합니다.</li><li>옵션값과 옵션가격의 구분자는 콤마(,)입니다.</li></ul>' +
+      '<div class="rowtools"><span><select style="width:190px"><option>저장옵션 선택</option></select> <button class="sbtn" data-act="noop">옵션 적용</button> <button class="sbtn" data-act="noop">저장옵션 관리</button></span><span><input style="width:130px"> <button class="sbtn" data-act="noop">현재옵션저장</button> <button class="sbtn" data-act="i-add">개별 옵션 항목 추가</button></span></div>' +
+      INDIV_NOTES +
       '<div class="center"><button class="bbtn" data-act="i-compose">' + (ind.rows.length ? '옵션 재조합' : '옵션 구성하기') + '</button></div>' +
       (ind.rows.length ? '<hr class="sep"><div class="optset"><div><b>옵션 재고 관리 선택</b> <label><input type="radio" name="istk">재고 사용 안함</label> <label><input type="radio" name="istk" checked>재고 사용</label></div></div>' +
         '<div class="sec" style="margin-top:4px">옵션 조합 확인 및 관리<span class="r"><button class="sbtn" data-act="noop">조합 옵션 기본 설정</button></span></div>' +
         '<div class="bulkbar">일괄처리: 선택항목의 <select id="bulk-k"><option value="price">옵션가격</option><option value="stock">재고</option><option value="status">상태</option></select><input id="bulk-v" style="width:180px"><button class="sbtn" data-act="i-bulk">적용</button></div>' +
-        '<div class="listwrap"><table class="ptable" style="border-top:0"><thead><tr><th style="width:30px"><input type="checkbox" data-act="chk-all"></th><th>개별 옵션명</th><th>개별 옵션값</th><th>개별 옵션가격</th><th>재고</th><th>상태</th><th class="code-col">옵션코드 ' + help() + '</th></tr></thead><tbody>' +
-        rows.map((r) => '<tr' + (!r.code && p.assigned ? ' class="new-row"' : '') + '><td><input type="checkbox" class="rowchk" data-id="' + r.id + '"></td><td class="l">' + esc(r.name) + '</td><td class="l">' + esc(r.value) + '</td>' +
+        '<div class="listwrap"><table class="ptable" style="border-top:0"><thead><tr><th style="width:30px"><input type="checkbox" data-act="chk-all"></th><th class="code-col">옵션코드 ' + help() + '</th><th>개별 옵션명</th><th>개별 옵션값</th><th>개별 옵션가격</th><th>재고</th><th>상태</th></tr></thead><tbody>' +
+        rows.map((r) => '<tr' + (!r.code && p.assigned ? ' class="new-row"' : '') + '><td><input type="checkbox" class="rowchk" data-id="' + r.id + '"></td><td class="code-col">' + codeCell(r.code, p) + '</td><td class="l">' + esc(r.name) + '</td><td class="l">' + esc(r.value) + '</td>' +
           '<td><input type="number" class="w80" data-ir="' + r.id + '" data-k="price" value="' + esc(r.price) + '"></td><td><input type="number" class="w60" data-ir="' + r.id + '" data-k="stock" value="' + esc(r.stock) + '"></td>' +
-          '<td><select data-ir="' + r.id + '" data-k="status">' + ['판매', '품절', '숨김'].map((x) => '<option' + (r.status === x ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></td><td class="code-col">' + codeCell(r.code, p) + '</td></tr>').join('') +
+          '<td>' + statusSel('data-ir="' + r.id + '"', r.status) + '</td></tr>').join('') +
         '</tbody></table></div><div class="rowtools"><span><button class="sbtn red" data-act="i-delrows">선택옵션삭제</button></span></div>' : '') +
       (pop.err ? '<p class="err">' + esc(pop.err) + '</p>' : '') +
       '<div class="center"><button class="bbtn" data-act="i-save">저 장</button><button class="bbtn" data-act="noop">미리보기</button><button class="bbtn" data-act="pop-close">닫 기</button></div></div></div>';
@@ -297,16 +331,23 @@
   function saveIndiv() {
     if (!pop.ind.rows.length) { pop.err = '[옵션 구성하기]로 개별옵션을 구성해 주세요.'; return render(); }
     try { checkOpts(pop.ind.opts, pop.orig.opts, pop.ind.rows.map((r) => ({ key: r.key.split('_')[1] }))); } catch (err) { pop.err = err.message; return render(); }
+    if (M.needsRecompose(pop.ind)) { pop.err = '옵션명이나 옵션값이 바뀌었습니다. [옵션 재조합]을 눌러 주세요.'; return render(); }
     draft.indivUse = 'Y'; draft.indiv = pop.ind;
     applyPopup('indiv');
   }
 
+  // 재조합 확인창(옵션 팝업 안의 레이어): 기존 조합이 있는 상태에서 [옵션 재조합]을 누르면 엽니다. 전체 상점 공통.
+  function renderConfirm() {
+    return '<div class="overlay cfm-ov"><div class="cfm" role="alertdialog" aria-modal="true" aria-labelledby="cfm-msg"><p id="cfm-msg">재조합 시 기존 데이터를 유지할까요?</p>' +
+      '<div class="cfm-btns"><button class="bbtn" data-act="b-recombine" data-keep="1">기존 데이터 유지</button><button class="bbtn" data-act="b-recombine" data-keep="0">초기화</button><button class="bbtn gray" data-act="b-cfm-cancel">취소</button></div></div></div>';
+  }
   function renderPop() {
     const box = $('pop');
     if (!pop) { box.innerHTML = ''; document.body.style.overflow = ''; return; }
     const prev = box.querySelector('.win');
     const top = prev ? prev.scrollTop : 0;
-    box.innerHTML = '<div class="overlay">' + { base: renderBase, hybrid: renderHybrid, indiv: renderIndiv }[pop.type]() + '</div>';
+    box.innerHTML = '<div class="overlay">' + { base: renderBase, hybrid: renderHybrid, indiv: renderIndiv, stockopt: renderStockOpt }[pop.type]() + '</div>';
+    if (pop.confirm) box.querySelector('.win').insertAdjacentHTML('beforeend', renderConfirm()); // 옵션 팝업 창 안의 레이어
     box.querySelector('.win').scrollTop = top;
     document.body.style.overflow = 'hidden';
   }
@@ -327,34 +368,40 @@
       '<div class="sec">상품/옵션 재고 관리<span class="r"><button class="sbtn" data-act="noop">엑셀 샘플 양식 다운</button> <button class="sbtn" data-act="noop">엑셀로 등록</button> <button class="sbtn" data-act="noop">검색된 상품 엑셀다운</button></span></div>' +
       '<table class="ltable"><thead><tr><th style="width:30px"><input type="checkbox"></th><th style="width:56px">이미지</th><th>제품명</th><th style="width:60px">진열 여부</th><th style="width:60px">현재 재고</th><th style="width:170px">재고수정</th><th style="width:80px">옵션별 재고</th></tr></thead><tbody>' +
       (rows.length ? rows.map((p) => '<tr><td><input type="checkbox"></td><td><span class="noimg">No<br>Image</span></td><td class="l"><b>' + esc(p.name) + '</b> <span class="uid">(' + p.uid + ')</span><div class="sub">' + esc(optionSummary(p)) + '</div></td><td>' + esc(p.display) + '</td><td>' + stockOf(p) + '</td>' +
-        '<td><select><option>+</option><option>-</option><option>=</option></select> <input type="number" style="width:60px"> <button class="sbtn" data-act="noop">수정</button></td><td><button class="sbtn" data-act="noop">옵션별 재고</button></td></tr>').join('')
+        '<td><select><option>+</option><option>-</option><option>=</option></select> <input type="number" style="width:60px"> <button class="sbtn" data-act="noop">수정</button></td><td><button class="sbtn" data-act="open-stockopt" data-uid="' + p.uid + '">옵션별 재고</button></td></tr>').join('')
         : '<tr><td colspan="7" class="empty">조건에 맞는 검색 결과가 없습니다.</td></tr>') + '</tbody></table>' +
       '<ul class="pnote" style="margin-top:12px"><li style="color:#e60012">옵션 개별 재고를 설정한 상품은 일괄 수정이 가능하지않습니다.</li><li>"검색 포함 전체 옵션 노출"을 체크하시면 검색된 옵션이 포함된 해당 상품의 전체 옵션이 노출됩니다.</li></ul></div>';
   }
 
-  // ---------- 재입고 알림 관리 ----------
-  const RESTOCK_KEYS = ['상품명', '상품코드', '상품번호', '옵션코드', '키워드', '스타일코드', '상품 특이사항'];
-  function optionStock(p, code) {
-    const k = M.kindOf(p);
-    if (k === 'combo') { const r = p.base.rows.find((x) => x.code === code); return r ? r.stock : 0; }
-    if (k === 'hybrid') { for (const g of p.hybrid.groups) { const v = g.values.find((x) => x.code === code); if (v) return v.stock; } }
-    return p.stock;
+  // 옵션별 재고 수정 팝업: 조합 이후의 판매 단위 목록이라 재조합·코드 변경이 없습니다. 옵션코드는 맨 앞 열.
+  function unitsOf(p) {
+    const k = M.kindOf(p), out = [];
+    if (k === 'combo') M.sortByCode(p.base.rows).forEach((r) => out.push({ ref: r, code: r.code, label: r.labels.join(' / ') }));
+    if (k === 'hybrid') p.hybrid.groups.forEach((g) => g.values.forEach((v) => out.push({ ref: v, code: v.code, label: g.name + ': ' + v.text })));
+    if (k === 'simple') out.push({ ref: p, code: p.simple.code, label: '기본 품목' });
+    if (p.indivUse === 'Y') M.sortByCode(p.indiv.rows).forEach((r) => out.push({ ref: r, code: r.code, label: '[개별] ' + r.name + ': ' + r.value }));
+    return out;
   }
-  function renderRestock() {
-    const s = search.restock, q = s.val.trim();
-    const rows = alerts.filter((a) => { const p = product(a.uid); if (!p || p.state !== 'active') return false;
-      if (!q) return true; if (s.key === '옵션코드') return a.code === q && M.codesOf(p).some((c) => c.code === q); if (s.key === '상품번호') return p.uid === q; return p.name.includes(q); });
-    const r2 = (label, inner) => '<tr><th>' + label + '</th><td>' + inner + '</td></tr>';
-    return '<div class="page mpage"><div class="mhead"><h2>재입고 알림 관리</h2><span>상품 &gt; 부가 기능 &gt; 재입고 알림 관리</span></div><h3>상품검색</h3>' +
-      '<table class="mtable"><tbody>' + r2('상품 조건', '<label><input type="radio" name="rc" checked>재입고 알림 신청 리스트</label><label><input type="radio" name="rc">일시품절</label><label><input type="radio" name="rc">일시품절+재입고 알림 상품</label>') +
-      r2('상품 수량', '<label><input type="radio" name="rq" checked>전체</label><label><input type="radio" name="rq">무제한</label>') + r2('진열 여부', '<label><input type="radio" name="rd" checked>전체</label><label><input type="radio" name="rd">노출</label><label><input type="radio" name="rd">미노출</label>') +
-      r2('상품 분류', '<select><option>대분류</option></select> <select><option>중분류</option></select> <select><option>소분류</option></select>') +
-      r2('검색어', keySelect('skey', RESTOCK_KEYS, s.key) + ' <input id="sval" style="width:320px" value="' + esc(s.val) + '">') + '</tbody></table>' +
-      '<div class="center"><button class="mbtn" data-act="search" data-s="restock">검색</button></div>' +
-      '<div class="result-head"><h3 style="margin:0">검색결과</h3><span><select><option>10개씩 보기</option></select> <button class="sbtn" data-act="noop">엑셀다운로드</button></span></div>' +
-      '<table class="ltable mlist"><thead><tr><th style="width:30px"><input type="checkbox"></th><th style="width:56px">이미지</th><th>상품명</th><th style="width:76px">상품가격</th><th style="width:90px">특이사항</th><th style="width:60px">상품수량</th><th style="width:56px">신청(명)</th><th style="width:66px">알림 미발송</th><th style="width:76px">신청자 리스트</th></tr></thead><tbody>' +
-      (rows.length ? rows.map((a) => { const p = product(a.uid); return '<tr><td><input type="checkbox"></td><td><span class="noimg">No<br>Image</span></td><td class="l"><b>' + esc(p.name) + '</b><div class="sub">옵션: ' + esc(a.option) + '</div></td><td>' + won(p.price) + '</td><td class="sub">' + esc(a.note) + '</td><td>' + optionStock(p, a.code) + '</td><td>' + a.requests + '</td><td>' + a.unsent + '</td><td><button class="sbtn" data-act="noop">보기</button></td></tr>'; }).join('')
-        : '<tr><td colspan="9" class="empty">리스트가 없습니다.</td></tr>') + '</tbody></table><div style="margin-top:8px"><button class="sbtn" data-act="noop">선택삭제</button></div></div>';
+  function renderStockOpt() {
+    const p = product(pop.uid), us = unitsOf(p);
+    return '<div class="win" style="width:760px"><button class="win-x" data-act="pop-close" aria-label="닫기">✕</button><div class="ptop">옵션별 재고 수정</div><div class="pbody">' +
+      '<div class="sec">' + esc(p.name) + ' <small>(' + p.uid + ')</small></div>' +
+      '<table class="ptable"><thead><tr><th class="code-col">옵션코드 ' + help() + '</th><th>옵션</th><th style="width:70px">현재 재고</th><th style="width:150px">재고수정</th><th style="width:60px">상태</th></tr></thead><tbody>' +
+      us.map((u, i) => '<tr><td class="code-col">' + codeCell(u.code, p) + '</td><td class="l">' + esc(u.label) + '</td><td>' + (+u.ref.stock || 0) + '</td>' +
+        '<td><select data-so="' + i + '" data-k="op"><option>+</option><option>-</option><option>=</option></select> <input type="number" min="0" style="width:60px" data-so="' + i + '" data-k="qty"></td><td>' + esc(u.ref.status || '판매') + '</td></tr>').join('') +
+      '</tbody></table><ul class="pnote"><li>조합된 옵션 목록입니다. 옵션 추가·삭제와 재조합은 상품 수정의 옵션등록/수정에서 할 수 있습니다.</li></ul>' +
+      '<div class="center"><button class="bbtn" data-act="so-save">수 정</button><button class="bbtn" data-act="pop-close">닫 기</button></div></div></div>';
+  }
+  function saveStockOpt() {
+    const p = product(pop.uid), us = unitsOf(p);
+    let n = 0;
+    us.forEach((u, i) => {
+      const q = document.querySelector('[data-so="' + i + '"][data-k="qty"]').value, op = document.querySelector('[data-so="' + i + '"][data-k="op"]').value;
+      if (q === '') return;
+      const cur = +u.ref.stock || 0, v = Math.max(0, Number(q) || 0);
+      u.ref.stock = op === '+' ? cur + v : op === '-' ? Math.max(0, cur - v) : v; n++;
+    });
+    pop = null; render(); toast(n ? '재고를 수정했습니다. 옵션코드는 바뀌지 않습니다.' : '수정할 재고 수량을 입력해 주세요.');
   }
 
   // ---------- 이벤트 ----------
@@ -363,7 +410,7 @@
   function bulk(list) {
     const ids = checkedIds(), k = $('bulk-k').value, v = $('bulk-v').value;
     if (!ids.length) return toast('일괄 적용할 옵션을 선택해 주세요.');
-    list.filter((r) => ids.includes(r.id)).forEach((r) => { r[k] = k === 'status' ? (['판매', '품절', '숨김'].includes(v) ? v : r.status) : Number(v) || 0; });
+    list.filter((r) => ids.includes(r.id)).forEach((r) => { r[k] = k === 'status' ? (STATUS.includes(v) ? v : r.status) : Number(v) || 0; });
     render();
   }
 
@@ -387,11 +434,17 @@
       case 'open-base': openBase(); break;
       case 'open-hybrid': openHybrid(); break;
       case 'open-indiv': openIndiv(); break;
+      case 'open-stockopt': pop = { type: 'stockopt', uid: t.dataset.uid }; render(); break;
+      case 'so-save': saveStockOpt(); break;
       case 'pop-close': pop = null; render(); break;
       // 기본옵션
       case 'b-add': pop.base.opts.push(M.newOpt()); pop.err = ''; render(); break;
       case 'b-del': pop.base.opts.splice(i, 1); render(); break;
-      case 'b-combine': try { pop.base = M.recombine(pop.base, pop.orig); pop.mode = 'combo'; pop.err = ''; } catch (err) { pop.err = err.message; } render(); break;
+      case 'b-combine': if (pop.mode === 'combo' && pop.base.rows.length) { pop.confirm = true; render(); break; }
+        try { pop.base = M.recombine(pop.base, pop.orig); pop.mode = 'combo'; pop.err = ''; } catch (err) { pop.err = err.message; } render(); break;
+      case 'b-recombine': pop.confirm = false;
+        try { pop.base = M.recombine(pop.base, pop.orig, t.dataset.keep === '1'); pop.mode = 'combo'; pop.err = ''; toast(t.dataset.keep === '1' ? '옵션값이 같은 조합은 기존 데이터를 유지했습니다.' : '재고와 상태를 초기화했습니다. 옵션값이 같은 조합의 옵션코드는 유지됩니다.'); } catch (err) { pop.err = err.message; } render(); break;
+      case 'b-cfm-cancel': pop.confirm = false; render(); break;
       case 'b-nocombo': if (!pop.base.opts.some((o) => o.vals.length)) { pop.err = '옵션명과 옵션값을 입력해 주세요.'; } else { pop.mode = 'nocombo'; pop.err = ''; } render(); break;
       case 'b-bulk': bulk(pop.base.rows); break;
       case 'b-delrows': { const ids = checkedIds(); if (!ids.length) { toast('삭제할 옵션을 선택해 주세요.'); break; } pop.base.rows = pop.base.rows.filter((r) => !ids.includes(r.id)); render(); break; }
@@ -425,7 +478,7 @@
     }
     if (el.name === 'iuse') { syncFields(); draft.indivUse = val; render(); return; }
     if (el.name === 'hstk' && pop) { pop.h.stockUse = val; render(); return; }
-    if (el.id === 'skey') { const s = $('sval'); if (s) s.placeholder = val === '옵션코드' ? '예: 1100006925-0005' : ''; return; }
+    if (el.id === 'skey') { const s = $('sval'); if (s) s.placeholder = val === '옵션코드' ? '예: ' + EX : ''; return; }
     if (!pop || !k) return;
     try {
       if (d.o !== undefined) {
@@ -449,7 +502,7 @@
     } catch (err) { pop.err = err.message; render(); }
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && pop) { pop = null; render(); }
+    if (e.key === 'Escape' && pop) { if (pop.confirm) pop.confirm = false; else pop = null; render(); }
     if (e.key === 'Enter' && e.target.id === 'sval') { const b = document.querySelector('[data-act="search"]'); if (b) b.click(); }
   });
 

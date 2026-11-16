@@ -94,7 +94,7 @@ table { border-collapse: collapse; }
 
 /* 도움말 ? 아이콘 */
 .help { display: inline-grid; place-items: center; width: 14px; height: 14px; border: 1px solid #8fb1df; background: #fff; color: #3a6fd8; font-size: 10px; font-weight: 700; cursor: help; vertical-align: -2px; position: relative; margin-left: 3px; }
-.help:hover::after, .help:focus::after { content: attr(data-tip); position: absolute; top: 18px; left: -120px; z-index: 50; width: 260px; padding: 7px 9px; border: 1px solid #888; background: #fffef2; color: #333; font-weight: 400; font-size: 11px; line-height: 1.5; text-align: left; white-space: normal; box-shadow: 1px 1px 3px rgba(0, 0, 0, .2); }
+.help:hover::after, .help:focus::after { content: attr(data-tip); position: absolute; top: 18px; left: -120px; z-index: 50; width: 260px; padding: 7px 9px; border: 1px solid #888; background: #fffef2; color: #333; font-weight: 400; font-size: 11px; line-height: 1.5; text-align: left; white-space: pre-line; box-shadow: 1px 1px 3px rgba(0, 0, 0, .2); }
 
 /* 옵션코드 표시 */
 .code { font-family: Consolas, "Courier New", monospace; font-size: 12px; color: #1d1d1d; user-select: all; }
@@ -193,15 +193,17 @@ td.code-col { background: #f7faff !important; }
   .win { max-height: 100vh; }
 }
 
-/* 재입고 알림 관리(신규 디자인 화면) */
-.mpage { font-family: "Malgun Gothic", sans-serif; }
-.mhead { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 26px; }
-.mhead h2 { margin: 0; font-size: 22px; font-weight: 700; }
-.mhead span { color: #777; font-size: 11px; }
-.mpage h3 { font-size: 15px; margin: 0 0 10px; }
-.mtable { width: 100%; border-top: 1px solid #ccc; }
-.mtable th, .mtable td { border-bottom: 1px solid #e6e6e6; padding: 8px 12px; text-align: left; }
-.mtable th { width: 160px; background: #f7f7f7; font-weight: 400; color: #555; }
-.mtable label { margin-right: 40px; }
-.mbtn { height: 34px; padding: 0 40px; border: 0; background: #2d6be4; color: #fff; font-size: 13px; cursor: pointer; }
-.mlist { border-top: 1px solid #999; }
+
+/* 안내 문구 추가 표시 */
+
+.pnote li.newnote{color:#1e7a3c;font-weight:bold}
+
+/* 재조합 확인창(레이어) */
+.cfm-ov { z-index: 60; align-items: center; background: rgba(0, 0, 0, .25); }
+.cfm { width: 360px; max-width: calc(100% - 32px); background: #fff; border: 1px solid #555; box-shadow: 0 6px 24px rgba(0, 0, 0, .35); padding: 26px 20px 18px; text-align: center; }
+.cfm p { margin: 0 0 20px; font-size: 13px; color: #222; }
+.cfm-btns { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+.cfm-btns .bbtn { margin: 0; }
+
+td.code-col, th.code-col { white-space: nowrap; }
+.pnote-sub{margin:4px 0 0 12px;line-height:1.7}

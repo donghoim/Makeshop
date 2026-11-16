@@ -5,9 +5,9 @@
 | 구분 | 위치 | 내용 |
 |---|---|---|
 | 목업 | [`index.html`](./index.html) · [바로 보기](https://donghoim.github.io/Makeshop/product-option-identification/v0.2/) | 옵션 유형별 옵션코드 표시, 상품 검색 조건 |
-| HTML 화면정의서 | [`screen-spec.html`](./screen-spec.html) · [바로 보기](https://donghoim.github.io/Makeshop/product-option-identification/v0.2/screen-spec.html) | 화면 13개, 번호 마커와 DESCRIPTION |
-| 기획 문서 | [`08_Spec/`](./08_Spec) | 사양 정의서(FR 8·POL 47·AC 31), 요구사항 정의서, 정책서, 와이어프레임 초안, CS 운영·응대 가이드 |
-| 테스트 케이스 | [`qa/`](./qa) | 품질관리팀 표준 템플릿 기준 TC 48건(P0~P2) |
+| HTML 화면정의서 | [`screen-spec.html`](./screen-spec.html) · [바로 보기](https://donghoim.github.io/Makeshop/product-option-identification/v0.2/screen-spec.html) | 화면 16개, 번호 마커와 DESCRIPTION |
+| 기획 문서 | [`08_Spec/`](./08_Spec) | 사양 정의서(FR 11·POL 51·AC 35), 요구사항 정의서, 정책서, 와이어프레임 초안, CS 운영·응대 가이드 |
+| 테스트 케이스 | [`qa/`](./qa) | 품질관리팀 표준 템플릿 기준 TC 61건(P0~P2) |
 
 ## 실행 방법
 

@@ -9,14 +9,14 @@
   let idc = 1000;
   const nid = (p) => p + (++idc);
   const clone = (v) => JSON.parse(JSON.stringify(v));
-  const pad = (n) => String(n).padStart(4, '0');
+  const pad = (n) => String(n).padStart(9, '0'); // 순번 9자리, 0 채움. 999999999를 넘으면 자릿수가 늘어납니다.
   const seqOf = (code) => (code ? Number(String(code).split('-').pop()) : Infinity);
   const splitList = (t) => String(t || '').split(',').map((s) => s.trim()).filter(Boolean);
   const now = () => new Date().toISOString().slice(0, 19).replace('T', ' ');
 
   // 옵션값 문자열을 다시 읽을 때 기존 옵션값 id를 이어 받습니다.
   // 1) 같은 이름은 같은 id. 저장 전 팝업 안에서 지웠다가 다시 넣은 이름은 팝업을 열 때의 id(origVals)를 되살립니다.
-  // 2) 같은 자리의 기존 이름이 입력값에서 사라졌으면 이름 변경(같은 id)으로 봅니다. 값 추가와 함께 바꿔도 같습니다.
+  // 2) 위치로 맞추지 않습니다. 글자가 다른 값은 이름을 바꿨더라도 새 옵션값(새 코드)입니다.
   function reconcile(oldVals, texts, prices, origVals) {
     const used = new Set();
     const pool = [...oldVals, ...(origVals || []).filter((o) => !oldVals.some((x) => x.id === o.id))];
@@ -27,9 +27,7 @@
     });
     out.forEach((v, i) => {
       if (v) return;
-      const o = oldVals[i];
-      if (o && !used.has(o.id) && !texts.includes(o.text)) { used.add(o.id); out[i] = { ...o, text: texts[i] }; }
-      else out[i] = { id: nid('v'), text: texts[i], price: 0 };
+      out[i] = { id: nid('v'), text: texts[i], price: 0 };
     });
     out.forEach((v, i) => { v.price = Number(prices[i]) || 0; });
     return out;
@@ -42,9 +40,14 @@
     return opt;
   }
 
-  // 조합옵션 재조합: 조합에 쓰는 옵션명 구성이 같으면 같은 조합(옵션값 id 묶음)의 행을 그대로 유지합니다.
+  // 조합옵션 재조합: 조합에 쓰는 옵션명 구성이 같으면 같은 조합(옵션값 id 묶음)의 행과 옵션코드를 유지합니다.
   // orig(팝업을 열 때의 상태)를 함께 보므로 저장 전에 지웠다 다시 만든 조합도 원래 행·코드를 되살립니다.
-  function recombine(base, orig) {
+  // keep: 재조합 확인창 선택. true(기존 데이터 유지)는 같은 조합의 재고·상태·관리코드 등을 유지하고,
+  // false(초기화)는 같은 조합도 재고 0·상태 판매로 초기화합니다. 옵션코드는 어느 쪽이든 유지합니다.
+  // 옵션가격은 어느 쪽이든 옵션 설정에 입력한 값으로 다시 계산합니다.
+  const RESET = { stock: 0, status: '판매', stop: 0, mcode: '', memo: '' };
+  function recombine(base, orig, keep) {
+    if (keep === undefined) keep = true;
     const opts = base.opts.filter((o) => o.combo && o.vals.length);
     if (!opts.length) throw Error('조합할 옵션을 선택해 주세요. (조합 체크 후 옵션값 입력)');
     const sig = opts.map((o) => o.id).join('|');
@@ -55,22 +58,54 @@
       const key = c.map((v) => v.id).join('_');
       const labels = c.map((v) => v.text);
       const old = (sameStructure && base.rows.find((r) => r.key === key)) || (orig && sig === orig.sig && orig.rows.find((r) => r.key === key));
-      if (old) return { ...old, labels };
-      return { id: nid('r'), key, labels, price: c.reduce((a, v) => a + (v.price || 0), 0), stock: 0, status: '판매', stop: 0, mcode: '', memo: '', code: '' };
+      const price = c.reduce((a, v) => a + (v.price || 0), 0);
+      if (old) return keep ? { ...old, labels, price } : { ...old, ...RESET, labels, price };
+      return { id: nid('r'), key, labels, price, ...RESET, code: '' };
     });
-    return { ...base, sig, heads: opts.map((o) => o.name), rows };
+    return { ...base, sig, heads: opts.map((o) => o.name), rows, composed: rows.map((r) => r.key) };
+  }
+
+  // 저장 전 확인: 마지막 재조합 이후 조합에 쓰는 옵션 구성·옵션값이 바뀌었으면 재조합이 필요합니다.
+  // 조합 목록에서 행을 직접 지운 것은 허용합니다(composed는 재조합 직후의 전체 조합).
+  const comboSig = (opts) => opts.filter((o) => o.combo && o.vals.length).map((o) => o.id).join('|');
+  function comboKeys(opts) {
+    let keys = [''];
+    opts.filter((o) => o.combo && o.vals.length).forEach((o) => { keys = keys.flatMap((k) => o.vals.map((v) => (k ? k + '_' : '') + v.id)); });
+    return keys;
+  }
+  function needsRecombine(base) {
+    if (!base.rows.length) return false;
+    if (comboSig(base.opts) !== base.sig) return true;
+    const composed = new Set(base.composed || base.rows.map((r) => r.key));
+    const now = comboKeys(base.opts);
+    return now.some((k) => !composed.has(k)) || base.rows.some((r) => !now.includes(r.key));
   }
 
   // 개별옵션 구성: 개별 옵션값마다 1행, 같은 옵션값 id는 기존 행 유지.
+  const pairOf = (name, value) => name + '\u0001' + value;
+  const indivPairs = (opts) => opts.filter((o) => o.use !== 'N').flatMap((o) => o.vals.map((v) => pairOf(o.name, v.text)));
   function composeIndiv(indiv, origRows) {
-    const rows = [];
+    const pairs = indivPairs(indiv.opts);
+    // 서로 다른 개별옵션 항목이라도 옵션명·옵션값이 같으면 같은 판매 단위가 되므로 막습니다(POL-045).
+    if (new Set(pairs).size !== pairs.length) throw Error('같은 개별 옵션명과 옵션값이 중복되었습니다. 옵션명이나 옵션값을 확인해 주세요.');
+    const rows = [], used = new Set();
     indiv.opts.filter((o) => o.use !== 'N').forEach((o) => o.vals.forEach((v) => {
       const key = o.id + '_' + v.id;
-      const old = indiv.rows.find((r) => r.key === key) || (origRows || []).find((r) => r.key === key);
-      rows.push(old ? { ...old, name: o.name, value: v.text } : { id: nid('i'), key, name: o.name, value: v.text, price: v.price || 0, stock: 0, status: '판매', code: '' });
+      // 개별옵션은 옵션 항목과 옵션값 글자가 모두 같을 때만 유지(현행 동작). 기존 행 하나는 한 번만 이어 받습니다.
+      const same = (r) => r.name === o.name && r.value === v.text && !used.has(r.id);
+      const old = indiv.rows.find(same) || (origRows || []).find(same);
+      if (old) used.add(old.id);
+      rows.push(old ? { ...old, key, name: o.name, value: v.text } : { id: nid('i'), key, name: o.name, value: v.text, price: v.price || 0, stock: 0, status: '판매', code: '' });
     }));
     if (!rows.length) throw Error('개별 옵션명과 옵션값을 입력해 주세요.');
-    return { ...indiv, rows };
+    return { ...indiv, rows, composed: pairs };
+  }
+  // 저장 전 확인: 마지막 구성 이후 옵션명·옵션값·사용 여부가 바뀌었으면 다시 구성해야 합니다. 행 직접 삭제는 허용합니다.
+  function needsRecompose(indiv) {
+    if (!indiv.rows.length) return false;
+    const composed = new Set(indiv.composed || indiv.rows.map((r) => pairOf(r.name, r.value)));
+    const now = indivPairs(indiv.opts);
+    return now.some((k) => !composed.has(k)) || indiv.rows.some((r) => !now.includes(pairOf(r.name, r.value)));
   }
 
   // 하이브리드: 저장 전 팝업 안에서 지웠다 같은 옵션명·옵션값으로 다시 넣은 값은 팝업을 열 때의 값(id·코드)을 되살립니다.
@@ -94,9 +129,9 @@
 
   const kindOf = (p) => (p.optionUse === 'H' ? 'hybrid' : p.optionUse === 'Y' && p.mode === 'combo' ? 'combo' : 'simple');
   const typeSig = (p) => p.optionUse + (p.optionUse === 'Y' ? ':' + p.mode : '');
-  function issue(p) { p.maxSeq = (p.maxSeq || 0) + 1; return p.uid + '-' + pad(p.maxSeq); }
+  function issue(p) { p.maxSeq = (p.maxSeq || 0) + 1; return 'M' + p.uid + '-' + pad(p.maxSeq); }
 
-  // 코드가 없는 판매 단위에 화면 표시 순서대로 발급합니다. 보정 전 상품(assigned=false)은 발급하지 않습니다.
+  // 코드가 없는 판매 단위에 번호를 부여합니다. 다음 번호는 이 상품에서 쓴 가장 큰 번호 + 1입니다(지운 번호 재사용 없음). 보정 전 상품(assigned=false)은 발급하지 않습니다.
   function assign(p) {
     if (!p.assigned) return p;
     const kind = kindOf(p);
@@ -159,6 +194,6 @@
   const emptyProduct = () => ({ uid: null, name: '', price: '', stock: 0, state: 'draft', assigned: true, maxSeq: 0, optionUse: 'N', mode: 'combo',
     base: { opts: [], sig: '', heads: [], rows: [] }, simple: { code: '' }, hybrid: { stockUse: 'Y', groups: [] }, indivUse: 'N', indiv: { opts: [], rows: [] } });
 
-  return { clone, nid, splitList, setOptionValues, recombine, composeIndiv, restoreHybrid, sortByCode, kindOf, assign, validate, commit, codesOf, seqOf,
+  return { clone, nid, splitList, setOptionValues, recombine, needsRecombine, composeIndiv, needsRecompose, restoreHybrid, sortByCode, kindOf, assign, validate, commit, codesOf, seqOf,
     newOpt, newIndivOpt, newGroup, newHybridValue, emptyProduct };
 });

@@ -141,7 +141,6 @@ const AdsPage = (function () {
       <div class="kv__row"><dt>광고 계정명</dt><dd>${UI.esc(ad.name)} (${ad.id})</dd><dd class="kv__link"><a class="ext" data-ext="결제 수단 관리" data-url="https://adsmanager.facebook.com/adsmanager/manage/billing_payments?act=${act}&business_id=${a.businessId}">결제 수단 관리 ${UI.icon.ext}</a></dd></div>
       <div class="kv__row"><dt>계정 상태 ${UI.qmark("adStatus")}</dt><dd><span class="pill ${stCls}">${s.ads.status}</span></dd><dd class="kv__link"><a class="ext" data-ext="계정 상태 확인" data-url="https://adsmanager.facebook.com/adsmanager/manage/accounts?act=${act}&business_id=${a.businessId}">계정 상태 확인 ${UI.icon.ext}</a></dd></div>
       <div class="kv__row"><dt>이번 달 광고 지출</dt><dd>${UI.fmt(ad.monthSpend)}</dd></div>
-      <div class="kv__row"><dt>잔여 크레딧 ${UI.qmark("credit")}</dt><dd>${s.ads.billing === "선불" ? UI.fmt(ad.prepaidCredit) : "0(후불)"}</dd></div>
     </dl>`;
     const el = App.section("광고 계정 정보", "", body);
     ConnectPage.bindExt(el);
@@ -287,14 +286,15 @@ const AdsPage = (function () {
   /* ---------------- 5. 전환 추적 설정 ---------------- */
   function conversionSection() {
     const s = Store.s;
-    const draft = { naver: s.ads.naver, kakao: s.ads.kakao };
-    const row = (k, label, info, enabled, hint) => `
+    const draft = { capi: s.ads.capi, naver: s.ads.naver, kakao: s.ads.kakao };
+    const row = (k, label, info, enabled, hint, desc) => `
       <div class="conv-row"><div class="conv-row__label">${label} ${UI.qmark(info)}</div>
       <div class="seg seg--wide ${enabled ? "" : "is-disabled"}" data-k="${k}"><button type="button" data-v="on" ${enabled ? "" : "disabled"}>사용</button><button type="button" data-v="off" ${enabled ? "" : "disabled"}>사용안함</button></div>
-      ${hint ? `<span class="row-hint">${hint}</span>` : ""}</div>`;
+      ${hint ? `<span class="row-hint">${hint}</span>` : desc ? `<span class="row-hint">${desc}</span>` : ""}</div>`;
     const body = `
-      ${row("naver", "네이버페이 구매 전환", "naver", s.prereq.naver, s.prereq.naver ? "" : "네이버 연동 설정에서 주문형 네이버페이 사용 및 공통 인증키 입력 후 사용할 수 있습니다.")}
-      ${row("kakao", "카카오톡 체크아웃 구매 전환", "kakao", s.prereq.kakao, s.prereq.kakao ? "" : "카카오 연동 설정에서 톡 체크아웃 연동 후 사용할 수 있습니다.")}
+      ${row("capi", "Meta 전환 API(CAPI) 연동", "capi", true, "", "메이크샵 서버와 Meta 서버를 직접 연결해 브라우저 환경에 관계없이 광고 성과를 측정합니다.")}
+      ${row("naver", "네이버페이 구매 전환", "naver", s.prereq.naver, s.prereq.naver ? "" : "네이버 연동 설정에서 주문형 네이버페이 사용 및 공통 인증키 입력 후 사용할 수 있습니다.", "외부 결제(네이버페이 주문형) 구매 건을 CAPI 서버 이벤트로 Meta에 전송하여 구매 전환으로 집계합니다.")}
+      ${row("kakao", "카카오톡 체크아웃 구매 전환", "kakao", s.prereq.kakao, s.prereq.kakao ? "" : "카카오 연동 설정에서 톡 체크아웃 연동 후 사용할 수 있습니다.", "카카오톡 체크아웃 구매 건을 CAPI로 Meta에 전송하여 구매 전환으로 집계합니다.")}
       <div class="conv-foot"><button type="button" class="btn btn--primary btn--lg" data-act="save">확인</button></div>`;
     const el = App.section("전환 추적 설정", "", body);
     function paint() {

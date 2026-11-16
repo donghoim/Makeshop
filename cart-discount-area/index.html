@@ -28,6 +28,7 @@
   <p>목업 전용 패널입니다. 실제 화면에는 노출하지 않습니다.</p>
   <label for="screen">화면</label><select id="screen"><option value="cart">쇼핑몰 장바구니</option><option value="admin">관리자 쿠폰 기본 설정 모달</option></select>
   <label for="maxAuto">쿠폰 기본 설정 &gt; 최대 할인 자동 적용</label><select id="maxAuto"><option value="off">사용안함 (장바구니 쿠폰 이어서 적용)</option><option value="on">사용함 (주문서 자동 적용 기준)</option></select>
+  <label for="skin">스킨(결제 정보 배치)</label><select id="skin"><option value="rw">반응형 (오른쪽 사이드, 위아래 배치)</option><option value="basic">베이직심플·모던심플 PC (목록 아래, 2칸 배치)</option></select>
   <label for="cartType">장바구니 타입</label><select id="cartType"></select>
   <label for="preset">데이터</label><select id="preset"></select>
   <label for="member">회원 상태</label><select id="member"><option value="1">로그인 회원(쿠폰 보유)</option><option value="0">비회원</option></select>
@@ -44,7 +45,7 @@
   Object.keys(D.CART_TYPES).forEach(function (k) { $('cartType').add(new Option(D.CART_TYPES[k].label, k)); });
   Object.keys(D.PRESETS).forEach(function (k) { $('preset').add(new Option(D.PRESETS[k].label, k)); });
   var q = new URLSearchParams(location.search);
-  ['screen', 'maxAuto', 'cartType', 'preset', 'ship', 'view', 'member'].forEach(function (k) { if (q.get(k)) $(k).value = q.get(k); });
+  ['screen', 'maxAuto', 'skin', 'cartType', 'preset', 'ship', 'view', 'member'].forEach(function (k) { if (q.get(k)) $(k).value = q.get(k); });
   function remount() {
     var old = $('app'), fresh = document.createElement('div'); fresh.id = 'app'; old.replaceWith(fresh);
     $('frame').classList.toggle('mobile', $('view').value === 'mobile');
@@ -52,9 +53,9 @@
       window.admin = AdminCouponSetting.mount(fresh, { maxAuto: $('maxAuto').value, onSave: function (v) { $('maxAuto').value = v; } });
       return;
     }
-    window.cart = CartApp.mount(fresh, { live: true, cartType: $('cartType').value, preset: $('preset').value, shipBasis: $('ship').value, loggedIn: $('member').value === '1', maxAuto: $('maxAuto').value });
+    window.cart = CartApp.mount(fresh, { live: true, cartType: $('cartType').value, preset: $('preset').value, shipBasis: $('ship').value, loggedIn: $('member').value === '1', maxAuto: $('maxAuto').value, skin: $('skin').value });
   }
-  ['screen', 'maxAuto', 'cartType', 'preset', 'ship', 'view', 'member'].forEach(function (k) { $(k).addEventListener('change', remount); });
+  ['screen', 'maxAuto', 'skin', 'cartType', 'preset', 'ship', 'view', 'member'].forEach(function (k) { $(k).addEventListener('change', remount); });
   $('fab').onclick = function () { $('drawer').classList.add('open'); };
   $('close').onclick = function () { $('drawer').classList.remove('open'); };
   remount();
